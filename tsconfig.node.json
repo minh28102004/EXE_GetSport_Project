@@ -7,7 +7,7 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "Node", // ✅ sửa từ "bundler" ➝ "Node"
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
@@ -19,7 +19,11 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Bổ sung thêm types cho Node */
+    "types": ["node"],
+    // "typeRoots": ["./node_modules/@types", "./@types"]
   },
   "include": ["vite.config.ts"]
 }
