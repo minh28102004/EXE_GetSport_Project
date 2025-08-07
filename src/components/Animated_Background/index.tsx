@@ -3,6 +3,7 @@ import Particles from "react-tsparticles";
 import type { Engine } from "tsparticles-engine";
 import { loadSlim } from "tsparticles-slim"; 
 
+
 const AnimatedBackground: React.FC = () => {
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadSlim(engine);
@@ -12,12 +13,10 @@ const AnimatedBackground: React.FC = () => {
     <Particles
       id="tsparticles"
       init={particlesInit}
+       className="absolute top-0 left-0 w-full h-full z-0 bg-gradient-to-tl from-gray-50 via-gray-50 to-gray-50"
+
       options={{
-        background: {
-          color: {
-            value: "#F8FAFC",
-          },
-        },
+       
         fpsLimit: 60,
         interactivity: {
           events: {
@@ -39,7 +38,7 @@ const AnimatedBackground: React.FC = () => {
             value: "#00BFB3",
           },
           links: {
-            color: "#00BFB3",
+            color: "#009688", // Darker Grey for links
             distance: 150,
             enable: true,
             opacity: 0.5,
@@ -55,7 +54,7 @@ const AnimatedBackground: React.FC = () => {
               default: "bounce",
             },
             random: false,
-            speed: 2,
+            speed: 1,
             straight: false,
           },
           number: {
@@ -66,7 +65,7 @@ const AnimatedBackground: React.FC = () => {
             value: 80,
           },
           opacity: {
-            value: 0.5,
+            value: 0.6,
           },
           shape: {
             type: "circle",
@@ -77,7 +76,7 @@ const AnimatedBackground: React.FC = () => {
         },
         detectRetina: true,
       }}
-      className="absolute top-0 left-0 w-full h-full z-0"
+    
     />
   );
 };

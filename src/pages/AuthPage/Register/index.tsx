@@ -1,5 +1,4 @@
 import React from "react";
-import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -18,16 +17,10 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ toggleView }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm();
-
-  const password = watch("password");
-
-  const onSubmit = (data: any) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const data = Object.fromEntries(formData.entries());
     console.log("Registration data:", data);
   };
 
@@ -60,73 +53,49 @@ const Register: React.FC<RegisterProps> = ({ toggleView }) => {
           </p>
         </div>
 
-        <form className="space-y-4 mt-4" onSubmit={handleSubmit(onSubmit)}>
+        <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
           <CustomTextInput
             label="Tên người dùng:"
             name="username"
             icon={FaUser}
-            register={register}
-            errors={errors}
             placeholder="Nhập tên người dùng"
-            validation={{ required: "Vui lòng nhập tên người dùng" }}
+            required
           />
 
           <CustomTextInput
             label="Email:"
             name="email"
             icon={FaEnvelope}
-            register={register}
-            errors={errors}
             placeholder="Nhập email"
-            validation={{
-              required: "Vui lòng nhập email",
-              pattern: {
-                value: /^\S+@\S+$/i,
-                message: "Email không hợp lệ",
-              },
-            }}
+            type="email"
+            required
           />
 
           <CustomPasswordInput
             label="Mật khẩu:"
             name="password"
             icon={FaLock}
-            register={register}
-            errors={errors}
             placeholder="Nhập mật khẩu"
-            validation={{
-              required: "Vui lòng nhập mật khẩu",
-              minLength: {
-                value: 6,
-                message: "Mật khẩu phải có ít nhất 6 ký tự",
-              },
-            }}
+            required
           />
 
           <CustomPasswordInput
             label="Xác nhận mật khẩu:"
             name="confirmPassword"
             icon={FaLock}
-            register={register}
-            errors={errors}
             placeholder="Xác nhận lại mật khẩu"
-            validation={{
-              required: "Vui lòng xác nhận mật khẩu",
-              validate: (value: string) =>
-                value === password || "Mật khẩu không khớp",
-            }}
+            required
           />
 
           <div className="flex items-center">
             <input
               id="terms"
+              name="terms"
               type="checkbox"
-              {...register("terms", {
-                required: "Bạn phải đồng ý với điều khoản",
-              })}
+              required
               className="h-4 w-4 text-[#00BFB3] focus:ring-[#00BFB3] border-gray-300 rounded"
             />
-            <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
+            <label htmlFor="terms" className=" mt-0.5 ml-2 block text-sm text-gray-900">
               Tôi đồng ý với các{" "}
               <Link
                 to="/terms"
@@ -135,20 +104,14 @@ const Register: React.FC<RegisterProps> = ({ toggleView }) => {
                 điều khoản dịch vụ
               </Link>
             </label>
-            {errors.terms && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.terms.message as string}
-              </p>
-            )}
           </div>
 
-          <div
-            role="button"
-            onClick={handleSubmit(onSubmit)}
+          <button
+            type="submit"
             className="w-full cursor-pointer text-center py-3 px-4 rounded-md shadow-md text-sm font-semibold text-white bg-gradient-to-r from-teal-500 to-cyan-500 transition-all duration-300 transform hover:scale-[1.03] active:scale-95 hover:brightness-95"
           >
             Đăng Ký
-          </div>
+          </button>
         </form>
 
         <div className="mt-6">

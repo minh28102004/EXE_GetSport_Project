@@ -1,28 +1,23 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import type { FieldError, FieldErrors, UseFormRegister } from "react-hook-form";
 
 interface InputProps {
   label: string;
   name: string;
-  register: UseFormRegister<any>;
-  errors?: FieldErrors<any>;
-  validation?: Record<string, any>;
   placeholder?: string;
   icon?: React.ElementType;
+  type?: string;
+  required?: boolean;
 }
 
 export const CustomTextInput: React.FC<InputProps> = ({
   label,
   name,
-  register,
-  errors = {},
-  validation = {},
   placeholder = "",
   icon: Icon,
+  type = "text",
+  required = false,
 }) => {
-  const error = errors[name] as FieldError | undefined;
-
   return (
     <label className="block text-md font-medium text-gray-700">
       {label}
@@ -33,19 +28,15 @@ export const CustomTextInput: React.FC<InputProps> = ({
           </div>
         )}
         <input
-          type="text"
-          {...register(name, validation)}
+          type={type}
+          name={name}
           placeholder={placeholder}
+          required={required}
           className={`border border-gray-300 bg-white text-black rounded-md focus:outline-none focus:ring-1 focus:ring-[#00BFB3] px-2 py-2 w-full h-10 transition-all duration-200 ${
             Icon ? "pl-9" : ""
-          } ${error ? "border-red-500" : ""}`}
+          }`}
         />
       </div>
-      {error && (
-        <p className="mt-1 text-sm text-red-600">
-          {error.message}
-        </p>
-      )}
     </label>
   );
 };
@@ -53,14 +44,11 @@ export const CustomTextInput: React.FC<InputProps> = ({
 export const CustomPasswordInput: React.FC<InputProps> = ({
   label,
   name,
-  register,
-  errors = {},
-  validation = {},
   placeholder = "",
   icon: Icon,
+  required = false,
 }) => {
   const [show, setShow] = useState(false);
-  const error = errors[name] as FieldError | undefined;
 
   return (
     <label className="block text-md font-medium text-gray-700">
@@ -73,11 +61,12 @@ export const CustomPasswordInput: React.FC<InputProps> = ({
         )}
         <input
           type={show ? "text" : "password"}
-          {...register(name, validation)}
+          name={name}
           placeholder={placeholder}
+          required={required}
           className={`border border-gray-300 bg-white text-black rounded-md focus:outline-none focus:ring-1 focus:ring-[#00BFB3] px-2 py-2 pr-10 w-full h-10 transition-all duration-200 ${
             Icon ? "pl-9" : ""
-          } ${error ? "border-red-500" : ""}`}
+          }`}
         />
         <button
           type="button"
@@ -88,11 +77,6 @@ export const CustomPasswordInput: React.FC<InputProps> = ({
           {show ? <FaEyeSlash /> : <FaEye />}
         </button>
       </div>
-      {error && (
-        <p className="mt-1 text-sm text-red-600">
-          {error.message}
-        </p>
-      )}
     </label>
   );
 };

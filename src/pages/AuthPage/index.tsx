@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
 import AnimatedBackground from "@components/Animated_Background";
+import { Tooltip } from "@mui/material";
+import { FiArrowLeft } from "react-icons/fi";
 
 const AuthPage: React.FC = () => {
   const [isLoginView, setIsLoginView] = useState(true);
@@ -12,6 +15,16 @@ const AuthPage: React.FC = () => {
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
       <AnimatedBackground />
+
+      <Tooltip title="Quay về trang chủ" arrow placement="right">
+        <Link
+          to="/"
+          className="absolute top-5 left-5 z-20 group flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-md hover:shadow-xl transition-all duration-300 ring-2 ring-gray-300/50 hover:ring-sky-400/80"
+          aria-label="Quay về trang chủ"
+        >
+          <FiArrowLeft className="w-7 h-7 text-gray-600 group-hover:-translate-x-1 transition-transform duration-300" />
+        </Link>
+      </Tooltip>
 
       {/* Auth Container */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4">

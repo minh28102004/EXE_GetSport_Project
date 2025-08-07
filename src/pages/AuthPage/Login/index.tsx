@@ -1,9 +1,7 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaEnvelope, FaLock, FaFacebookF, FaApple } from "react-icons/fa";
-
 import logo from "@images/logo/logo.png";
 import { CustomTextInput, CustomPasswordInput } from "@components/Form_Input";
 
@@ -12,13 +10,10 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ toggleView }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const onSubmit = (data: any) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const data = Object.fromEntries(formData.entries());
     console.log("Login data:", data);
   };
 
@@ -51,25 +46,21 @@ const Login: React.FC<LoginProps> = ({ toggleView }) => {
           </p>
         </div>
 
-        <form className="space-y-4 mt-4" onSubmit={handleSubmit(onSubmit)}>
+        <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
           <CustomTextInput
             label="Email:"
             name="email"
             icon={FaEnvelope}
-            register={register}
-            errors={errors}
             placeholder="Nhập email hoặc tên đăng nhập"
-            validation={{ required: "Vui lòng nhập email hoặc tên đăng nhập" }}
+            required
           />
 
           <CustomPasswordInput
             label="Mật khẩu:"
             name="password"
             icon={FaLock}
-            register={register}
-            errors={errors}
             placeholder="Nhập mật khẩu"
-            validation={{ required: "Vui lòng nhập mật khẩu" }}
+            required
           />
 
           <div className="flex justify-end mt-3">
@@ -90,19 +81,18 @@ const Login: React.FC<LoginProps> = ({ toggleView }) => {
             />
             <label
               htmlFor="remember-me"
-              className="ml-2 block text-sm text-gray-900"
+              className="mt-0.5 ml-2 block text-sm text-gray-900"
             >
               Ghi nhớ đăng nhập
             </label>
           </div>
 
-          <div
-            role="button"
-            onClick={handleSubmit(onSubmit)}
+          <button
+            type="submit"
             className="w-full cursor-pointer text-center py-3 px-4 rounded-md shadow-md text-sm font-semibold text-white bg-gradient-to-r from-teal-500 to-cyan-500 transition-all duration-300 transform hover:scale-[1.03] active:scale-95 hover:brightness-95"
           >
             Đăng Nhập
-          </div>
+          </button>
         </form>
 
         {/* Divider */}

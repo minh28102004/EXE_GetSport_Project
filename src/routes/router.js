@@ -6,6 +6,7 @@ const endPoint = {
   USERHISTORY: "/userHistory",
   DASHBOARDLAYOUT: "/dashboard",
   UNAUTHORIZEDPAGE: "/unauthorizedPage",
+  TERMSOFSERVICE: "/terms",
 };
 
 export default endPoint;
