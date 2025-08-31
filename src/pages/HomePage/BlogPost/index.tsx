@@ -114,7 +114,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
   );
 };
 
-const BlogPost = ({ index }: { index: number }) => {
+const BlogPost = ({ index = 0 }: { index?: number }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Paging logic
@@ -131,10 +131,7 @@ const BlogPost = ({ index }: { index: number }) => {
         <div className="relative mx-auto">
           {/* Sub-title nhỏ 🏸 */}
           <div
-            className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-lg font-bold mb-0.5 animate-fadeInDown "
-            style={{
-              animationDelay: `${0.4 + index * 0.1}s`,
-            }}
+            className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-lg font-bold mb-0.5 animate-fadeInDown"
           >
             🏸 BLOG CẦU LÔNG CHUYÊN NGHIỆP
           </div>
