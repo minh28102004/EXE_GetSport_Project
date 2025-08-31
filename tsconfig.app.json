@@ -32,8 +32,9 @@
       "@hooks/*": ["src/hooks/*"],
       "@utils/*": ["src/utils/*"],
       "@services/*": ["src/services/*"],
+      "@images/*": ["src/images/*"],
       "@routes/*": ["src/routes/*"],
-      "@layouts/*": ["src/layouts/*"],
+      "@layout/*": ["src/layout/*"],
       "@api/*": ["src/api/*"],
       "@app/*": ["src/app/*"],
       "@redux/*": ["src/redux/*"]
