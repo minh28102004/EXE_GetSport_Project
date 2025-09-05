@@ -1,31 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
-// Define the User type
-interface User {
-  id?: number; // Optional for new users
+interface Court {
+  id?: number;
   name: string;
-  email: string;
-  role: string;
-  status: string;
+  type: string;
+  status: "Hoạt động" | "Bảo trì";
+  price: string;
+  time: string;
 }
 
-const UserForm: React.FC<{
-  user: User | null; // Allow user to be null for new user
-  onSave: (user: User) => void;
+interface CourtFormProps {
+  court: Court | null;
+  onSave: (court: Court) => void;
   onClose: () => void;
-}> = ({ user, onSave, onClose }) => {
-  const [formData, setFormData] = useState<User>({
-    name: "",
-    email: "",
-    role: "Admin",
-    status: "Hoạt động",
-  });
+}
 
-  useEffect(() => {
-    if (user) {
-      setFormData(user);
-    }
-  }, [user]);
+const CourtForm: React.FC<CourtFormProps> = ({ court, onSave, onClose }) => {
+  const [formData, setFormData] = useState<Court>(
+    court || { name: "", type: "", status: "Hoạt động", price: "", time: "" }
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,50 +30,78 @@ const UserForm: React.FC<{
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1 className="text-2xl font-bold">{user ? "Chỉnh sửa người dùng" : "Thêm người dùng"}</h1>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h2 className="text-lg font-bold">
+        {court ? "Chỉnh sửa sân" : "Thêm sân mới"}
+      </h2>
+
       <input
+        type="text"
         name="name"
         value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        placeholder="Tên"
-        className="border p-2 rounded-lg w-full mb-2"
+        onChange={handleChange}
+        placeholder="Tên sân"
+        className="w-full border px-3 py-2 rounded"
         required
       />
+
       <input
-        name="email"
-        value={formData.email}
-        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        placeholder="Email"
-        className="border p-2 rounded-lg w-full mb-2"
+        type="text"
+        name="type"
+        value={formData.type}
+        onChange={handleChange}
+        placeholder="Loại sân"
+        className="w-full border px-3 py-2 rounded"
         required
       />
+
       <select
-        value={formData.role}
-        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-        className="border p-2 rounded-lg w-full mb-2"
-      >
-        <option>Admin</option>
-        <option>Quản lý</option>
-        <option>Nhân viên</option>
-        <option>Khách hàng</option>
-      </select>
-      <select
+        name="status"
         value={formData.status}
-        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-        className="border p-2 rounded-lg w-full mb-4"
+        onChange={handleChange}
+        className="w-full border px-3 py-2 rounded"
       >
-        <option>Hoạt động</option>
-        <option>Bị khóa</option>
+        <option value="Hoạt động">Hoạt động</option>
+        <option value="Bảo trì">Bảo trì</option>
       </select>
-      <button type="submit" className="bg-[#23AEB1] text-white px-4 py-2 rounded-lg">
-        {user ? "Cập nhật" : "Thêm"}
-      </button>
-      <button type="button" onClick={onClose} className="bg-gray-300 text-black px-4 py-2 rounded-lg ml-2">
-        Hủy
-      </button>
+
+      <input
+        type="text"
+        name="price"
+        value={formData.price}
+        onChange={handleChange}
+        placeholder="Giá thuê"
+        className="w-full border px-3 py-2 rounded"
+        required
+      />
+
+      <input
+        type="text"
+        name="time"
+        value={formData.time}
+        onChange={handleChange}
+        placeholder="Thời gian hoạt động"
+        className="w-full border px-3 py-2 rounded"
+        required
+      />
+
+      <div className="flex justify-end gap-3">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+        >
+          Hủy
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-[#23AEB1] text-white rounded hover:bg-[#1e9697]"
+        >
+          Lưu
+        </button>
+      </div>
     </form>
   );
 };
 
-export default UserForm;
+export default CourtForm;
