@@ -18,7 +18,7 @@ const AuthPage: React.FC = () => {
 
       <Tooltip title="Quay về trang chủ" arrow placement="right">
         <Link
-          to="/"
+          to="/homePage"
           className="absolute top-5 left-5 z-20 group flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-md hover:shadow-xl transition-all duration-300 ring-2 ring-gray-300/50 hover:ring-sky-400/80"
           aria-label="Quay về trang chủ"
         >
