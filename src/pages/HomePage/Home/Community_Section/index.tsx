@@ -131,7 +131,7 @@ const CommunitySection = () => {
   }
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="py-12 sm:py-18 bg-gray-50">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-15">
         {/* Header */}
         <div className="text-center mb-10">

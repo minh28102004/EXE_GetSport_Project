@@ -35,7 +35,7 @@ const CourtSection = () => {
   };
 
   return (
-    <section className="py-12 bg-gradient-to-br from-slate-50 via-white to-teal-50 relative overflow-hidden">
+    <section className="py-12 sm:py-18 bg-gradient-to-br from-slate-50 via-white to-teal-50 relative overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-teal-100 rounded-full opacity-20 blur-3xl"></div>

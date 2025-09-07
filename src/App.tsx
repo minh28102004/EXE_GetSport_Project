@@ -1,7 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import MainLayout from "@pages/HomePage/mainLayout";
+import endPoint from "@routes/router";
+// User
+import HomePage from "@pages/HomePage/Home/mainSection";
+import AboutPage from "./pages/HomePage/About/mainSection";
+import BlogPost from "@pages/HomePage/BlogPost";
 import AuthPage from "@pages/AuthPage";
 import TermsOfServicePage from "@pages/TermsOfServicePage";
-import endPoint from "@routes/router";
 
 // Staff
 import StaffLayout from "./pages/OwnerPage/Layout/StaffLayout";
@@ -22,7 +27,17 @@ function App() {
     <Router>
       <Routes>
         {/* Public route */}
-        <Route path="/" element={<AuthPage />} />
+        <Route element={<MainLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path={endPoint.HOMEPAGE} element={<HomePage />} />
+          <Route path={endPoint.ABOUT} element={<AboutPage />} />
+          <Route path={endPoint.BLOGPOST} element={<BlogPost />} />
+          <Route
+            path={endPoint.TERMSOFSERVICE}
+            element={<TermsOfServicePage />}
+          />
+        </Route>
+        <Route path={endPoint.AUTH} element={<AuthPage />} />
 
         {/* Staff layout + nested routes */}
         <Route path="/Staff" element={<StaffLayout />}>
@@ -35,14 +50,19 @@ function App() {
         <Route path="/Admin" element={<AdminLayout />}>
           <Route path="Dashboard" element={<AdminDashboard />} />
           <Route path="CourtManagement" element={<CourtManagementAdmin />} />
-          <Route path="BookingManagement" element={<BookingManagementAdmin />} />
+          <Route
+            path="BookingManagement"
+            element={<BookingManagementAdmin />}
+          />
           <Route path="BookingReport" element={<BookingReport />} />
           <Route path="UserManagement" element={<UserManagement />} />
-         
         </Route>
 
         {/* Terms */}
-        <Route path={endPoint.TERMSOFSERVICE} element={<TermsOfServicePage />} />
+        <Route
+          path={endPoint.TERMSOFSERVICE}
+          element={<TermsOfServicePage />}
+        />
       </Routes>
     </Router>
   );

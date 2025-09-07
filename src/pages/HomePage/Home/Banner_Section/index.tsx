@@ -76,7 +76,7 @@ const BannerSection = () => {
   }, [packages.length]);
 
   return (
-    <div className="pb-8">
+    <div className="pb-12">
       {/* Hero Background Banner - Improved */}
       <div className="absolute inset-0 h-screen">
         <div className="relative h-screen w-full">

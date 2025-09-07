@@ -6,7 +6,7 @@ const HighLightSection = () => {
 
   return (
     <>
-      <section className="py-14 bg-white">
+      <section className="py-20 bg-white">
         <div className=" mx-auto px-4 sm:px-6 lg:px-30">
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">

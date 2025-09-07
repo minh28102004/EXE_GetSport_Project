@@ -18,7 +18,7 @@ const CourtStatusBadge = ({ status }: { status: Court["status"] }) => {
 // Main component
 const MapSection = () => {
   return (
-    <section className="py-12 bg-gradient-to-br from-[#f0fdfa] to-[#e6fffa]">
+    <section className="py-12 sm:py-18 bg-gradient-to-br from-[#f0fdfa] to-[#e6fffa]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-10">
