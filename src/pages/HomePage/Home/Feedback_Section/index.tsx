@@ -229,7 +229,7 @@ const FeedbackSection: React.FC = () => {
         <div className="text-center mt-12">
           <Link
             to="/blogPost"
-            className="group inline-flex items-center gap-1 px-3 py-2 border-2 border-teal-200 text-teal-600 rounded-xl font-semibold 
+            className="group inline-flex items-center gap-1 px-3 py-2 border-2 border-teal-200 text-teal-600 rounded-xl font-medium
                hover:bg-teal-50 hover:border-teal-300 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
           >
             Xem Thêm Đánh Giá

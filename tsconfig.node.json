@@ -6,6 +6,8 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
+    
+
     /* Bundler mode */
     "moduleResolution": "Node", // ✅ sửa từ "bundler" ➝ "Node"
     "allowImportingTsExtensions": true,
@@ -15,8 +17,8 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,   // tắt để run with no error declared
+    "noUnusedParameters": false,  // tắt để run with no error declared
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,

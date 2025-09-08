@@ -63,7 +63,7 @@ const UserManagement: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null); // For editing user
 
   const handleDelete = (id: number) => {
-    setUsers(users.filter(user => user.id !== id));
+    setUsers(users.filter((user) => user.id !== id));
   };
 
   const openModal = (user: User | null = null) => {
@@ -78,7 +78,7 @@ const UserManagement: React.FC = () => {
 
   const handleUserSaved = (user: User) => {
     if (user.id) {
-      setUsers(users.map(u => (u.id === user.id ? user : u)));
+      setUsers(users.map((u) => (u.id === user.id ? user : u)));
     } else {
       setUsers([...users, { ...user, id: users.length + 1 }]);
     }
@@ -102,19 +102,19 @@ const UserManagement: React.FC = () => {
         <div className="p-4 bg-white shadow rounded-xl">
           <p className="text-gray-500">Hoạt động</p>
           <h2 className="text-xl font-bold text-green-600">
-            {users.filter(user => user.status === "Hoạt động").length}
+            {users.filter((user) => user.status === "Hoạt động").length}
           </h2>
         </div>
         <div className="p-4 bg-white shadow rounded-xl">
           <p className="text-gray-500">Bị khóa</p>
           <h2 className="text-xl font-bold text-red-600">
-            {users.filter(user => user.status === "Bị khóa").length}
+            {users.filter((user) => user.status === "Bị khóa").length}
           </h2>
         </div>
         <div className="p-4 bg-white shadow rounded-xl">
           <p className="text-gray-500">Admin</p>
           <h2 className="text-xl font-bold text-purple-600">
-            {users.filter(user => user.role === "Admin").length}
+            {users.filter((user) => user.role === "Admin").length}
           </h2>
         </div>
       </div>
@@ -129,23 +129,22 @@ const UserManagement: React.FC = () => {
             className="w-full border pl-10 p-2 rounded-lg"
           />
         </div>
-        <select
-          className="border p-2 rounded-lg"
-        >
+        <select className="border p-2 rounded-lg">
           <option>Tất cả vai trò</option>
           <option>Admin</option>
           <option>Quản lý</option>
           <option>Nhân viên</option>
           <option>Khách hàng</option>
         </select>
-        <select
-          className="border p-2 rounded-lg"
-        >
+        <select className="border p-2 rounded-lg">
           <option>Tất cả trạng thái</option>
           <option>Hoạt động</option>
           <option>Bị khóa</option>
         </select>
-        <button onClick={() => openModal()} className="flex items-center gap-2 bg-[#23AEB1] text-white px-4 py-2 rounded-lg">
+        <button
+          onClick={() => openModal()}
+          className="flex items-center gap-2 bg-[#23AEB1] text-white px-4 py-2 rounded-lg"
+        >
           <FiUserPlus /> Thêm người dùng
         </button>
       </div>
@@ -223,7 +222,8 @@ const UserManagement: React.FC = () => {
         {/* Pagination */}
         <div className="flex justify-between items-center mt-4">
           <p className="text-sm text-gray-500">
-            Hiển thị 1 đến {users.length} trong tổng số {users.length} người dùng
+            Hiển thị 1 đến {users.length} trong tổng số {users.length} người
+            dùng
           </p>
           <div className="flex gap-2">
             <button className="px-3 py-1 border rounded-lg">Trước</button>
@@ -237,15 +237,18 @@ const UserManagement: React.FC = () => {
       </div>
 
       {/* User Form Modal */}
-{/* User Form Modal */}
-{/* User Form Modal */}
-{isModalOpen && (
-  <div className="modal-overlay">
-    <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
-      <UserForm user={currentUser} onSave={handleUserSaved} onClose={closeModal} />
-    </div>
-  </div>
-)}
+
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
+            <UserForm
+              user={currentUser}
+              onSave={handleUserSaved}
+              onClose={closeModal}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

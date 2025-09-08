@@ -143,19 +143,7 @@ const BlogPost = ({ index = 0 }: { index?: number }) => {
             chơi cầu lông trên khắp cả nước. Từ người mới bắt đầu đến pro
             player.
           </p>
-          {/* Floating elements decoration */}
-          <div
-            className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-teal-400 to-blue-400 rounded-full opacity-10 animate-bounce"
-            style={{ animationDelay: "1s" }}
-          ></div>
-          <div
-            className="absolute top-32 right-16 w-16 h-16 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full opacity-10 animate-bounce"
-            style={{ animationDelay: "1.5s" }}
-          ></div>
-          <div
-            className="absolute top-48 left-1/4 w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full opacity-10 animate-bounce"
-            style={{ animationDelay: "2s" }}
-          ></div>
+         
         </div>
       </section>
 
