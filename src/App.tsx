@@ -22,7 +22,7 @@ import UserManagement from "@pages/AdminPage/UserManagement";
 import AdminProfile from "@pages/AdminPage/AdminProfile";
 
 // Layout chung
-import ManagementLayout from "@layout/ManagementLayout";
+import ManagementLayout from "./Layout/ManagementLayout";
 
 function App() {
   return (
