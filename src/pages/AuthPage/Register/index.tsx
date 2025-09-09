@@ -1,186 +1,339 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
 import {
+  FaUser,
   FaEnvelope,
   FaLock,
   FaFacebookF,
   FaApple,
-  FaUser,
 } from "react-icons/fa";
-
-import logo from "@images/logo/logo.png";
+import { FcGoogle } from "react-icons/fc";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { GiShuttlecock } from "react-icons/gi";
 import { CustomTextInput, CustomPasswordInput } from "@components/Form_Input";
+import LoadingSpinner from "@components/Loading_Spinner";
+import useCustomForm from "@hooks/useReactHookForm";
+
+interface FormData {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  agreeTerms: boolean;
+}
 
 interface RegisterProps {
   toggleView: () => void;
+  onRegister?: (data: FormData) => void;
+  onSocialRegister?: (platform: string) => void;
 }
 
-const Register: React.FC<RegisterProps> = ({ toggleView }) => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    console.log("Registration data:", data);
+const Register: React.FC<RegisterProps> = ({
+  toggleView,
+  onRegister,
+  onSocialRegister,
+}) => {
+  const [password, setPassword] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [isMultiline, setIsMultiline] = useState(false);
+  const passwordDescriptionRef = useRef<HTMLParagraphElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    let strength = 0;
+    if (password) {
+      if (password.length >= 8) strength++;
+      if (/[A-Z]/.test(password)) strength++;
+      if (/[a-z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+    }
+    setPasswordStrength(strength);
+  }, [password]);
+
+  useEffect(() => {
+    if (passwordDescriptionRef.current) {
+      const computed = window.getComputedStyle(passwordDescriptionRef.current);
+      const lineHeight = parseFloat(computed.lineHeight);
+      const height = passwordDescriptionRef.current.offsetHeight;
+      setIsMultiline(height > lineHeight + 1); // +1 để tránh sai số
+    }
+  }, [passwordStrength]);
+
+  const getPasswordStrengthColor = () => {
+    switch (passwordStrength) {
+      case 0:
+        return "bg-gray-300 w-0";
+      case 1:
+        return "bg-red-500/80 w-1/5";
+      case 2:
+        return "bg-orange-400/80 w-2/5";
+      case 3:
+        return "bg-yellow-400 w-3/5";
+      case 4:
+        return "bg-lime-500 w-4/5";
+      case 5:
+        return "bg-green-600/80 w-full";
+      default:
+        return "bg-gray-200 w-0";
+    }
   };
 
+  const getPasswordStrengthLabel = () => {
+    switch (passwordStrength) {
+      case 0:
+        return "0%";
+      case 1:
+        return "20% - Rất yếu";
+      case 2:
+        return "40% - Yếu";
+      case 3:
+        return "60% - Trung bình";
+      case 4:
+        return "80% - Mạnh";
+      case 5:
+        return "100% - Rất mạnh";
+      default:
+        return "";
+    }
+  };
+
+  const { register, handleFormSubmit, errors, isSubmitting, reset, watch } =
+    useCustomForm<FormData>({
+      defaultValues: {
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        agreeTerms: false,
+      },
+      onSubmit: (data) => {
+        setIsLoading(true);
+        setTimeout(() => {
+          onRegister?.(data);
+          setIsLoading(false);
+          reset();
+        }, 1500);
+      },
+    });
+  const passwordValue = watch("password");
+  const confirmPasswordValue = watch("confirmPassword");
+
   return (
-    <motion.div
-      className="max-w-md w-full space-y-8"
-      initial={{ opacity: 0, y: 0 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="bg-white p-6 rounded-2xl shadow-lg">
-        <div className="text-center border-b border-gray-300 pb-4">
-          <motion.img
-            src={logo}
-            alt="Logo"
-            className="mx-auto w-44 h-20 mb-2 object-contain drop-shadow-lg"
-            initial={{ rotate: 10, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            whileHover={{
-              scale: 1.05,
-              rotate: -3,
-              filter: "drop-shadow(0 0 4px #00BFB3)",
-              transition: { type: "spring", stiffness: 300 },
-            }}
-          />
-          <h2 className="text-2xl font-bold text-gray-900">Đăng Ký</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Đăng ký liền tay, trải nghiệm liền ngay!
-          </p>
-        </div>
-
-        <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
-          <CustomTextInput
-            label="Tên người dùng:"
-            name="username"
-            icon={FaUser}
-            placeholder="Nhập tên người dùng"
-            required
-          />
-
-          <CustomTextInput
-            label="Email:"
-            name="email"
-            icon={FaEnvelope}
-            placeholder="Nhập email"
-            type="email"
-            required
-          />
-
-          <CustomPasswordInput
-            label="Mật khẩu:"
-            name="password"
-            icon={FaLock}
-            placeholder="Nhập mật khẩu"
-            required
-          />
-
-          <CustomPasswordInput
-            label="Xác nhận mật khẩu:"
-            name="confirmPassword"
-            icon={FaLock}
-            placeholder="Xác nhận lại mật khẩu"
-            required
-          />
-
-          <div className="flex items-center">
-            <input
-              id="terms"
-              name="terms"
-              type="checkbox"
-              required
-              className="h-4 w-4 text-[#00BFB3] focus:ring-[#00BFB3] border-gray-300 rounded"
-            />
-            <label htmlFor="terms" className=" mt-0.5 ml-2 block text-sm text-gray-900">
-              Tôi đồng ý với các{" "}
-              <Link
-                to="/terms"
-                className="text-[#00BFB3] hover:underline hover:brightness-75"
-              >
-                điều khoản dịch vụ
-              </Link>
-            </label>
+    <div className="flex items-center justify-center p-2">
+      <div className="relative w-full max-w-xl">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden transition-all duration-500 hover:scale-[1.02]">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-teal-500 via-teal-600 to-cyan-600 py-2.5 text-center">
+            <div className="mx-auto w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-1 backdrop-blur-sm transform transition-all duration-500 hover:scale-110 hover:rotate-12">
+              <GiShuttlecock className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-xl font-bold text-white">Get Sport</h1>
+            <p className="text-teal-100 text-sm">
+              Nền tảng đặt sân cầu lông chuyên nghiệp, dễ dàng, đáng tin cậy
+            </p>
           </div>
 
-          <button
-            type="submit"
-            className="w-full cursor-pointer text-center py-3 px-4 rounded-md shadow-md text-sm font-semibold text-white bg-gradient-to-r from-teal-500 to-cyan-500 transition-all duration-300 transform hover:scale-[1.03] active:scale-95 hover:brightness-95"
-          >
-            Đăng Ký
-          </button>
-        </form>
-
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+          {/* Form */}
+          <form onSubmit={handleFormSubmit} className="px-6 pt-3 pb-4 ">
+            <div className="text-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-800">Đăng ký</h2>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
+
+            {/* ==== INPUT GRID (2 COLUMN) ==== */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              <CustomTextInput
+                label="Tên người dùng"
+                name="username"
+                placeholder="Nhập tên người dùng"
+                icon={FaUser}
+                error={errors.username?.message}
+                required
+                register={register("username")}
+              />
+              <CustomTextInput
+                label="Email"
+                name="email"
+                placeholder="Nhập email"
+                icon={FaEnvelope}
+                error={errors.email?.message}
+                required
+                type="email"
+                register={register("email")}
+              />
+              <CustomPasswordInput
+                label="Mật khẩu"
+                name="password"
+                placeholder="Nhập mật khẩu"
+                icon={FaLock}
+                error={errors.password?.message}
+                required
+                register={register("password", {
+                  onChange: (e) => setPassword(e.target.value),
+                })}
+              />
+              {/* Password Strength Indicator */}
+              {password && (
+                <div
+                  className={`${isMultiline ? "mt-2" : "mt-4"}`} // margin ngoài thay đổi tùy multiline
+                >
+                  <span className="text-sm font-medium text-gray-700">
+                    Độ mạnh: {getPasswordStrengthLabel()}
+                  </span>
+                  <div className="h-2 rounded-full bg-gray-200 mt-0.5">
+                    <div
+                      className={`${getPasswordStrengthColor()} h-2 rounded-full transition-all duration-300`}
+                    />
+                  </div>
+                  <p
+                    className="mt-1.5 text-xs italic text-gray-500"
+                    ref={passwordDescriptionRef}
+                  >
+                    {" "}
+                    {/* Bỏ margin-top ở p */}
+                    {passwordStrength <= 1 &&
+                      "Mật khẩu quá yếu, hãy thêm chữ hoa, số hoặc ký tự đặc biệt."}
+                    {passwordStrength === 2 &&
+                      "Mật khẩu yếu, nên bổ sung thêm độ đa dạng ký tự."}
+                    {passwordStrength === 3 &&
+                      "Mức độ trung bình, có thể tốt hơn với nhiều ký tự hơn."}
+                    {passwordStrength === 4 && "Mạnh, bạn đang làm tốt!"}
+                    {passwordStrength === 5 && "Rất mạnh! Tuyệt vời!"}
+                  </p>
+                </div>
+              )}
+
+              <CustomPasswordInput
+                label="Xác nhận mật khẩu"
+                name="confirmPassword"
+                placeholder="Nhập lại mật khẩu"
+                icon={FaLock}
+                error={errors.confirmPassword?.message}
+                required
+                register={register("confirmPassword")}
+              />
+
+              {/* Feedback giống password strength */}
+              {confirmPasswordValue && (
+                <div className="mt-6 flex items-center gap-2">
+                  {confirmPasswordValue === passwordValue ? (
+                    <div className="w-full">
+                      <div className="flex items-center gap-1.5">
+                        <FaCheckCircle
+                          size={16}
+                          className="text-green-600/80 text-lg mb-0.5"
+                        />
+                        <span className="text-sm font-medium text-green-600">
+                          Mật khẩu khớp!
+                        </span>
+                      </div>
+                      <div className="h-2 rounded-full bg-gray-200 mt-1">
+                        <div className="w-full h-2 rounded-full bg-green-600/60 transition-all duration-300" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      <div className="flex items-center gap-1.5">
+                        <FaTimesCircle
+                          size={16}
+                          className="text-red-600/80 text-lg mb-0.5"
+                        />
+                        <span className="text-sm font-medium text-red-600">
+                          Mật khẩu chưa khớp
+                        </span>
+                      </div>
+                      <div className="h-2 rounded-full bg-gray-200 mt-1">
+                        <div className="w-2/5 h-2 rounded-full bg-red-600/60 transition-all duration-300" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Agree Terms */}
+            <label className="flex items-center gap-2 text-sm mb-5">
+              <input
+                type="checkbox"
+                className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500"
+                {...register("agreeTerms")}
+                required
+              />
+              <span>
+                Tôi đồng ý với các{" "}
+                <a
+                  href="/terms"
+                  className="text-teal-600 hover:brightness-75 hover:underline"
+                >
+                  điều khoản dịch vụ
+                </a>
+              </span>
+            </label>
+
+            {/* Register Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting || isLoading}
+              className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 disabled:from-gray-400 disabled:to-gray-500 text-white  hover:scale-[1.02] font-medium py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <LoadingSpinner color="white" size="6" inline />
+                  <span>Đang đăng ký...</span>
+                </div>
+              ) : (
+                "Đăng ký"
+              )}
+            </button>
+
+            {/* Divider */}
+            <div className="my-6 flex items-center">
+              <div className="flex-grow border-t border-gray-200" />
+              <span className="px-3 text-gray-400 text-sm">
                 Hoặc đăng ký bằng
               </span>
+              <div className="flex-grow border-t border-gray-200" />
             </div>
-          </div>
 
-          <div className="mt-5 grid grid-cols-3 gap-3">
-            <button className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm bg-[#2563EB] text-white hover:bg-blue-700 transition-all">
-              <FaFacebookF />
-            </button>
-            <button className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-gray-500 hover:bg-gray-100 transition-all">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+            {/* Social Register */}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <button
+                type="button"
+                onClick={() => onSocialRegister?.("Google")}
+                className="flex items-center justify-center p-2 border-2 transition-transform duration-300 ease-in-out hover:scale-105 border-gray-200 rounded-lg hover:bg-gray-50"
               >
-                <g clip-path="url(#clip0_105_174)">
-                  <path
-                    d="M17.64 9.20455C17.64 8.56682 17.5827 7.95273 17.4764 7.36364H9V10.845H13.8436C13.635 11.97 13.0009 12.9232 12.0477 13.5614V15.8195H14.9564C16.6582 14.2527 17.64 11.9455 17.64 9.20455Z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M9 18C11.43 18 13.4673 17.1941 14.9564 15.8195L12.0477 13.5614C11.2418 14.1014 10.2109 14.4205 9 14.4205C6.65591 14.4205 4.67182 12.8373 3.96409 10.71H0.957275V13.0418C2.43818 15.9832 5.48182 18 9 18Z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M3.96409 10.71C3.78409 10.17 3.68182 9.59318 3.68182 9C3.68182 8.40682 3.78409 7.83 3.96409 7.29H0.957275V9.62182C0.347727 7.54545 0.347727 10.4545 0.957275 12.5318L3.96409 10.71Z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957275 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z"
-                    fill="#EA4335"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_105_174">
-                    <rect width="18" height="18" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-            </button>
-            <button className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-black text-white hover:bg-gray-800 transition-all">
-              <FaApple />
-            </button>
-          </div>
-        </div>
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Đã có tài khoản?{" "}
-            <button
-              onClick={toggleView}
-              className="font-medium text-[#00BFB3] hover:underline hover:brightness-75"
-            >
-              Đăng nhập ngay
-            </button>
-          </p>
+                <FcGoogle className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onSocialRegister?.("Facebook")}
+                className="flex items-center justify-center p-2 ransition-transform duration-300 ease-in-out hover:scale-105 bg-blue-500 border-2 border-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                <FaFacebookF className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onSocialRegister?.("Apple")}
+                className="flex items-center justify-center p-2 transition-transform duration-300 ease-in-out hover:scale-105 bg-black border-2 border-black text-white rounded-lg hover:bg-gray-800"
+              >
+                <FaApple className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Login toggle */}
+            <p className="text-center text-sm text-gray-600">
+              Đã có tài khoản?{" "}
+              <button
+                type="button"
+                onClick={toggleView}
+                className="text-teal-600 hover:brightness-75 font-medium hover:underline"
+              >
+                Đăng nhập ngay
+              </button>
+            </p>
+          </form>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

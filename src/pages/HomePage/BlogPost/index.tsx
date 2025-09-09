@@ -11,12 +11,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
   return (
     <article
       className="group relative bg-white rounded-3xl shadow-lg overflow-hidden 
-      hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3 
-      animate-slideInUp opacity-0"
-      style={{
-        animationDelay: `${0.4 + index * 0.1}s`,
-        animationFillMode: "forwards",
-      }}
+      hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3 "
     >
       {/* Featured Badge */}
       {post.featured && (
@@ -130,14 +125,12 @@ const BlogPost = ({ index = 0 }: { index?: number }) => {
       <section className="relative py-6 text-center overflow-hidden">
         <div className="relative mx-auto">
           {/* Sub-title nhỏ 🏸 */}
-          <div
-            className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-lg font-bold mb-0.5 animate-fadeInDown"
-          >
+          <div className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-lg font-bold mb-0.5 ">
             🏸 BLOG CẦU LÔNG CHUYÊN NGHIỆP
           </div>
 
           {/* Tiêu đề chính */}
-          <div className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2 leading-snug animate-fadeInUp">
+          <div className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2 leading-snug ">
             Cộng Đồng & Kiến Thức
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 -mt-1.5 ">
               Cầu Lông Việt Nam
@@ -145,24 +138,12 @@ const BlogPost = ({ index = 0 }: { index?: number }) => {
           </div>
 
           {/* Mô tả */}
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-4 leading-relaxed animate-slideInUp">
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-4 leading-relaxed ">
             Chia sẻ kinh nghiệm, tips hữu ích và kết nối với cộng đồng người
             chơi cầu lông trên khắp cả nước. Từ người mới bắt đầu đến pro
             player.
           </p>
-          {/* Floating elements decoration */}
-          <div
-            className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-teal-400 to-blue-400 rounded-full opacity-10 animate-bounce"
-            style={{ animationDelay: "1s" }}
-          ></div>
-          <div
-            className="absolute top-32 right-16 w-16 h-16 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full opacity-10 animate-bounce"
-            style={{ animationDelay: "1.5s" }}
-          ></div>
-          <div
-            className="absolute top-48 left-1/4 w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full opacity-10 animate-bounce"
-            style={{ animationDelay: "2s" }}
-          ></div>
+         
         </div>
       </section>
 

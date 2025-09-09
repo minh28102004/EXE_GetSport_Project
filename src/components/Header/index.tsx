@@ -1,22 +1,20 @@
-import React, { memo, useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import endPoint from "@routes/router.js";
 import {
-  Home,
-  Zap,
-  Calendar,
-  HelpCircle,
-  Phone,
   ArrowLeft,
+  Calendar,
+  ChevronDown,
+  HelpCircle,
+  Home,
+  MapPin,
   Menu,
-  X,
+  Newspaper,
+  Phone,
   User,
   UserPlus,
-  ChevronDown,
-  MapPin,
-  Clock,
-  Newspaper,
+  X,
 } from "lucide-react";
-import endPoint from "@routes/router.js";
+import React, { memo, useEffect, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 
 interface HeaderProps {
   variant?: "site" | "auth";
@@ -46,11 +44,11 @@ const Brand: React.FC = () => (
 
 const navItems: NavItem[] = [
   { label: "Trang chủ", to: endPoint.HOMEPAGE, icon: Home },
-  { label: "Giới thiệu", to: "/about", icon: HelpCircle },
+  { label: "Giới thiệu", to: endPoint.ABOUT, icon: HelpCircle },
   { label: "Bài viết", to: endPoint.BLOGPOST, icon: Newspaper },
-  { label: "Đặt sân", to: "/booking", icon: Calendar },
-  { label: "Địa điểm sân", to: "/locations", icon: MapPin },
-  { label: "Liên hệ", to: "/contact", icon: Phone },
+  { label: "Đặt sân", to: endPoint.BOOKING, icon: Calendar },
+  { label: "Địa điểm sân", to: endPoint.LOCATIONS, icon: MapPin },
+  { label: "Liên hệ", to: endPoint.CONTACT, icon: Phone },
 ];
 
 
@@ -260,7 +258,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({ variant = "site" }) => {
           <div className="hidden md:flex items-center gap-3">
             {/* Nút Đăng ký */}
             <Link
-              to="/"
+              to={endPoint.REGISTER}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#23AEB1] 
                text-[#23AEB1] text-sm font-medium 
                transition-all duration-300 ease-in-out
@@ -272,7 +270,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({ variant = "site" }) => {
 
             {/* Nút Đăng nhập */}
             <Link
-              to="/"
+              to={endPoint.LOGIN}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl 
                bg-gradient-to-r from-[#23AEB1] to-[#1e9ea1] 
                text-white text-sm font-medium shadow-md 

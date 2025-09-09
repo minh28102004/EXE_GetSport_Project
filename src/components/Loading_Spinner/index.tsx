@@ -2,7 +2,7 @@ import React from "react";
 
 interface LoadingSpinnerProps {
   color?: "blue" | "red" | "green" | "yellow" | "gray" | "white";
-  size?: "4" | "6" | "8" | "10" | "12";
+  size?: "4" | "5" | "6" | "8" | "10" | "12";
   inline?: boolean;
   className?: string;
 }
@@ -15,7 +15,10 @@ const sizeMap: Record<"4" | "6" | "8" | "10" | "12", string> = {
   "12": "w-12 h-12",
 };
 
-const colorMap: Record<"blue" | "red" | "green" | "yellow" | "gray" | "white", string> = {
+const colorMap: Record<
+  "blue" | "red" | "green" | "yellow" | "gray" | "white",
+  string
+> = {
   blue: "border-blue-500",
   red: "border-red-500",
   green: "border-green-500",
@@ -26,7 +29,7 @@ const colorMap: Record<"blue" | "red" | "green" | "yellow" | "gray" | "white", s
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   color = "blue",
-  size = "8",
+  size = "4",
   inline = false,
   className = "",
 }) => {
@@ -42,10 +45,10 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     />
   );
 
-  return inline ? spinner : (
-    <div className="flex justify-center items-center h-32">
-      {spinner}
-    </div>
+  return inline ? (
+    spinner
+  ) : (
+    <div className="flex justify-center items-center h-32">{spinner}</div>
   );
 };
 

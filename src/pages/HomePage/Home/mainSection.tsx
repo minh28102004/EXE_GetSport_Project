@@ -6,6 +6,7 @@ import ProcessSection from "./Process_Section";
 import HighLightSection from "./Highlight_Section";
 import CTASection from "./CTA_Section";
 import CourtSection from "./Court_Section";
+import FeedbackSection from "./Feedback_Section";
 
 const MainSection = () => {
   return (
@@ -15,6 +16,7 @@ const MainSection = () => {
       <CommunitySection />
       <MapSection />
       <HighLightSection />
+      <FeedbackSection />
       <ProcessSection />
       <CTASection />
     </div>

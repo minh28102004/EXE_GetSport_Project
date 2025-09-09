@@ -68,7 +68,7 @@ const ProcessSection = () => {
   ];
 
   return (
-    <section className="relative py-12 bg-gradient-to-t from-teal-50 via-slate-100 to-teal-50 overflow-hidden">
+    <section className="relative py-12 sm:py-18 bg-gradient-to-t from-teal-50 via-slate-100 to-teal-50 overflow-hidden">
       <div className="relative mx-auto px-10 sm:px-15 lg:px-30">
         {/* Header */}
         <div className="text-center mb-12">

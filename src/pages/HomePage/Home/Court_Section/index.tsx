@@ -35,7 +35,7 @@ const CourtSection = () => {
   };
 
   return (
-    <section className="py-12 bg-gradient-to-br from-slate-50 via-white to-teal-50 relative overflow-hidden">
+    <section className="py-12 sm:py-18 bg-gradient-to-br from-slate-50 via-white to-teal-50 relative overflow-hidden">
       {/* Background Decorations */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-teal-100 rounded-full opacity-20 blur-3xl"></div>
@@ -184,7 +184,7 @@ const CourtSection = () => {
                <div className="text-center mt-12">
           <Link
             to="/blogPost"
-            className="group inline-flex items-center gap-1 px-3 py-2 border-2 border-teal-200 text-teal-600 rounded-xl font-semibold 
+            className="group inline-flex items-center gap-1 px-3 py-2 border-2 border-teal-200 text-teal-600 rounded-xl font-medium 
                hover:bg-teal-50 hover:border-teal-300 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
           >
             Xem Thêm Sân Cầu Lông

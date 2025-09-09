@@ -131,7 +131,7 @@ const CommunitySection = () => {
   }
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="py-12 sm:py-18 bg-gray-50">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-15">
         {/* Header */}
         <div className="text-center mb-10">
@@ -155,7 +155,7 @@ const CommunitySection = () => {
         <div className="text-center mt-12">
           <Link
             to="/blogPost"
-            className="group inline-flex items-center gap-1 px-3 py-2 border-2 border-teal-200 text-teal-600 rounded-xl font-semibold 
+            className="group inline-flex items-center gap-1 px-3 py-2 border-2 border-teal-200 text-teal-600 rounded-xl font-medium
                hover:bg-teal-50 hover:border-teal-300 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
           >
             Xem Thêm Bài Viết
