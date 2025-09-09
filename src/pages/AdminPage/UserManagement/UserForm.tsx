@@ -1,27 +1,30 @@
 import React, { useState } from "react";
 
-interface Court {
+interface User {
   id?: number;
   name: string;
-  type: string;
-  status: "Hoạt động" | "Bảo trì";
-  price: string;
-  time: string;
+  email: string;
+  role: string;
+  status: string;
+  createdAt?: string;
 }
 
-interface CourtFormProps {
-  court: Court | null;
-  onSave: (court: Court) => void;
+interface UserFormProps {
+  user: User | null;
+  onSave: (user: User) => void;
   onClose: () => void;
 }
 
-const CourtForm: React.FC<CourtFormProps> = ({ court, onSave, onClose }) => {
-  const [formData, setFormData] = useState<Court>(
-    court || { name: "", type: "", status: "Hoạt động", price: "", time: "" }
+const UserForm: React.FC<UserFormProps> = ({ user, onSave, onClose }) => {
+  const [formData, setFormData] = useState<User>(
+    user || { name: "", email: "", role: "Khách hàng", status: "Hoạt động" }
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,72 +34,48 @@ const CourtForm: React.FC<CourtFormProps> = ({ court, onSave, onClose }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-lg font-bold">
-        {court ? "Chỉnh sửa sân" : "Thêm sân mới"}
-      </h2>
-
       <input
-        type="text"
         name="name"
         value={formData.name}
         onChange={handleChange}
-        placeholder="Tên sân"
-        className="w-full border px-3 py-2 rounded"
+        placeholder="Tên người dùng"
+        className="border p-2 rounded w-full"
         required
       />
-
       <input
-        type="text"
-        name="type"
-        value={formData.type}
+        name="email"
+        value={formData.email}
         onChange={handleChange}
-        placeholder="Loại sân"
-        className="w-full border px-3 py-2 rounded"
+        placeholder="Email"
+        className="border p-2 rounded w-full"
         required
       />
-
+      <select
+        name="role"
+        value={formData.role}
+        onChange={handleChange}
+        className="border p-2 rounded w-full"
+      >
+        <option>Admin</option>
+        <option>Quản lý</option>
+        <option>Nhân viên</option>
+        <option>Khách hàng</option>
+      </select>
       <select
         name="status"
         value={formData.status}
         onChange={handleChange}
-        className="w-full border px-3 py-2 rounded"
+        className="border p-2 rounded w-full"
       >
-        <option value="Hoạt động">Hoạt động</option>
-        <option value="Bảo trì">Bảo trì</option>
+        <option>Hoạt động</option>
+        <option>Bị khóa</option>
       </select>
 
-      <input
-        type="text"
-        name="price"
-        value={formData.price}
-        onChange={handleChange}
-        placeholder="Giá thuê"
-        className="w-full border px-3 py-2 rounded"
-        required
-      />
-
-      <input
-        type="text"
-        name="time"
-        value={formData.time}
-        onChange={handleChange}
-        placeholder="Thời gian hoạt động"
-        className="w-full border px-3 py-2 rounded"
-        required
-      />
-
-      <div className="flex justify-end gap-3">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-        >
+      <div className="flex justify-end gap-2">
+        <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
           Hủy
         </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-[#23AEB1] text-white rounded hover:bg-[#1e9697]"
-        >
+        <button type="submit" className="px-4 py-2 bg-[#23AEB1] text-white rounded">
           Lưu
         </button>
       </div>
@@ -104,4 +83,4 @@ const CourtForm: React.FC<CourtFormProps> = ({ court, onSave, onClose }) => {
   );
 };
 
-export default CourtForm;
+export default UserForm;
