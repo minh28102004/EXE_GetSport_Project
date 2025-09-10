@@ -5,6 +5,8 @@ export interface Court {   // ✅ export interface
   name: string;
   type: string;
   status: string;
+  price?: string;
+  time?: string;
 }
 
 interface CourtFormProps {

@@ -10,19 +10,21 @@ import TermsOfServicePage from "@pages/TermsOfServicePage";
 import FAQsPage from "@pages/HomePage/FAQs";
 import ContactPage from "@pages/HomePage/Contact";
 
-// Staff
-import StaffLayout from "./pages/OwnerPage/Layout/StaffLayout";
-import Dashboard from "./pages/OwnerPage/Dashboard";
-import CourtManagement from "./pages/OwnerPage/CourtManagement";
-import BookingManagement from "./pages/OwnerPage/BookingManagement";
+// Staff pages
+import Dashboard from "@pages/OwnerPage/Dashboard";
+import CourtManagement from "@pages/OwnerPage/CourtManagement";
+import BookingManagement from "@pages/OwnerPage/BookingManagement";
+import StaffProfile from "@pages/OwnerPage/StaffProfile";
+// Admin pages
+import AdminDashboard from "@pages/AdminPage/Dashboard";
+import CourtManagementAdmin from "@pages/AdminPage/CourtManagement";
+import BookingManagementAdmin from "@pages/AdminPage/BookingManagement";
+import BookingReport from "@pages/AdminPage/BookingReport";
+import UserManagement from "@pages/AdminPage/UserManagement";
+import AdminProfile from "@pages/AdminPage/AdminProfile";
 
-// Admin
-import AdminDashboard from "./pages/AdminPage/Dashboard";
-import AdminLayout from "./pages/AdminPage/Layout/AdminLayout";
-import CourtManagementAdmin from "./pages/AdminPage/CourtManagement";
-import BookingManagementAdmin from "./pages/AdminPage/BookingManagement";
-import BookingReport from "./pages/AdminPage/BookingReport";
-import UserManagement from "./pages/AdminPage/UserManagement";
+// Layout chung
+import ManagementLayout from "./Layout/ManagementLayout";
 
 function App() {
   return (
@@ -47,14 +49,15 @@ function App() {
         <Route path={endPoint.AUTH} element={<AuthPage />} />
 
         {/* Staff layout + nested routes */}
-        <Route path="/Staff" element={<StaffLayout />}>
+        <Route path="/Staff" element={<ManagementLayout role="staff" />}>
           <Route path="Dashboard" element={<Dashboard />} />
           <Route path="CourtManagement" element={<CourtManagement />} />
           <Route path="BookingManagement" element={<BookingManagement />} />
+          <Route path="Settings" element={<StaffProfile />} />
         </Route>
 
         {/* Admin layout + nested routes */}
-        <Route path="/Admin" element={<AdminLayout />}>
+        <Route path="/Admin" element={<ManagementLayout role="admin" />}>
           <Route path="Dashboard" element={<AdminDashboard />} />
           <Route path="CourtManagement" element={<CourtManagementAdmin />} />
           <Route
@@ -63,6 +66,7 @@ function App() {
           />
           <Route path="BookingReport" element={<BookingReport />} />
           <Route path="UserManagement" element={<UserManagement />} />
+          <Route path="Settings" element={<AdminProfile />} />
         </Route>
 
         {/* Terms */}

@@ -8,7 +8,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { FiCalendar, FiDollarSign, FiCheckCircle, FiBarChart2 } from "react-icons/fi";
 
 const revenueData = [
   { date: "1/1", revenue: 40 },

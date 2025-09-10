@@ -10,7 +10,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import { FiSearch, FiRefreshCw, FiDownload } from "react-icons/fi";
+import { FiRefreshCw, FiDownload } from "react-icons/fi";
 
 // Mock dữ liệu
 const lineData = [
