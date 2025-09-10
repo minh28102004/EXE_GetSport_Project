@@ -1,9 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MainLayout from "@pages/HomePage/mainLayout";
 import endPoint from "@routes/router";
+import ErrorBoundary from "@components/Error_Boundary";
+// Layout chung
+import MainLayout from "@pages/HomePage/mainLayout";
+import ManagementLayout from "@layout/ManagementLayout";
 // User
 import HomePage from "@pages/HomePage/Home/mainSection";
-import AboutPage from "./pages/HomePage/About/mainSection";
+import AboutPage from "@pages/HomePage/About/mainSection";
 import BlogPost from "@pages/HomePage/BlogPost";
 import AuthPage from "@pages/AuthPage";
 import TermsOfServicePage from "@pages/TermsOfServicePage";
@@ -23,10 +26,7 @@ import BookingReport from "@pages/AdminPage/BookingReport";
 import UserManagement from "@pages/AdminPage/UserManagement";
 import AdminProfile from "@pages/AdminPage/AdminProfile";
 
-// Layout chung
-import ManagementLayout from "./Layout/ManagementLayout";
-
-function App() {
+function AppRoutes() {
   return (
     <Router>
       <Routes>
@@ -72,6 +72,14 @@ function App() {
         {/* Terms */}
       </Routes>
     </Router>
+  );
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <AppRoutes />
+    </ErrorBoundary>
   );
 }
 

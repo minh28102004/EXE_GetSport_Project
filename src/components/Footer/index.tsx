@@ -127,7 +127,7 @@ const Footer: React.FC = () => {
       <div className="w-full px-9 py-3 flex flex-col md:flex-row items-center justify-between border-t border-white/10 text-sm text-gray-300">
         {/* Trademark */}
         <p className="text-center flex-1 ml-20">
-          © 2025 GetSport. All rights reserved.
+          © 2025 GetSport. Tất cả quyền được bảo lưu.
         </p>
 
         {/* Các icon thanh toán */}

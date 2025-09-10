@@ -130,7 +130,7 @@ const ContactPage: React.FC = () => {
   ];
 
   return (
-    <div className=" bg-gradient-to-br from-slate-50 to-teal-50">
+    <div className=" bg-gray-100">
       <div className=" mx-auto px-4 sm:px-6 lg:px-50 py-8">
         <div className="grid lg:grid-cols-[1.75fr_4.25fr] gap-8">
           {/* Left Contact Info */}

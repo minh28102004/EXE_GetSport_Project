@@ -13,10 +13,10 @@ const ManagementLayout: React.FC<ManagementLayoutProps> = ({ role }) => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
       {/* Header với nút toggle */}
-<Header 
-  onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
-  role={role}   // ✅ truyền role xuống Header
-/>
+      <Header
+        onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        role={role} // ✅ truyền role xuống Header
+      />
 
       <div className="flex flex-1">
         {/* Sidebar */}

@@ -25,7 +25,6 @@ const BannerSection = () => {
   const [currentPackage, setCurrentPackage] = useState(0);
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [translateZ, setTranslateZ] = useState<number>(0);
-  
 
   const nextSlide = () => {
     setCurrent((prev) => (prev + 1) % courtImageList.length);
@@ -180,9 +179,10 @@ const BannerSection = () => {
                     <button className="group w-1/2 sm:w-auto px-2 py-2 sm:px-6 sm:py-3 text-xs sm:text-lg bg-gradient-to-r from-teal-600 via-teal-500 to-cyan-500 text-white rounded-xl sm:rounded-2xl font-bold overflow-hidden transform transition-all duration-300 hover:scale-[1.03] hover:brightness-90 relative">
                       <span className="relative z-10 flex items-center justify-center gap-1">
                         Đặt Sân Ngay
-                        <ArrowRight className="w-4 sm:w-6 h-4 sm:h-6 transform group-hover:translate-x-2 transition-transform" />
+                        <ArrowRight className="w-4 sm:w-6 h-4 sm:h-6 transform group-hover:translate-x-2 transition-transform " />
                       </span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                      <div className="absolute inset-0 rounded-2xl bg-teal-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </button>
 
                     <button className="group w-1/2 sm:w-auto px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-lg border-2 border-teal-200 text-teal-700 rounded-xl sm:rounded-2xl font-bold hover:bg-teal-50 hover:scale-[1.03] hover:brightness-90  transition-all duration-300 flex items-center justify-center hover:border-teal-300">
