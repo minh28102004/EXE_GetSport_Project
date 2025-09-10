@@ -32,7 +32,7 @@ const MapSection = () => {
         </div>
 
         {/* Map card */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
           {/* Controls */}
           <div className="p-6 border-b border-gray-100">
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">

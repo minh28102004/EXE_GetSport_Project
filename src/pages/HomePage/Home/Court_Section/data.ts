@@ -31,7 +31,7 @@ export const featuredCourts: FeaturedCourt[] = [
       location: "Quận Đống Đa, Hà Nội",
       rating: 4.8,
       reviews: 256,
-      priceRange: "200.000đ - 350.000đ/giờ",
+      priceRange: "150.000đ/giờ",
       openHours: "06:00 - 22:00",
       image:
         "https://media.istockphoto.com/id/968826044/vi/anh/b%C3%A0n-tay-h%E1%BB%8Dc-sinh-c%E1%BA%A7m-b%C3%BAt-vi%E1%BA%BFt-l%C3%A0m-b%C3%A0i-ki%E1%BB%83m-tra.jpg?s=612x612&w=0&k=20&c=bCfjElpYNs5BETAQxD1QkzoMwHh5l1aL5KxXWaVkHFU=",
@@ -48,7 +48,7 @@ export const featuredCourts: FeaturedCourt[] = [
       location: "Quận Cầu Giấy, Hà Nội",
       rating: 4.9,
       reviews: 189,
-      priceRange: "250.000đ - 400.000đ/giờ",
+      priceRange: "250.000đ/giờ",
       openHours: "05:30 - 22:30",
       image:
         "https://qvbadminton.com/wp-content/uploads/2024/07/san-cau-long-quoc-viet-badminton-9.jpg",
@@ -65,7 +65,7 @@ export const featuredCourts: FeaturedCourt[] = [
       location: "Quận Hai Bà Trưng, Hà Nội",
       rating: 4.7,
       reviews: 143,
-      priceRange: "180.000đ - 300.000đ/giờ",
+      priceRange: "180.000đ/giờ",
       openHours: "06:00 - 23:00",
       image:
         "https://static.fbshop.vn/wp-content/media-old/uploads/2019/03/tham-cau-long-tinsue-bsc-750.png",
@@ -82,7 +82,7 @@ export const featuredCourts: FeaturedCourt[] = [
       location: "Quận Ba Đình, Hà Nội",
       rating: 4.6,
       reviews: 298,
-      priceRange: "220.000đ - 380.000đ/giờ",
+      priceRange: "220.000đ/giờ",
       openHours: "05:00 - 23:30",
       image:
         "https://sanbaokim.com/upload/baiviet/thamsancaulongkhongthethieuchocacnhathidau01-4710.png",
@@ -106,7 +106,7 @@ export const featuredCourts: FeaturedCourt[] = [
       location: "Quận Thanh Xuân, Hà Nội",
       rating: 4.5,
       reviews: 167,
-      priceRange: "190.000đ - 320.000đ/giờ",
+      priceRange: "190.000đ/giờ",
       openHours: "06:30 - 22:00",
       image:
         "https://qvbadminton.com/wp-content/uploads/2024/07/san-cau-long-quoc-viet-badminton-12.jpg",

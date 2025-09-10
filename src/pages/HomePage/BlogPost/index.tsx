@@ -10,7 +10,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 
   return (
     <article
-      className="group relative bg-white rounded-3xl shadow-lg overflow-hidden 
+      className="group relative bg-white rounded-2xl shadow-lg overflow-hidden 
       hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3 "
     >
       {/* Featured Badge */}
@@ -118,34 +118,33 @@ const BlogPost = ({ index = 0 }: { index?: number }) => {
   const paginatedPosts = posts.slice(startIndex, startIndex + POSTS_PER_PAGE);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-teal-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Custom CSS for animations */}
 
       {/* Title */}
-      <section className="relative py-6 text-center overflow-hidden">
-        <div className="relative mx-auto">
-          {/* Sub-title nhỏ 🏸 */}
-          <div className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-lg font-bold mb-0.5 ">
-            🏸 BLOG CẦU LÔNG CHUYÊN NGHIỆP
-          </div>
+      {/* Title Section */}
+<section className="relative py-6 text-center overflow-hidden">
+  <div className="relative mx-auto px-4">
+    {/* Sub-title nhỏ 🏸 */}
+    <div className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-lg font-bold mb-1">
+      🏸 BLOG CẦU LÔNG CHUYÊN NGHIỆP
+    </div>
 
-          {/* Tiêu đề chính */}
-          <div className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2 leading-snug ">
-            Cộng Đồng & Kiến Thức
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 -mt-1.5 ">
-              Cầu Lông Việt Nam
-            </span>
-          </div>
+    {/* Tiêu đề chính */}
+    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 leading-snug">
+      Cộng Đồng & Kiến Thức
+      <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 mt-1">
+        Cầu Lông Việt Nam
+      </span>
+    </h1>
 
-          {/* Mô tả */}
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-4 leading-relaxed ">
-            Chia sẻ kinh nghiệm, tips hữu ích và kết nối với cộng đồng người
-            chơi cầu lông trên khắp cả nước. Từ người mới bắt đầu đến pro
-            player.
-          </p>
-         
-        </div>
-      </section>
+    {/* Mô tả */}
+    <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto mb-4 leading-relaxed">
+      Chia sẻ kinh nghiệm, tips hữu ích và kết nối với cộng đồng người chơi cầu lông trên khắp cả nước. Từ người mới bắt đầu đến pro player.
+    </p>
+  </div>
+</section>
+
 
       {/* Posts Grid */}
       <section className="sm:px-20 px-5 pb-13">

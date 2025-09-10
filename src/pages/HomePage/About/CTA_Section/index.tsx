@@ -12,10 +12,13 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
+import endPoint from "@routes/router";
+import { useNavigate } from "react-router-dom";
 
 const CTASection = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   type FAQ = {
     question: string;
@@ -51,7 +54,7 @@ const CTASection = () => {
   return (
     <section
       id="cta-section"
-      className="py-12 sm:py-16 bg-gradient-to-br from-teal-600 to-teal-500 text-white"
+      className="py-12 sm:py-16 bg-gradient-to-br from-[#1a999b] to-[#23AEB1] text-white"
     >
       <div className="container mx-auto px-6 md:px-20 grid md:grid-cols-2 gap-12 items-end">
         {/* Text + Contact support */}
@@ -118,9 +121,12 @@ const CTASection = () => {
                 📞 Hotline: 1900 1234
               </button>
 
-              <button className="flex-1 bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium">
+              <a
+                href={endPoint.CONTACT}
+                className="flex-1 bg-[#21a4a6] text-white py-2 hover:brightness-90 transition-colors text-sm font-medium flex items-center justify-center rounded-lg"
+              >
                 Liên hệ ngay
-              </button>
+              </a>
             </div>
           </div>
         </motion.div>
@@ -222,7 +228,7 @@ const CTASection = () => {
                     </div>
                   </div>
                   <a
-                    href="/qa"
+                    href={endPoint.FAQS}
                     className="group inline-flex items-center bg-white hover:bg-teal-600 text-teal-600 hover:text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md transform hover:scale-105"
                   >
                     <span>Xem tất cả Q&A</span>

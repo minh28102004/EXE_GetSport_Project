@@ -57,7 +57,7 @@ const Pagination = ({
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`flex items-center justify-center w-8.5 h-8.5 rounded-xl transition-all duration-300 ${
+            className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg transition-all duration-300 ${
               currentPage === 1
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-white text-[#23AEB1] hover:bg-[#5FC5CB] hover:text-white shadow-md hover:shadow-lg transform hover:scale-105"
@@ -81,7 +81,7 @@ const Pagination = ({
               <button
                 key={page}
                 onClick={() => handlePageChange(Number(page))}
-                className={`flex items-center justify-center w-8.5 h-8.5 rounded-xl font-bold text-lg transition-all duration-300 shadow-md transform hover:scale-105 ${
+                className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg font-bold text-lg transition-all duration-300 shadow-md transform hover:scale-105 ${
                   page === currentPage
                     ? "bg-[#23AEB1] text-white shadow-lg scale-105 ring-1 ring-[#b2e2e5]"
                     : "bg-white text-[#23AEB1] hover:bg-[#5FC5CB] hover:text-white"
@@ -98,7 +98,7 @@ const Pagination = ({
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`flex items-center justify-center w-8.5 h-8.5 rounded-xl transition-all duration-300 ${
+            className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg transition-all duration-300 ${
               currentPage === totalPages
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-white text-[#23AEB1] hover:bg-[#5FC5CB] hover:text-white shadow-md hover:shadow-lg transform hover:scale-105"
@@ -111,20 +111,14 @@ const Pagination = ({
 
       {/* Info */}
       <div className="flex items-center justify-center space-x-2 text-sm">
-        <div className="bg-white px-4 py-2 rounded-xl shadow-md text-gray-700">
+        <div className="bg-white px-4 py-2 rounded-2xl shadow-md text-gray-700">
           Trang{" "}
           <span className="font-semibold text-[#23AEB1]">{currentPage}</span> /{" "}
           {totalPages}
         </div>
-        {totalItems > 0 && (
-          <div className="bg-white px-4 py-2 rounded-xl shadow-md text-gray-700">
-            Hiển thị {(currentPage - 1) * pageSize + 1} -{" "}
-            {Math.min(currentPage * pageSize, totalItems)} / {totalItems} bài
-            viết
-          </div>
-        )}
+
         {/* Input + GO */}
-        <div className="bg-white p-1 rounded-xl shadow-md text-gray-700">
+        <div className="bg-white p-1 rounded-lg shadow-md text-gray-700">
           {totalPages > 2 && (
             <div className="flex items-center space-x-2">
               <Tooltip title="Nhập số trang muốn tới" arrow>
@@ -134,14 +128,14 @@ const Pagination = ({
                   max={totalPages}
                   value={inputPage}
                   onChange={handleInputChange}
-                  className="w-12 px-2 py-1 border rounded-xl text-center text-sm outline-none border-gray-300"
+                  className="w-12 px-2 py-1 border rounded-lg text-center text-sm outline-none border-gray-300"
                   placeholder="Page"
                 />
               </Tooltip>
               <Tooltip title="Nhấn GO để chuyển tới trang" arrow>
                 <button
                   onClick={handleGoClick}
-                  className="px-2 py-1 rounded-xl bg-[#23AEB1] text-white text-sm font-medium hover:bg-[#5FC5CB] transition-colors"
+                  className="px-2 py-1 rounded-lg bg-[#23AEB1] text-white text-sm font-medium hover:bg-[#5FC5CB] transition-colors"
                 >
                   GO
                 </button>

@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 const PostCard = ({ post }: { post: Post }) => {
   return (
     <article
-      className={`group relative bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3`}
+      className={`group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3`}
     >
       {/* Featured Badge */}
       {post.featured && (

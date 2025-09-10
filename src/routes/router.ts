@@ -6,6 +6,7 @@ const endPoint = {
   FORGOTPASSWORD:"auth?view=forgotpass",
   BLOGPOST: "/blogPost",
   ABOUT: "/about",  
+  FAQS:"/faqs",
   BOOKING: "/booking",
   LOCATIONS: "/locations",
   CONTACT: "/contact",

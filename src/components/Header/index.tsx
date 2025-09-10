@@ -12,6 +12,7 @@ import {
   User,
   UserPlus,
   X,
+  MessageCircleQuestion 
 } from "lucide-react";
 import React, { memo, useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
@@ -46,6 +47,7 @@ const navItems: NavItem[] = [
   { label: "Trang chủ", to: endPoint.HOMEPAGE, icon: Home },
   { label: "Giới thiệu", to: endPoint.ABOUT, icon: HelpCircle },
   { label: "Bài viết", to: endPoint.BLOGPOST, icon: Newspaper },
+  { label: "FAQs", to: endPoint.FAQS, icon: MessageCircleQuestion },
   { label: "Đặt sân", to: endPoint.BOOKING, icon: Calendar },
   { label: "Địa điểm sân", to: endPoint.LOCATIONS, icon: MapPin },
   { label: "Liên hệ", to: endPoint.CONTACT, icon: Phone },

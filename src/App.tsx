@@ -7,6 +7,8 @@ import AboutPage from "./pages/HomePage/About/mainSection";
 import BlogPost from "@pages/HomePage/BlogPost";
 import AuthPage from "@pages/AuthPage";
 import TermsOfServicePage from "@pages/TermsOfServicePage";
+import FAQsPage from "@pages/HomePage/FAQs";
+import ContactPage from "@pages/HomePage/Contact";
 
 // Staff
 import StaffLayout from "./pages/OwnerPage/Layout/StaffLayout";
@@ -32,11 +34,16 @@ function App() {
           <Route path={endPoint.HOMEPAGE} element={<HomePage />} />
           <Route path={endPoint.ABOUT} element={<AboutPage />} />
           <Route path={endPoint.BLOGPOST} element={<BlogPost />} />
+          <Route path={endPoint.FAQS} element={<FAQsPage />} />
+          <Route path={endPoint.CONTACT} element={<ContactPage />} />
+
           <Route
             path={endPoint.TERMSOFSERVICE}
             element={<TermsOfServicePage />}
           />
         </Route>
+
+        {/* Login + Register + forgotPassword */}
         <Route path={endPoint.AUTH} element={<AuthPage />} />
 
         {/* Staff layout + nested routes */}
@@ -59,10 +66,6 @@ function App() {
         </Route>
 
         {/* Terms */}
-        <Route
-          path={endPoint.TERMSOFSERVICE}
-          element={<TermsOfServicePage />}
-        />
       </Routes>
     </Router>
   );

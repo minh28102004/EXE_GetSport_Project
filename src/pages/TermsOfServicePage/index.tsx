@@ -16,6 +16,7 @@ import {
   Eye,
 } from "lucide-react";
 import { useImageZoom } from "@hooks/useImageZoom";
+import endPoint from "@routes/router";
 
 // Load ảnh bằng import.meta.glob (Vite only)
 const paymentImages = import.meta.glob("../../images/Payment_Images/*.png", {
@@ -561,15 +562,21 @@ const TermsOfServicePage: React.FC = () => {
                       điều khoản dịch vụ.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <button className="flex items-center justify-center gap-2 bg-white text-teal-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-200 transform hover:scale-[1.03]">
+                      <a
+                        href={endPoint.CONTACT}
+                        className="flex items-center justify-center gap-2 bg-white text-teal-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-200 transform hover:scale-[1.03]"
+                      >
                         <FiPhone className="w-5 h-5" />
                         Liên hệ hỗ trợ
-                      </button>
+                      </a>
 
-                      <button className="flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-teal-600 transition-all duration-200">
+                      <a
+                        href={endPoint.FAQS}
+                        className="flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-teal-600 transition-all duration-200"
+                      >
                         <FiHelpCircle className="w-5 h-5" />
                         FAQ thường gặp
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </section>

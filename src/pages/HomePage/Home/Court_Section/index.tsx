@@ -59,7 +59,7 @@ const CourtSection = () => {
           {featuredCourts.slice(0, 4).map((court) => (
             <div
               key={court.id}
-              className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-700 border border-gray-100"
+              className="group relative bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-700 border border-gray-100"
               onMouseEnter={() => setHoveredCard(court.id)}
               onMouseLeave={() => setHoveredCard(null)}
             >
@@ -157,31 +157,34 @@ const CourtSection = () => {
                 </div>
 
                 {/* Price & Hours */}
-                <div className="space-y-2 mb-5">
+                <div className="space-y-2">
+                  {/* Giờ mở cửa */}
                   <div className="flex items-center gap-2 text-sm">
                     <Clock className="w-4 h-4 text-gray-400" />
                     <span className="text-gray-600">{court.openHours}</span>
                   </div>
-                  <div className="text-lg font-bold text-teal-600">
-                    {court.priceRange}
+
+                  {/* Giá + Nút đặt ngay */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-lg font-semibold text-teal-600">
+                      {court.priceRange}
+                    </div>
+                    <button
+                      onClick={() => handleBooking(court)}
+                      className="px-3 py-1.5 bg-gradient-to-br from-[#35b6b8] to-[#1e9ea1] text-white font-medium rounded-xl hover:brightness-90 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl flex items-center justify-center gap-1 group"
+                    >
+                      Đặt Sân Ngay
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
                   </div>
                 </div>
-
-                {/* Action Button */}
-                <button
-                  onClick={() => handleBooking(court)}
-                  className="w-full px-3 py-2 bg-gradient-to-br from-teal-600 to-teal-500 text-white font-semibold rounded-2xl hover:brightness-90 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
-                >
-                  Đặt Ngay
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
               </div>
             </div>
           ))}
         </div>
 
         {/* View All Button */}
-               <div className="text-center mt-12">
+        <div className="text-center mt-12">
           <Link
             to="/blogPost"
             className="group inline-flex items-center gap-1 px-3 py-2 border-2 border-teal-200 text-teal-600 rounded-xl font-medium 

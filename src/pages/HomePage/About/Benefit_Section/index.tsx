@@ -133,7 +133,7 @@ const BenefitSection = () => {
           <div
             data-animate
             id="additional-features"
-            className={`bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl px-6 py-7.5 mb-16 relative overflow-hidden transform transition-all duration-1000 delay-400 ${
+            className={`bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl px-6 py-7.5 mb-16 relative overflow-hidden transform transition-all duration-1000 delay-400 ${
               isVisible["additional-features"]
                 ? "translate-y-0 opacity-100"
                 : "translate-y-10 opacity-0"
