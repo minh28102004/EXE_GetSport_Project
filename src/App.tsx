@@ -45,11 +45,13 @@ function AppRoutes() {
           />
         </Route>
 
+        {/* <Route path="/layout" element={<BadmintonDashboard />} /> */}
+
         {/* Login + Register + forgotPassword */}
         <Route path={endPoint.AUTH} element={<AuthPage />} />
 
         {/* Staff layout + nested routes */}
-        <Route path="/Staff" element={<ManagementLayout role="staff" />}>
+        <Route path="/layoutOwner" element={<ManagementLayout role="owner" />}>
           <Route path="Dashboard" element={<Dashboard />} />
           <Route path="CourtManagement" element={<CourtManagement />} />
           <Route path="BookingManagement" element={<BookingManagement />} />
@@ -57,7 +59,7 @@ function AppRoutes() {
         </Route>
 
         {/* Admin layout + nested routes */}
-        <Route path="/Admin" element={<ManagementLayout role="admin" />}>
+        <Route path="/layoutAdmin" element={<ManagementLayout role="admin" />}>
           <Route path="Dashboard" element={<AdminDashboard />} />
           <Route path="CourtManagement" element={<CourtManagementAdmin />} />
           <Route

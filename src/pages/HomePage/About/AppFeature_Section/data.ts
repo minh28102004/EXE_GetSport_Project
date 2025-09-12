@@ -25,32 +25,7 @@ export const bannerImages = [
 "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dG9nZXRoZXJ8ZW58MHx8MHx8fDA%3D",
 "https://plus.unsplash.com/premium_photo-1663050844860-548dbfcc79a9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHNwb3J0fGVufDB8fDB8fHww"];
 
-export const stats = [
-  {
-    icon: Users,
-    label: "Người dùng hoạt động",
-    value: "50,000+",
-    color: "text-teal-600",
-  },
-  {
-    icon: MapPin,
-    label: "Sân cầu lông",
-    value: "1,200+",
-    color: "text-blue-600",
-  },
-  {
-    icon: Clock,
-    label: "Giờ đặt sân",
-    value: "500,000+",
-    color: "text-emerald-600",
-  },
-  {
-    icon: Star,
-    label: "Đánh giá 5 sao",
-    value: "4.9/5",
-    color: "text-amber-600",
-  },
-];
+
 
 export const features = [
   {

@@ -1,12 +1,3 @@
-import {
-  Users,
-  Star,
-  Smartphone,
-  Shield,
-  Sparkles,
-  ArrowRight,
-  Download,
-} from "lucide-react";
 import HeroSection from "./Hero_Section";
 import StorySection from "./Story_Section";
 import AppFeatureSection from "./AppFeature_Section";

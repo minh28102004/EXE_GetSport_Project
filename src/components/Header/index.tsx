@@ -12,7 +12,7 @@ import {
   User,
   UserPlus,
   X,
-  MessageCircleQuestion 
+  MessageCircleQuestion,
 } from "lucide-react";
 import React, { memo, useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
@@ -25,7 +25,7 @@ interface NavItem {
   label: string;
   href?: string;
   to?: string;
-  icon: React.ComponentType<any>;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
   hasDropdown?: boolean;
 }
 
@@ -52,7 +52,6 @@ const navItems: NavItem[] = [
   { label: "Địa điểm sân", to: endPoint.LOCATIONS, icon: MapPin },
   { label: "Liên hệ", to: endPoint.CONTACT, icon: Phone },
 ];
-
 
 const SiteNav: React.FC = () => (
   <nav className="hidden lg:flex items-center gap-1">

@@ -1,20 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
-  Search,
-  MapPin,
-  Calendar,
-  Clock,
-  Star,
-  ArrowRight,
-  Play,
-  CheckCircle,
-  Users,
-  Award,
   Phone,
   Mail,
-  Shield,
-  Zap,
 } from "lucide-react";
 
 const CTASection = () => {

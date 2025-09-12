@@ -1,6 +1,6 @@
 import { Play, Sparkles, Download } from "lucide-react";
 import { motion } from "framer-motion";
-import { stats } from "../data";
+import { stats } from "./data";
 
 const HeroSection = () => {
   return (

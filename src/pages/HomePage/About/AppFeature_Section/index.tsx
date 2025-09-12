@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { Star, Sparkles } from "lucide-react";
-import {  appFeatures} from "../data";
+import {  appFeatures} from "./data";
 
 const AppFeatureSection = () => {
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});

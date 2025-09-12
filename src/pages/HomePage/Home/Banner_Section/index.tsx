@@ -1,30 +1,25 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Search,
-  MapPin,
-  Calendar,
-  Clock,
   Star,
   ArrowRight,
-  Play,
   CheckCircle,
-  Users,
   Award,
-  Phone,
-  Mail,
   Shield,
-  Zap,
 } from "lucide-react";
 import { courtImageList, packages, stats } from "./data";
+import endPoint from "@routes/router";
+import { useNavigate } from "react-router-dom";
 
 const BannerSection = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [activeFeature, setActiveFeature] = useState(0);
+  const [_activeFeature, setActiveFeature] = useState(0);
   const [current, setCurrent] = useState(0);
   const [currentPackage, setCurrentPackage] = useState(0);
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const [translateZ, setTranslateZ] = useState<number>(0);
+  const [_translateZ, setTranslateZ] = useState<number>(0);
+  const navigate = useNavigate();
 
   const nextSlide = () => {
     setCurrent((prev) => (prev + 1) % courtImageList.length);
@@ -185,7 +180,8 @@ const BannerSection = () => {
                       <div className="absolute inset-0 rounded-2xl bg-teal-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </button>
 
-                    <button className="group w-1/2 sm:w-auto px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-lg border-2 border-teal-200 text-teal-700 rounded-xl sm:rounded-2xl font-bold hover:bg-teal-50 hover:scale-[1.03] hover:brightness-90  transition-all duration-300 flex items-center justify-center hover:border-teal-300">
+                    <button className="group w-1/2 sm:w-auto px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-lg border-2 border-teal-200 text-teal-700 rounded-xl sm:rounded-2xl font-bold hover:bg-teal-50 hover:scale-[1.03] hover:brightness-90  transition-all duration-300 flex items-center justify-center hover:border-teal-300"
+                    onClick={() => navigate(endPoint.ABOUT)}>
                       <Search className="mr-1 sm:mr-3 w-4 sm:w-6 h-4 sm:h-6" />
                       Tìm hiểu thêm
                     </button>

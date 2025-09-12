@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Clock, Search, Star, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { Clock, Star } from "lucide-react";
 import Pagination from "@components/Pagination";
-import { posts, categories } from "./data";
+import { posts } from "./data";
 import type { Post } from "./data";
 const POSTS_PER_PAGE = 9;
 
-const PostCard = ({ post, index }: { post: Post; index: number }) => {
+const PostCard = ({ post }: { post: Post }) => {
   const [isLiked, setIsLiked] = useState(false);
 
   return (
@@ -109,7 +109,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
   );
 };
 
-const BlogPost = ({ index = 0 }: { index?: number }) => {
+const BlogPost = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Paging logic
@@ -123,28 +123,29 @@ const BlogPost = ({ index = 0 }: { index?: number }) => {
 
       {/* Title */}
       {/* Title Section */}
-<section className="relative py-6 text-center overflow-hidden">
-  <div className="relative mx-auto px-4">
-    {/* Sub-title nhỏ 🏸 */}
-    <div className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-lg font-bold mb-1">
-      🏸 BLOG CẦU LÔNG CHUYÊN NGHIỆP
-    </div>
+      <section className="relative py-6 text-center overflow-hidden">
+        <div className="relative mx-auto px-4">
+          {/* Sub-title nhỏ 🏸 */}
+          <div className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-lg font-bold mb-1">
+            🏸 BLOG CẦU LÔNG CHUYÊN NGHIỆP
+          </div>
 
-    {/* Tiêu đề chính */}
-    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 leading-snug">
-      Cộng Đồng & Kiến Thức
-      <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 mt-1">
-        Cầu Lông Việt Nam
-      </span>
-    </h1>
+          {/* Tiêu đề chính */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 leading-snug">
+            Cộng Đồng & Kiến Thức
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 mt-1">
+              Cầu Lông Việt Nam
+            </span>
+          </h1>
 
-    {/* Mô tả */}
-    <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto mb-4 leading-relaxed">
-      Chia sẻ kinh nghiệm, tips hữu ích và kết nối với cộng đồng người chơi cầu lông trên khắp cả nước. Từ người mới bắt đầu đến pro player.
-    </p>
-  </div>
-</section>
-
+          {/* Mô tả */}
+          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto mb-4 leading-relaxed">
+            Chia sẻ kinh nghiệm, tips hữu ích và kết nối với cộng đồng người
+            chơi cầu lông trên khắp cả nước. Từ người mới bắt đầu đến pro
+            player.
+          </p>
+        </div>
+      </section>
 
       {/* Posts Grid */}
       <section className="sm:px-20 px-5 pb-13">
@@ -152,8 +153,8 @@ const BlogPost = ({ index = 0 }: { index?: number }) => {
           {paginatedPosts.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {paginatedPosts.map((post, index) => (
-                  <PostCard key={post.id} post={post} index={index} />
+                {paginatedPosts.map((post) => (
+                  <PostCard key={post.id} post={post} />
                 ))}
               </div>
 

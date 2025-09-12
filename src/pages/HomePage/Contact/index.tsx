@@ -41,7 +41,7 @@ const ContactPage: React.FC = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [_submitted, setSubmitted] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<

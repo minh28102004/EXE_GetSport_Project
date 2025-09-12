@@ -37,7 +37,7 @@ const mockCourtImages = Object.values(courtImages).slice(0, 3) as string[];
 
 // Navigation item component
 const NavItem = ({
-  id,
+  
   icon: Icon,
   title,
   isActive,

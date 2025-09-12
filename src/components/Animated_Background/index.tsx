@@ -14,7 +14,7 @@ const SportCourtAnimatedBackground: React.FC<SportCourtBackgroundProps> = ({
   animated = true,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [_dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   // Theme configurations
   const themes = {

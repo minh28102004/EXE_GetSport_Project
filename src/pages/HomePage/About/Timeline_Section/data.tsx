@@ -2,16 +2,10 @@ import {
   Play,
   Users,
   MapPin,
-  Trophy,
   Smartphone,
   Globe,
   Award,
   Zap,
-  Target,
-  TrendingUp,
-  ChevronRight,
-  CheckCircle,
-  ChevronLeft,
 } from "lucide-react";
 
 export interface TimelineItem {

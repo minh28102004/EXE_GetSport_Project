@@ -6,8 +6,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    
-
     /* Bundler mode */
     "moduleResolution": "Node", // ✅ sửa từ "bundler" ➝ "Node"
     "allowImportingTsExtensions": true,

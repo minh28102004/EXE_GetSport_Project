@@ -14,7 +14,7 @@ const BadmintonFAQ: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [currentPage, setCurrentPage] = useState<number>(1); // trang hiện tại
-  const pageSize = 6; // số item trên mỗi trang
+  const pageSize = 8; // số item trên mỗi trang
 
   const toggleExpanded = (id: number): void => {
     const newExpanded = new Set(expandedItems);

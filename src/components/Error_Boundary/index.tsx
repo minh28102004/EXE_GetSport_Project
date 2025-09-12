@@ -36,7 +36,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     };
   }
 
-  static getDerivedStateFromError(_: Error): Partial<ErrorBoundaryState> {
+  // static getDerivedStateFromError(_: Error): Partial<ErrorBoundaryState> {
+  //   return { hasError: true };
+  // }
+  static getDerivedStateFromError(): Partial<ErrorBoundaryState> {
     return { hasError: true };
   }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Clock, Star, TrendingUp } from "lucide-react";
+import { Clock, Star } from "lucide-react";
 import { posts } from "@pages/HomePage/BlogPost/data";
 import type { Post } from "@pages/HomePage/BlogPost/data";
 import { Link } from "react-router-dom";

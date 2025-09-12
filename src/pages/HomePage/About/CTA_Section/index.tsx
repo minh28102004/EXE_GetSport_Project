@@ -14,11 +14,10 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import endPoint from "@routes/router";
-import { useNavigate } from "react-router-dom";
 
 const CTASection = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const navigate = useNavigate();
+
 
   type FAQ = {
     question: string;

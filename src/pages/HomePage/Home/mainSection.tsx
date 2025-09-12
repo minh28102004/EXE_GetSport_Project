@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import BannerSection from "./Banner_Section";
 import CommunitySection from "./Community_Section";
 import MapSection from "./Map_Section";

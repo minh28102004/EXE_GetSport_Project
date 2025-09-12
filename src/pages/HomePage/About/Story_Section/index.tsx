@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { MapPin, Heart, Calendar, Sparkles, Quote, Eye } from "lucide-react";
-import { bannerImages } from "../data";
+import { bannerImages } from "./data";
 
 const StorySection = () => {
   const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({});
