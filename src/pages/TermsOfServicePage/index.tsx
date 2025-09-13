@@ -198,7 +198,7 @@ const TermsOfServicePage: React.FC = () => {
     <div className="bg-gradient-to-br from-gray-50 to-teal-50 min-h-screen">
       {/* Header */}
       <div className="bg-gradient-to-r from-teal-600 via-teal-500 to-cyan-500 text-white">
-        <div className="container mx-auto px-4 py-12 text-center">
+        <div className="container mx-auto px-4 py-7 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4">
             <ShieldCheck className="w-8 h-8" />
           </div>

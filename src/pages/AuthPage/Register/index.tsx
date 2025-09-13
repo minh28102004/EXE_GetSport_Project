@@ -12,6 +12,7 @@ import { GiShuttlecock } from "react-icons/gi";
 import { CustomTextInput, CustomPasswordInput } from "@components/Form_Input";
 import LoadingSpinner from "@components/Loading_Spinner";
 import useCustomForm from "@hooks/useReactHookForm";
+import endPoint from "@routes/router";
 
 interface FormData {
   username: string;
@@ -261,7 +262,7 @@ const Register: React.FC<RegisterProps> = ({
               <span>
                 Tôi đồng ý với các{" "}
                 <a
-                  href="/terms"
+                  href={endPoint.TERMSOFSERVICE}
                   className="text-teal-600 hover:brightness-75 hover:underline"
                 >
                   điều khoản dịch vụ

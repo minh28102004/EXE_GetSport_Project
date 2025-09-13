@@ -171,10 +171,10 @@ const CourtSection = () => {
                     </div>
                     <button
                       onClick={() => handleBooking(court)}
-                      className="px-3 py-1.5 bg-gradient-to-br from-[#35b6b8] to-[#1e9ea1] text-white font-medium rounded-xl hover:brightness-90 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl flex items-center justify-center gap-1 group"
+                      className="px-3 py-1.5 bg-gradient-to-br from-[#35b6b8] to-[#1e9ea1] text-white font-medium rounded-lg hover:brightness-90 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl flex items-center justify-center gap-1 group"
                     >
                       Đặt Sân Ngay
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      
                     </button>
                   </div>
                 </div>

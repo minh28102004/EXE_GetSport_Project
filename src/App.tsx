@@ -9,9 +9,11 @@ import HomePage from "@pages/HomePage/Home/mainSection";
 import AboutPage from "@pages/HomePage/About/mainSection";
 import BlogPost from "@pages/HomePage/BlogPost";
 import AuthPage from "@pages/AuthPage";
-import TermsOfServicePage from "@pages/TermsOfServicePage";
 import FAQsPage from "@pages/HomePage/FAQs";
 import ContactPage from "@pages/HomePage/Contact";
+import CourtBooking from "@pages/HomePage/CourtBooking"
+import TermsOfServicePage from "@pages/TermsOfServicePage";
+import PrivacyPolicyPage from "@pages/PrivacyPolicyPage";
 
 // Staff pages
 import Dashboard from "@pages/OwnerPage/Dashboard";
@@ -38,10 +40,14 @@ function AppRoutes() {
           <Route path={endPoint.BLOGPOST} element={<BlogPost />} />
           <Route path={endPoint.FAQS} element={<FAQsPage />} />
           <Route path={endPoint.CONTACT} element={<ContactPage />} />
-
+          <Route path={endPoint.COURTBOOKING} element={<CourtBooking />} />
           <Route
             path={endPoint.TERMSOFSERVICE}
             element={<TermsOfServicePage />}
+          />
+            <Route
+            path={endPoint.PRIVACYPOLICY}
+            element={<PrivacyPolicyPage />}
           />
         </Route>
 

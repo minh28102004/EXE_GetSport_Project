@@ -7,14 +7,15 @@ const endPoint = {
   BLOGPOST: "/blogPost",
   ABOUT: "/about",  
   FAQS:"/faqs",
-  BOOKING: "/booking",
+  COURTBOOKING: "/booking",
   LOCATIONS: "/locations",
   CONTACT: "/contact",
   USERPROFILE: "/userProfile",
   USERHISTORY: "/userHistory",
   DASHBOARDLAYOUT: "/dashboard",
-  UNAUTHORIZEDPAGE: "/unauthorizedPage",
-  TERMSOFSERVICE: "/terms",
+  UNAUTHORIZEDPAGE: "/unauthorizedpage",
+  TERMSOFSERVICE: "/termsofservice",
+  PRIVACYPOLICY:"/privacypolicy"
 };
 
 export default endPoint;

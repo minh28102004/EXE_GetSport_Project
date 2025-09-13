@@ -48,6 +48,8 @@ const BadmintonFAQ: React.FC = () => {
       court: "Sân bãi",
       account: "Tài khoản",
       security: "Bảo mật",
+      service: "Dịch vụ",
+      support: "Hỗ trợ",
     };
     return categoryNames[category] || category;
   };
