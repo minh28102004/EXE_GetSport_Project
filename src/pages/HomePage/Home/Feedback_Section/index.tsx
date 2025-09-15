@@ -117,7 +117,7 @@ const FeedbackSection: React.FC = () => {
     <div className="py-12 sm:py-18 px-4 sm:px-6 lg:px-15 bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <h2 className="text-4xl font-bold text-gray-800 mb-3">
             Khách Hàng Nói Gì Về Chúng Tôi
           </h2>

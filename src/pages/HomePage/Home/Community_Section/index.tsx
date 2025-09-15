@@ -3,6 +3,7 @@ import { Clock, Star } from "lucide-react";
 import { posts } from "@pages/HomePage/BlogPost/data";
 import type { Post } from "@pages/HomePage/BlogPost/data";
 import { Link } from "react-router-dom";
+import endPoint from "@routes/router";
 
 const PostCard = ({ post }: { post: Post }) => {
   return (
@@ -134,7 +135,7 @@ const CommunitySection = () => {
     <section className="py-12 sm:py-18 bg-gray-50">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-15">
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Cộng Đồng Cầu Lông
           </h2>
@@ -153,8 +154,8 @@ const CommunitySection = () => {
 
         {/* Button */}
         <div className="text-center mt-12">
-          <Link
-            to="/blogPost"
+          <a
+            href={endPoint.BLOGPOST}
             className="group inline-flex items-center gap-1 px-3 py-2 border-2 border-teal-200 text-teal-600 rounded-xl font-medium
                hover:bg-teal-50 hover:border-teal-300 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
           >
@@ -162,7 +163,7 @@ const CommunitySection = () => {
             <span className="transform transition-transform duration-300 group-hover:translate-x-1">
               →
             </span>
-          </Link>
+          </a>
         </div>
       </div>
     </section>

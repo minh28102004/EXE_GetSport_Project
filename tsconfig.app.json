@@ -18,8 +18,8 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": false,     // tắt để run with no error declared
-    "noUnusedParameters": false,  // tắt để run with no error declared
+    "noUnusedLocals": false, // tắt để run with no error declared
+    "noUnusedParameters": false, // tắt để run with no error declared
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,

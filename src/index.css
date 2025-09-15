@@ -34,6 +34,19 @@ h1 {
   line-height: 1.1;
 }
 
+/* Chrome, Safari, Edge */
+.custom-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: white;
+  border: 2px solid #14b8a6; /* màu xanh teal */
+  cursor: pointer;
+  box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
 /* Custom scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;

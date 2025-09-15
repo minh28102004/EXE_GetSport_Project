@@ -57,7 +57,7 @@ const Pagination = ({
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg transition-all duration-300 ${
+            className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg border border-gray-200 transition-all duration-300 ${
               currentPage === 1
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-white text-[#23AEB1] hover:bg-[#5FC5CB] hover:text-white shadow-md hover:shadow-lg transform hover:scale-105"
@@ -98,7 +98,7 @@ const Pagination = ({
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg transition-all duration-300 ${
+            className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg border border-gray-200 transition-all duration-300 ${
               currentPage === totalPages
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-white text-[#23AEB1] hover:bg-[#5FC5CB] hover:text-white shadow-md hover:shadow-lg transform hover:scale-105"
@@ -118,8 +118,8 @@ const Pagination = ({
         </div>
 
         {/* Input + GO */}
-        <div className="bg-white p-1 rounded-lg shadow-md text-gray-700">
-          {totalPages > 2 && (
+        {totalPages > 2 && (
+          <div className="bg-white p-1 rounded-lg shadow-md text-gray-700">
             <div className="flex items-center space-x-2">
               <Tooltip title="Nhập số trang muốn tới" arrow>
                 <input
@@ -128,7 +128,7 @@ const Pagination = ({
                   max={totalPages}
                   value={inputPage}
                   onChange={handleInputChange}
-                  className="w-12 px-2 py-1 border rounded-lg text-center text-sm outline-none border-gray-300"
+                  className="w-12 px-2 py-1 border rounded-md text-center text-sm outline-none border-gray-300"
                   placeholder="Page"
                 />
               </Tooltip>
@@ -141,8 +141,8 @@ const Pagination = ({
                 </button>
               </Tooltip>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
