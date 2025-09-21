@@ -1,6 +1,6 @@
 // src/store.ts
 import { configureStore } from "@reduxjs/toolkit";
-import { baseApi } from "./features/api/baseApi"; // file baseApi mà bạn đã viết
+import { baseApi } from "../api/baseApi"; // file baseApi mà bạn đã viết
 
 export const store = configureStore({
   reducer: {

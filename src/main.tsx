@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { store } from "./store";   // import store
+import { store } from "./features/store/store.ts";   // import store
 import "./index.css";
 import App from "./App.tsx";
 import { ToastContainer } from "react-toastify";
