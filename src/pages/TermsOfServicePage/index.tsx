@@ -205,11 +205,11 @@ const TermsOfServicePage: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Điều Khoản Dịch Vụ
           </h1>
-          <p className="text-teal-100 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-50 text-lg max-w-2xl mx-auto">
             Nền tảng đặt sân cầu lông hàng đầu - Minh bạch, tin cậy và chuyên
             nghiệp
           </p>
-          <div className="flex items-center justify-center mt-6 text-teal-100">
+          <div className="flex items-center justify-center mt-4 text-gray-50">
             <Clock className="w-5 h-5 mr-2" />
             <span>Cập nhật lần cuối: 08/07/2025</span>
           </div>

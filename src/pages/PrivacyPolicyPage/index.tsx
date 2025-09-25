@@ -231,7 +231,7 @@ const PrivacyPolicyPage: React.FC = () => {
   return (
     <div className="bg-gradient-to-br from-gray-50 to-[#1e9ea1]/5 min-h-screen">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#1e9ea1] via-[#16a085] to-[#0891b2] text-white">
+      <div className="bg-gradient-to-r from-teal-600 via-teal-500 to-cyan-500 text-white">
         <div className="container mx-auto px-4 py-7 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4">
             <Shield className="w-8 h-8" />
@@ -239,11 +239,11 @@ const PrivacyPolicyPage: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Chính Sách Bảo Mật
           </h1>
-          <p className="text-white text-lg max-w-2xl mx-auto">
+          <p className="text-gray-50 text-lg max-w-2xl mx-auto">
             Cam kết bảo vệ thông tin cá nhân và quyền riêng tư của bạn một cách
             tuyệt đối
           </p>
-          <div className="flex items-center justify-center mt-6 text-white">
+          <div className="flex items-center justify-center mt-4 text-gray-50">
             <Clock className="w-5 h-5 mr-2" />
             <span>Cập nhật lần cuối: 08/07/2025</span>
           </div>

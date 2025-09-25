@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import { courts, amenitiesList, areas } from "./data";
 import CourtCard from "./CourtCard";
 import Pagination from "@components/Pagination";
+import MapView from "./GoogleMap/modernMapInterFace";
 
 // ========================== Main Component ==========================
 const BadmintonBooking: React.FC = () => {
@@ -358,11 +359,20 @@ const BadmintonBooking: React.FC = () => {
         {/* Main Content */}
         <div className="lg:col-span-3">
           {/* Date Selector */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
+          <div
+            className={`bg-white rounded-lg shadow-sm p-6   ${
+              isList ? "mb-6" : "mb-0"
+            }`}
+          >
+            <div
+              className={`flex items-center justify-between ${
+                isList ? "mb-4" : "mb-0"
+              }`}
+            >
               <h2 className="text-3xl font-semibold text-gray-900">
-                Danh Sách Sân Cầu Lông
+                {isList ? "Danh Sách Sân Cầu Lông" : "Bản Đồ Sân Cầu Lông"}
               </h2>
+
               {/* Title + Toggle Buttons */}
               <div className="flex items-center justify-center">
                 <div
@@ -398,74 +408,88 @@ const BadmintonBooking: React.FC = () => {
             </div>
 
             {/* Calendar Buttons */}
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#1e9ea1]" />
-                Chọn ngày
-              </p>
+            {isList && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-[#1e9ea1]" />
+                  Chọn ngày
+                </p>
 
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                {dates.map((date) => (
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                  {dates.map((date) => (
+                    <button
+                      key={date.date}
+                      onClick={() => setSelectedDate(date.fullDate)}
+                      className={`flex flex-col items-center min-w-[72px] py-3 px-4 rounded-xl border transition-all duration-200 shadow-sm hover:shadow-md ${
+                        selectedDate === date.fullDate
+                          ? "bg-gradient-to-r from-[#25b1b3] to-[#1a9498] text-white border-transparent scale-105"
+                          : "bg-white text-gray-600 border-gray-300 hover:border-[#1e9ea1] hover:text-[#1e9ea1]"
+                      }`}
+                    >
+                      <span className="text-xs font-medium">{date.day}</span>
+                      <span className="text-xl font-bold">{date.date}</span>
+                      <span className="text-xs">{date.label}</span>
+                    </button>
+                  ))}
                   <button
-                    key={date.date}
-                    onClick={() => setSelectedDate(date.fullDate)}
-                    className={`flex flex-col items-center min-w-[72px] py-3 px-4 rounded-xl border transition-all duration-200 shadow-sm hover:shadow-md ${
-                      selectedDate === date.fullDate
-                        ? "bg-gradient-to-r from-[#22a6a9] to-[#1a9498] text-white border-transparent scale-105"
-                        : "bg-white text-gray-600 border-gray-300 hover:border-[#1e9ea1] hover:text-[#1e9ea1]"
-                    }`}
+                    onClick={() => setOpenCalendarModal(true)}
+                    className="flex flex-col items-center justify-center min-w-[72px] py-3 px-4 rounded-xl border border-gray-300 text-gray-600 transition-all duration-200 hover:border-[#1e9ea1] hover:text-[#1e9ea1] hover:shadow-md"
                   >
-                    <span className="text-xs font-medium">{date.day}</span>
-                    <span className="text-xl font-bold">{date.date}</span>
-                    <span className="text-xs">{date.label}</span>
+                    <Calendar className="w-6 h-6 mb-1" />
+                    <span className="text-sm font-medium">Khác</span>
                   </button>
+                  <CalendarModal
+                    open={openCalendarModal}
+                    onClose={() => setOpenCalendarModal(false)}
+                    onSelectDate={(date) => {
+                      setSelectedDate(date);
+                      setOpenCalendarModal(false);
+                    }}
+                  />
+                </div>
+
+                {selectedDate && (
+                  <p className="mt-3 text-medium text-gray-700">
+                    <span className="font-medium text-[#1e9ea1]">
+                      Ngày đã chọn:
+                    </span>{" "}
+                    {formatDateShort(selectedDate)}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* List view court or Map */}
+          {isList ? (
+            <>
+              {/* Courts Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-12">
+                {paginatedCourts.map((court) => (
+                  <CourtCard
+                    key={court.id}
+                    court={court}
+                    onBooking={handleBooking}
+                  />
                 ))}
-                <button
-                  onClick={() => setOpenCalendarModal(true)}
-                  className="flex flex-col items-center justify-center min-w-[72px] py-3 px-4 rounded-xl border border-gray-300 text-gray-600 transition-all duration-200 hover:border-[#1e9ea1] hover:text-[#1e9ea1] hover:shadow-md"
-                >
-                  <Calendar className="w-6 h-6 mb-1" />
-                  <span className="text-sm font-medium">Khác</span>
-                </button>
-                <CalendarModal
-                  open={openCalendarModal}
-                  onClose={() => setOpenCalendarModal(false)}
-                  onSelectDate={(date) => {
-                    setSelectedDate(date);
-                    setOpenCalendarModal(false);
-                  }}
-                />
               </div>
 
-              {selectedDate && (
-                <p className="mt-3 text-medium text-gray-700">
-                  <span className="font-medium text-[#1e9ea1]">
-                    Ngày đã chọn:
-                  </span>{" "}
-                  {formatDateShort(selectedDate)}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Courts Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-12">
-            {paginatedCourts.map((court) => (
-              <CourtCard
-                key={court.id}
-                court={court}
-                onBooking={handleBooking}
+              {/* Pagination */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                pageSize={pageSize}
+                totalItems={courts.length}
+                onPageChange={setCurrentPage}
               />
-            ))}
-          </div>
-          {/* Pagination */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            pageSize={pageSize}
-            totalItems={courts.length}
-            onPageChange={setCurrentPage}
-          />
+            </>
+          ) : (
+            <div className=" mt-2">
+              {" "}
+              {/* h-4/5 = 80vh */}
+              <MapView />
+            </div>
+          )}
         </div>
       </div>
     </div>
