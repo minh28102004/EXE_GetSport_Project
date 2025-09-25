@@ -1,6 +1,6 @@
 // src/components/UserManagement.tsx
 import React, { useState, useEffect } from "react";
-import { FaLock, FaUnlock, FaTrash, FaUserEdit } from "react-icons/fa";
+import { FaLock, FaUnlock, FaTrash, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import UserForm from "./UserForm";
 import { useGetAccountsQuery } from "../../../features/accounts/accountApi";
 import type { Account } from "../../../types/account";
@@ -12,7 +12,6 @@ const UserManagement: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<Account | null>(null);
   const [localUsers, setLocalUsers] = useState<Account[]>([]);
 
-  // Sync localUsers với dữ liệu từ API khi load xong
   useEffect(() => {
     if (users.length) setLocalUsers(users);
   }, [users]);
@@ -40,54 +39,81 @@ const UserManagement: React.FC = () => {
     closeModal();
   };
 
-  if (isLoading) return <div>Đang tải dữ liệu...</div>;
-  if (isError) return <div>Lỗi khi tải dữ liệu</div>;
+  if (isLoading) return <div className="text-center p-10">Đang tải dữ liệu...</div>;
+  if (isError) return <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>;
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Quản lý người dùng</h1>
-      <p className="text-gray-600">
-        Quản lý tài khoản và phân quyền người dùng trong hệ thống
-      </p>
+    <div className="min-h-screen bg-gray-100 p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Quản lý người dùng</h1>
+          <p className="text-gray-500">Quản lý tài khoản và phân quyền trong hệ thống</p>
+        </div>
+        <button
+          onClick={() => openModal(null)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow hover:scale-105 transition"
+        >
+          <FaUserPlus /> Thêm người dùng
+        </button>
+      </div>
 
-      <div className="bg-white shadow rounded-xl p-4">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b">
-              <th className="p-2">Người dùng</th>
-              <th className="p-2">Email</th>
-              <th className="p-2">Vai trò</th>
-              <th className="p-2">Trạng thái</th>
-              <th className="p-2">Ngày tạo</th>
-              <th className="p-2">Thao tác</th>
+      {/* Table */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-gray-50 border-b text-gray-700">
+            <tr>
+              <th className="p-3">Người dùng</th>
+              <th className="p-3">Email</th>
+              <th className="p-3">Vai trò</th>
+              <th className="p-3">Trạng thái</th>
+              <th className="p-3">Ngày tạo</th>
+              <th className="p-3">Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {localUsers.map((u) => (
-              <tr key={u.userId} className="border-b">
-                <td className="p-2 font-medium">{u.fullname}</td>
-                <td className="p-2">{u.email}</td>
-                <td className="p-2">{u.role}</td>
-                <td className="p-2">{u.status}</td>
-                <td className="p-2">{new Date(u.createat).toLocaleDateString()}</td>
-                <td className="p-2 flex gap-2">
-                  <button onClick={() => openModal(u)}>
+            {localUsers.map((u, i) => (
+              <tr
+                key={u.userId}
+                className={`${
+                  i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                } hover:bg-gray-100 transition`}
+              >
+                <td className="p-3 font-medium text-gray-800">{u.fullname}</td>
+                <td className="p-3">{u.email}</td>
+                <td className="p-3">{u.role}</td>
+                <td className="p-3">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      u.status === "active"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {u.status}
+                  </span>
+                </td>
+                <td className="p-3 text-gray-600">
+                  {new Date(u.createat).toLocaleDateString()}
+                </td>
+                <td className="p-3 flex gap-3">
+                  <button onClick={() => openModal(u)} className="hover:scale-110 transition">
                     <FaUserEdit className="text-blue-500 hover:text-blue-700" />
                   </button>
                   {u.status === "active" ? (
-                    <button className="text-yellow-500 hover:text-yellow-700">
-                      <FaLock />
+                    <button className="hover:scale-110 transition">
+                      <FaLock className="text-yellow-500 hover:text-yellow-700" />
                     </button>
                   ) : (
-                    <button className="text-green-500 hover:text-green-700">
-                      <FaUnlock />
+                    <button className="hover:scale-110 transition">
+                      <FaUnlock className="text-green-500 hover:text-green-700" />
                     </button>
                   )}
                   <button
-                    className="text-red-500 hover:text-red-700"
+                    className="hover:scale-110 transition"
                     onClick={() => handleDelete(u.userId)}
                   >
-                    <FaTrash />
+                    <FaTrash className="text-red-500 hover:text-red-700" />
                   </button>
                 </td>
               </tr>
@@ -96,9 +122,10 @@ const UserManagement: React.FC = () => {
         </table>
       </div>
 
+      {/* Modal */}
       {isModalOpen && (
         <div className="modal-overlay">
-          <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
+          <div className="modal-content">
             <UserForm user={currentUser} onSave={handleUserSaved} onClose={closeModal} />
           </div>
         </div>
