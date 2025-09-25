@@ -8,7 +8,9 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "esModuleInterop": true, // ✅ thêm
+    "allowSyntheticDefaultImports": true, // ✅ thêm
+    "moduleResolution": "Node", // ✅ đổi từ "bundler" sang Node
     "allowJs": true,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,

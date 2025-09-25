@@ -16,7 +16,7 @@ const Pagination = ({
   currentPage,
   totalPages,
   pageSize = 6,
-  totalItems = 0,
+  totalItems = 0, 
   onPageChange,
 }: PaginationProps) => {
   const visiblePages = usePagination(currentPage, totalPages);

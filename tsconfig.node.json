@@ -15,14 +15,14 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": false,   // tắt để run with no error declared
-    "noUnusedParameters": false,  // tắt để run with no error declared
+    "noUnusedLocals": false, // tắt để run with no error declared
+    "noUnusedParameters": false, // tắt để run with no error declared
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
     /* Bổ sung thêm types cho Node */
-    "types": ["node"],
+    "types": ["node"]
     // "typeRoots": ["./node_modules/@types", "./@types"]
   },
   "include": ["vite.config.ts"]
