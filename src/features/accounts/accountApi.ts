@@ -1,6 +1,6 @@
 // src/features/account/accountApi.ts
 import { baseApi } from "../api/baseApi";
-import type { Account } from "../../types/account";
+import type { Account } from "../types/account";
 
 export const accountApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

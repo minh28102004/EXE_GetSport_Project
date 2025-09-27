@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FaLock, FaUnlock, FaTrash, FaUserEdit, FaUserPlus } from "react-icons/fa";
 import UserForm from "./UserForm";
 import { useGetAccountsQuery } from "../../../features/accounts/accountApi";
-import type { Account } from "../../../types/account";
+import type { Account } from "../../../features/types/account";
 import "./styles.css";
 
 const UserManagement: React.FC = () => {
