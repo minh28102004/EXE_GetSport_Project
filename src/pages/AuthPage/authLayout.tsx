@@ -31,28 +31,28 @@ const AuthPage: React.FC = () => {
       {/* Back to home */}
       <Link
         to="/"
-        className="absolute top-5 left-5 z-20 group flex items-center justify-center 
-             w-auto px-3 py-2 rounded-full bg-white shadow-md hover:shadow-xl 
-             transition-all duration-300 ring-2 ring-gray-300/50 hover:ring-teal-500/80"
+        className="absolute top-4 left-4 z-20 group inline-flex items-center
+                   px-3 py-2 rounded-full bg-white shadow-md hover:shadow-lg
+                   transition-all duration-300 ring-1 ring-gray-300/60 hover:ring-teal-500/70"
         aria-label="Quay về trang chủ"
       >
-        <FiArrowLeft className="w-5 h-5 text-gray-600 transition-transform duration-300 group-hover:-translate-x-1 group-hover:text-teal-600" />
-        <span className="ml-0.5 text-gray-700 font-medium transition-transform duration-300 group-hover:-translate-x-1 group-hover:text-teal-600">
-          Trang chủ
+        <FiArrowLeft className="w-4.5 h-4.5 text-gray-600 transition-transform duration-300 group-hover:-translate-x-1 group-hover:text-teal-600" />
+        <span className="ml-1 text-sm text-gray-700 font-medium group-hover:-translate-x-1 transition-transform duration-300 group-hover:text-teal-600">
+         Trang chủ
         </span>
       </Link>
 
       {/* Auth Container */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
-        <div className="w-full ">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-3 sm:px-4">
+        <div className="w-full">
           <AnimatePresence mode="wait">
             {view === "login" && (
               <motion.div
                 key="login"
-                initial={{ opacity: 0, x: -50, rotateY: 20 }}
+                initial={{ opacity: 0, x: -40, rotateY: 16 }}
                 animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                exit={{ opacity: 0, x: -50, rotateY: 10, rotateX: -5 }}
-                transition={{ duration: 0.6 }}
+                exit={{ opacity: 0, x: -40, rotateY: 8, rotateX: -4 }}
+                transition={{ duration: 0.5 }}
                 className="w-full"
               >
                 <Login
@@ -65,10 +65,10 @@ const AuthPage: React.FC = () => {
             {view === "register" && (
               <motion.div
                 key="register"
-                initial={{ opacity: 0, x: 50, rotateY: -20 }}
+                initial={{ opacity: 0, x: 40, rotateY: -16 }}
                 animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                exit={{ opacity: 0, x: 50, rotateY: 10, rotateX: 5 }}
-                transition={{ duration: 0.6 }}
+                exit={{ opacity: 0, x: 40, rotateY: 8, rotateX: 4 }}
+                transition={{ duration: 0.5 }}
                 className="w-full"
               >
                 <Register toggleView={() => changeView("login")} />
@@ -78,10 +78,10 @@ const AuthPage: React.FC = () => {
             {view === "forgot" && (
               <motion.div
                 key="forgot"
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.6 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.45 }}
                 className="w-full"
               >
                 <ForgotPassword toggleView={() => changeView("login")} />

@@ -8,7 +8,7 @@ import ManagementLayout from "@layout/ManagementLayout";
 import HomePage from "@pages/HomePage/Home/mainSection";
 import AboutPage from "@pages/HomePage/About/mainSection";
 import BlogPost from "@pages/HomePage/BlogPost";
-import AuthPage from "@pages/AuthPage";
+import AuthPage from "@pages/AuthPage/authLayout";
 import FAQsPage from "@pages/HomePage/FAQs";
 import ContactPage from "@pages/HomePage/Contact";
 import CourtBooking from "@pages/HomePage/CourtBooking"

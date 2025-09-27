@@ -12,24 +12,24 @@ const Footer: React.FC = () => {
   return (
     <footer className="w-full bg-[#2E2B2B] text-gray-300">
       {/* Top section */}
-      <div className="w-full px-10 py-8 pt-6 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="w-full px-4 sm:px-10 py-6 sm:py-8 grid grid-cols-1 md:grid-cols-4 gap-8 sm:gap-10">
         {/* Cột 1 */}
         <div>
-          <h3 className="text-2xl font-extrabold text-white">
+          <h3 className="text-xl sm:text-2xl font-extrabold text-white leading-none">
             Get <span className="text-[#23AEB1]">Sport!</span>
           </h3>
-          <p className="mt-4 text-md text-gray-400 leading-relaxed">
+          <p className="mt-3 text-sm sm:text-base text-gray-400 leading-relaxed">
             Hệ thống đặt sân cầu lông hiện đại, tiện lợi và dễ sử dụng nhất Việt
             Nam.
           </p>
-          <div className="mt-5 flex items-center gap-3">
+          <div className="mt-4 flex items-center gap-2 sm:gap-3">
             {[Facebook, Instagram, Youtube, Twitter].map((Icon, idx) => (
               <a
                 key={idx}
                 href="#"
-                className="p-2.5 rounded-lg bg-white/5 hover:bg-[#23AEB1]/20 transition"
+                className="p-2 sm:p-2.5 rounded-lg bg-white/5 hover:bg-[#23AEB1]/20 transition"
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
             ))}
           </div>
@@ -37,10 +37,10 @@ const Footer: React.FC = () => {
 
         {/* Cột 2 */}
         <div>
-          <h4 className="text-lg font-semibold text-white mb-4">
+          <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
             Liên Kết Nhanh
           </h4>
-          <ul className="grid grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-6">
+          <ul className="grid grid-cols-2 md:grid-cols-1 gap-y-2 sm:gap-y-3 gap-x-4 sm:gap-x-6 text-sm sm:text-base">
             {[
               "Trang Chủ",
               "Đặt Sân",
@@ -53,9 +53,9 @@ const Footer: React.FC = () => {
                 <a
                   href="#"
                   className="relative inline-flex items-center text-gray-400 hover:text-[#23AEB1] transition-colors
-             after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 
-             after:bg-[#23AEB1] after:transition-all after:duration-300
-             hover:after:w-full"
+                             after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 
+                             after:bg-[#23AEB1] after:transition-all after:duration-300
+                             hover:after:w-full"
                 >
                   {item}
                 </a>
@@ -66,8 +66,10 @@ const Footer: React.FC = () => {
 
         {/* Cột 3 */}
         <div>
-          <h4 className="text-lg font-semibold text-white mb-4">Dịch Vụ</h4>
-          <ul className="grid grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-6">
+          <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">
+            Dịch Vụ
+          </h4>
+          <ul className="grid grid-cols-2 md:grid-cols-1 gap-y-2 sm:gap-y-3 gap-x-4 sm:gap-x-6 text-sm sm:text-base">
             {[
               "Đặt Sân Cầu Lông",
               "Thuê HLV Cá Nhân",
@@ -80,9 +82,9 @@ const Footer: React.FC = () => {
                 <a
                   href="#"
                   className="relative inline-flex items-center text-gray-400 hover:text-[#23AEB1] transition-colors
-             after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 
-             after:bg-[#23AEB1] after:transition-all after:duration-300
-             hover:after:w-full"
+                             after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 
+                             after:bg-[#23AEB1] after:transition-all after:duration-300
+                             hover:after:w-full"
                 >
                   {item}
                 </a>
@@ -93,30 +95,29 @@ const Footer: React.FC = () => {
 
         {/* Cột 4 */}
         <div>
-          <h4 className="text-lg font-semibold text-white mb-4">
+          <h4 className="text-base sm:text-lg font-semibold text-white mb-3">
             Tải Ứng Dụng
           </h4>
-          <p className="text-md text-gray-400 mb-4">
+          <p className="text-sm sm:text-base text-gray-400 mb-3">
             Tải ứng dụng để có trải nghiệm tốt nhất khi đặt sân cầu lông.
           </p>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 sm:gap-3">
             <a
               href="#"
-              className="flex items-center justify-center gap-2 bg-[#23AEB1] text-white px-4 py-2 rounded-lg hover:opacity-90"
+              className="flex items-center justify-center gap-2 bg-[#23AEB1] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg hover:opacity-90"
             >
-              <SiAppstore size={22} />
-              <span className="text-base">
-                Tải về trên <span className="font-bold text-lg">App Store</span>
+              <SiAppstore size={20} className="sm:w-6 sm:h-6" />
+              <span className="text-sm sm:text-base">
+                Tải về trên <span className="font-bold">App Store</span>
               </span>
             </a>
             <a
               href="#"
-              className="flex items-center justify-center gap-2 bg-[#23AEB1] text-white px-4 py-2 rounded-lg hover:opacity-90"
+              className="flex items-center justify-center gap-2 bg-[#23AEB1] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg hover:opacity-90"
             >
-              <SiGoogleplay size={22} />
-              <span className="text-base">
-                Tải về trên{" "}
-                <span className="font-bold text-lg">Google Play</span>
+              <SiGoogleplay size={20} className="sm:w-6 sm:h-6" />
+              <span className="text-sm sm:text-base">
+                Tải về trên <span className="font-bold">Google Play</span>
               </span>
             </a>
           </div>
@@ -124,17 +125,14 @@ const Footer: React.FC = () => {
       </div>
 
       {/* Bottom bar */}
-      <div className="w-full px-9 py-3 flex flex-col md:flex-row items-center justify-between border-t border-white/10 text-sm text-gray-300">
-        {/* Trademark */}
-        <p className="text-center flex-1 ml-20">
+      <div className="w-full px-4 sm:px-10 py-3 flex flex-col md:flex-row items-center justify-between border-t border-white/10 text-xs sm:text-sm md:text-base text-gray-300">
+        <p className="text-center md:text-left">
           © 2025 GetSport. Tất cả quyền được bảo lưu.
         </p>
-
-        {/* Các icon thanh toán */}
-        <div className="flex items-center gap-5 md:ml-auto mt-3 md:mt-0">
-          <SiVisa className="w-6 h-6 hover:text-white cursor-pointer" />
-          <SiPaypal className="w-6 h-6 hover:text-white cursor-pointer" />
-          <CreditCard className="w-6 h-6 hover:text-white cursor-pointer" />
+        <div className="flex items-center gap-3 sm:gap-4 md:ml-auto mt-2 md:mt-0">
+          <SiVisa className="w-4 h-4 sm:w-5 sm:h-5 hover:text-white cursor-pointer" />
+          <SiPaypal className="w-4 h-4 sm:w-5 sm:h-5 hover:text-white cursor-pointer" />
+          <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 hover:text-white cursor-pointer" />
         </div>
       </div>
     </footer>
