@@ -365,7 +365,7 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
       <div className="absolute bottom-6 left-6 right-6 space-y-3">
         <Link
-          to="/"
+          to={endPoint.REGISTER}
           onClick={onClose}
           className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl 
                border-2 border-[#23AEB1] text-[#23AEB1] font-medium 
@@ -377,7 +377,7 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
         </Link>
 
         <Link
-          to="/"
+          to={endPoint.LOGIN}
           onClick={onClose}
           className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl 
                bg-gradient-to-r from-[#23AEB1] via-[#20a4a6] to-[#1e9ea1] 

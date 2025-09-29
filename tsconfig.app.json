@@ -39,7 +39,8 @@
       "@layout/*": ["src/layout/*"],
       "@api/*": ["src/api/*"],
       "@app/*": ["src/app/*"],
-      "@redux/*": ["src/redux/*"]
+      "@redux/*": ["src/redux/*"],
+      "@lib/*": ["src/lib/*"]
     }
   },
   "include": ["src"]

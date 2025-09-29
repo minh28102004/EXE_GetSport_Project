@@ -1,3 +1,4 @@
+// components/Form_Input.tsx
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import type { UseFormRegisterReturn } from "react-hook-form";
@@ -16,6 +17,10 @@ interface InputProps {
 
   // react-hook-form
   register?: UseFormRegisterReturn;
+
+  // NEW: hỗ trợ autoComplete + pass-through
+  autoComplete?: string;
+  inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
 /* ===================== TEXT INPUT (Floating Label) ===================== */
@@ -29,19 +34,19 @@ export const CustomTextInput: React.FC<InputProps> = ({
   value,
   onChange,
   register,
+  autoComplete,
+  inputProps,
 }) => {
   const hasIcon = !!Icon;
 
   return (
     <div className="relative">
-      {/* Left icon */}
       {hasIcon && (
         <div className="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none">
           <Icon />
         </div>
       )}
 
-      {/* Input (use placeholder=' ' for :placeholder-shown trick) */}
       <input
         id={name}
         name={name}
@@ -50,7 +55,11 @@ export const CustomTextInput: React.FC<InputProps> = ({
         value={value}
         onChange={onChange}
         placeholder=" "
+        autoComplete={autoComplete}
+        autoCapitalize="off"
+        spellCheck={false}
         aria-invalid={!!error}
+        {...inputProps}
         {...register}
         className={[
           "peer w-full border-2 rounded-lg bg-gray-50 focus:bg-white text-sm transition-all duration-200 outline-none",
@@ -58,29 +67,21 @@ export const CustomTextInput: React.FC<InputProps> = ({
           error
             ? "border-red-500 focus:ring-2 focus:ring-red-400"
             : "border-gray-200 hover:border-teal-500/30 focus:border-teal-500 focus:ring-1 focus:ring-teal-400/10",
-          // Ẩn placeholder thật, chỉ dùng label nổi
           "placeholder-transparent",
         ].join(" ")}
       />
 
-      {/* Floating label */}
       <label
         htmlFor={name}
         className={[
           "absolute pointer-events-none transition-all",
-          // vị trí mặc định (chưa nhập / chưa focus)
           "top-1/2 -translate-y-1/2 text-sm text-gray-500",
           hasIcon ? "left-10" : "left-3",
-
-          // khi focus hoặc có value
           "peer-focus:top-0 peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-teal-600",
           "peer-[&:not(:placeholder-shown)]:top-0 peer-[&:not(:placeholder-shown)]:-translate-y-2.5 peer-[&:not(:placeholder-shown)]:text-xs",
-
-          // khi nổi thì đẩy label sát viền hơn (left-2 thay vì left-3/left-10)
           hasIcon
             ? "peer-focus:left-8 peer-[&:not(:placeholder-shown)]:left-8"
             : "peer-focus:left-2 peer-[&:not(:placeholder-shown)]:left-2",
-
           "px-1 bg-gray-50 peer-focus:bg-white peer-[&:not(:placeholder-shown)]:bg-white",
           error ? "text-red-600 peer-focus:text-red-600" : "",
         ].join(" ")}
@@ -88,7 +89,6 @@ export const CustomTextInput: React.FC<InputProps> = ({
         {label}
       </label>
 
-      {/* Error */}
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
     </div>
   );
@@ -104,20 +104,20 @@ export const CustomPasswordInput: React.FC<InputProps> = ({
   value,
   onChange,
   register,
+  autoComplete,
+  inputProps,
 }) => {
   const [show, setShow] = useState(false);
   const hasIcon = !!Icon;
 
   return (
     <div className="relative">
-      {/* Left icon */}
       {hasIcon && (
         <div className="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none">
           <Icon />
         </div>
       )}
 
-      {/* Input */}
       <input
         id={name}
         name={name}
@@ -126,7 +126,11 @@ export const CustomPasswordInput: React.FC<InputProps> = ({
         value={value}
         onChange={onChange}
         placeholder=" "
+        autoComplete={autoComplete} // e.g. "current-password" | "new-password"
+        autoCapitalize="off"
+        spellCheck={false}
         aria-invalid={!!error}
+        {...inputProps}
         {...register}
         className={[
           "peer w-full border-2 rounded-lg bg-gray-50 focus:bg-white text-sm transition-all duration-200 outline-none",
@@ -138,10 +142,9 @@ export const CustomPasswordInput: React.FC<InputProps> = ({
         ].join(" ")}
       />
 
-      {/* Toggle Show/Hide */}
       <button
         type="button"
-        onClick={() => setShow((prev) => !prev)}
+        onClick={() => setShow((p) => !p)}
         onMouseDown={(e) => e.preventDefault()}
         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-teal-500"
         aria-label={show ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
@@ -150,24 +153,17 @@ export const CustomPasswordInput: React.FC<InputProps> = ({
         {show ? <FaEyeSlash /> : <FaEye />}
       </button>
 
-      {/* Floating label */}
       <label
         htmlFor={name}
         className={[
           "absolute pointer-events-none transition-all",
-          // vị trí mặc định (chưa nhập / chưa focus)
           "top-1/2 -translate-y-1/2 text-sm text-gray-500",
           hasIcon ? "left-10" : "left-3",
-
-          // khi focus hoặc có value
           "peer-focus:top-0 peer-focus:-translate-y-2.5 peer-focus:text-xs peer-focus:text-teal-600",
           "peer-[&:not(:placeholder-shown)]:top-0 peer-[&:not(:placeholder-shown)]:-translate-y-2.5 peer-[&:not(:placeholder-shown)]:text-xs",
-
-          // khi nổi thì đẩy label sát viền hơn (left-2 thay vì left-3/left-10)
           hasIcon
             ? "peer-focus:left-8 peer-[&:not(:placeholder-shown)]:left-8"
             : "peer-focus:left-2 peer-[&:not(:placeholder-shown)]:left-2",
-
           "px-1 bg-gray-50 peer-focus:bg-white peer-[&:not(:placeholder-shown)]:bg-white",
           error ? "text-red-600 peer-focus:text-red-600" : "",
         ].join(" ")}
@@ -175,7 +171,6 @@ export const CustomPasswordInput: React.FC<InputProps> = ({
         {label}
       </label>
 
-      {/* Error */}
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
     </div>
   );

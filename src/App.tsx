@@ -11,7 +11,7 @@ import BlogPost from "@pages/HomePage/BlogPost";
 import AuthPage from "@pages/AuthPage/authLayout";
 import FAQsPage from "@pages/HomePage/FAQs";
 import ContactPage from "@pages/HomePage/Contact";
-import CourtBooking from "@pages/HomePage/CourtBooking"
+import CourtBooking from "@pages/HomePage/CourtBooking";
 import TermsOfServicePage from "@pages/TermsOfServicePage";
 import PrivacyPolicyPage from "@pages/PrivacyPolicyPage";
 
@@ -27,6 +27,8 @@ import BookingManagementAdmin from "@pages/AdminPage/BookingManagement";
 import BookingReport from "@pages/AdminPage/BookingReport";
 import UserManagement from "@pages/AdminPage/UserManagement";
 import AdminProfile from "@pages/AdminPage/AdminProfile";
+// Serices
+import AuthTokenWatcher from "@utils/authTokenWatcher";
 
 function AppRoutes() {
   return (
@@ -45,13 +47,11 @@ function AppRoutes() {
             path={endPoint.TERMSOFSERVICE}
             element={<TermsOfServicePage />}
           />
-            <Route
+          <Route
             path={endPoint.PRIVACYPOLICY}
             element={<PrivacyPolicyPage />}
           />
         </Route>
-
-        {/* <Route path="/layout" element={<BadmintonDashboard />} /> */}
 
         {/* Login + Register + forgotPassword */}
         <Route path={endPoint.AUTH} element={<AuthPage />} />
@@ -86,6 +86,7 @@ function AppRoutes() {
 function App() {
   return (
     <ErrorBoundary>
+      <AuthTokenWatcher />
       <AppRoutes />
     </ErrorBoundary>
   );

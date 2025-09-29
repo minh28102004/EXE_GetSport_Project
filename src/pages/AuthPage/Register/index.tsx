@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   FaUser,
   FaEnvelope,
@@ -20,6 +20,9 @@ import {
   barClassFor,
   labelForScore,
 } from "@hooks/usePasswordStrength";
+import { useRegisterMutation } from "@redux/features/auth/authApi";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
   username: string;
@@ -28,6 +31,7 @@ interface FormData {
   confirmPassword: string;
   agreeTerms: boolean;
 }
+
 interface RegisterProps {
   toggleView: () => void;
   onRegister?: (data: FormData) => void;
@@ -39,17 +43,14 @@ const Register: React.FC<RegisterProps> = ({
   onRegister,
   onSocialRegister,
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [registerApi, { isLoading }] = useRegisterMutation();
   const passAnchorRef = useRef<HTMLDivElement>(null);
   const confirmAnchorRef = useRef<HTMLDivElement>(null);
-
   const [passFocused, setPassFocused] = useState(false);
   const [confirmFocused, setConfirmFocused] = useState(false);
-
-  // NEW: chỉ show tooltip khi đã nhập
   const [passTyped, setPassTyped] = useState(false);
   const [confirmTyped, setConfirmTyped] = useState(false);
+  const navigate = useNavigate();
 
   const { register, handleFormSubmit, errors, isSubmitting, reset, watch } =
     useCustomForm<FormData>({
@@ -60,29 +61,52 @@ const Register: React.FC<RegisterProps> = ({
         confirmPassword: "",
         agreeTerms: false,
       },
-      onSubmit: (data) => {
-        setIsLoading(true);
-        setTimeout(() => {
+      onSubmit: async (data) => {
+        if (data.password !== data.confirmPassword) {
+          toast.error("Mật khẩu xác nhận chưa khớp");
+          return;
+        }
+        try {
+          const payload = {
+            fullname: data.username,
+            email: data.email,
+            password: data.password,
+            role: "Customer" as const,
+          };
+          await registerApi(payload).unwrap();
+          toast.success("Đăng ký tài khoản thành công!");
+
+          // Lưu tạm để Login có thể "Điền vào form" đúng 1 lần
+          sessionStorage.setItem("signup_hint_email", data.email);
+          sessionStorage.setItem("signup_hint_password", data.password);
+
+          // Điều hướng về login với hint
+          navigate(
+            `/auth?view=login&hint=signup&email=${encodeURIComponent(
+              data.email
+            )}`,
+            { replace: true, state: { signupSuccess: true, email: data.email } }
+          );
+
           onRegister?.(data);
-          setIsLoading(false);
           reset();
           setPassTyped(false);
           setConfirmTyped(false);
-        }, 1100);
+        } catch (e: any) {
+          const msg = e?.data?.message || e?.error || "Đăng ký thất bại";
+          toast.error(msg);
+        }
       },
     });
 
   const passwordValue = watch("password");
   const confirmPasswordValue = watch("confirmPassword");
 
-  // strength gốc 0..5
   const { score: passwordStrength } = usePasswordStrength(passwordValue ?? "");
-
-  // NEW: hiển thị tối thiểu = 1 khi đã nhập (bắt đầu từ case 1)
   const displayStrength = passTyped ? Math.max(1, passwordStrength) : 0;
   const strengthLabel = labelForScore(displayStrength);
 
-  const openPassTooltip = passFocused && passTyped; // chỉ mở khi đã nhập
+  const openPassTooltip = passFocused && passTyped;
   const openConfirmTooltip =
     confirmFocused && (confirmTyped || (confirmPasswordValue?.length ?? 0) > 0);
 
@@ -93,7 +117,7 @@ const Register: React.FC<RegisterProps> = ({
           {/* Header */}
           <div className="bg-gradient-to-r from-teal-500 via-teal-600/70 to-teal-600/80 py-4">
             <div className="mx-auto flex items-center justify-center gap-2">
-              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-1.5 backdrop-blur-sm transform transition-all duration-300 hover:scale-105 hover:rotate-6">
+              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-1.5 backdrop-blur-sm">
                 <GiShuttlecock className="w-7 h-7 text-white" />
               </div>
               <h1 className="ml-1 text-base md:text-lg font-bold text-white">
@@ -106,168 +130,168 @@ const Register: React.FC<RegisterProps> = ({
           </div>
 
           {/* Form */}
-          <form
-            onSubmit={handleFormSubmit}
-            className="px-4 md:px-5 pt-3 pb-4 space-y-3.5"
-          >
-            <div className="text-center mb-7">
+          <form onSubmit={handleFormSubmit} className="px-4 md:px-5 pt-3 pb-4">
+            <div className="text-center mb-6">
               <h2 className="text-xl md:text-2xl font-bold text-gray-800">
                 Đăng ký
               </h2>
             </div>
 
-            <div className="space-y-5 mb-7">
-              <CustomTextInput
-                label="Tên người dùng"
-                name="username"
-                icon={FaUser}
-                error={errors.username?.message}
-                required
-                register={register("username")}
-              />
-
-              <CustomTextInput
-                label="Email"
-                name="email"
-                icon={FaEnvelope}
-                error={errors.email?.message}
-                required
-                type="email"
-                register={register("email")}
-              />
-
-              {/* Password + Tooltip (chỉ hiện khi đã nhập) */}
-              <div
-                ref={passAnchorRef}
-                className="relative"
-                onFocusCapture={() => setPassFocused(true)}
-                onBlurCapture={(e) => {
-                  const next = e.relatedTarget as Node | null;
-                  if (!e.currentTarget.contains(next)) setPassFocused(false);
-                }}
-              >
-                <CustomPasswordInput
-                  label="Mật khẩu"
-                  name="password"
-                  icon={FaLock}
-                  error={errors.password?.message}
+            <div className="space-y-3">
+              <div className="space-y-5 mb-8">
+                <CustomTextInput
+                  label="Họ và tên"
+                  name="username"
+                  icon={FaUser}
+                  error={errors.username?.message}
                   required
-                  register={register("password", {
-                    onChange: (e) =>
-                      setPassTyped((e.target.value?.length ?? 0) > 0),
-                  })}
+                  register={register("username")}
                 />
-                <FieldTooltip
-                  anchorRef={passAnchorRef}
-                  open={openPassTooltip}
-                  desktopMaxWidthPx={300}
+
+                <CustomTextInput
+                  label="Email"
+                  name="email"
+                  icon={FaEnvelope}
+                  error={errors.email?.message}
+                  required
+                  type="email"
+                  autoComplete="username"
+                  register={register("email")}
+                />
+
+                {/* Password + Tooltip */}
+                <div
+                  ref={passAnchorRef}
+                  className="relative"
+                  onFocusCapture={() => setPassFocused(true)}
+                  onBlurCapture={(e) => {
+                    const next = e.relatedTarget as Node | null;
+                    if (!e.currentTarget.contains(next)) setPassFocused(false);
+                  }}
                 >
-                  <div className="text-sm font-medium text-gray-800 whitespace-nowrap">
-                    Độ mạnh: {strengthLabel}
-                  </div>
-                  <div className="mt-1 h-2 rounded-full bg-gray-200">
-                    <div
-                      className={`${barClassFor(
-                        displayStrength
-                      )} h-2 rounded-full transition-all duration-300`}
-                    />
-                  </div>
-                  <p className="mt-1.5 text-xs italic text-gray-500">
-                    {displayStrength <= 1 &&
-                      "Mật khẩu quá yếu, hãy thêm chữ hoa, số hoặc ký tự đặc biệt."}
-                    {displayStrength === 2 &&
-                      "Mật khẩu yếu, nên bổ sung thêm độ đa dạng ký tự."}
-                    {displayStrength === 3 &&
-                      "Mức độ trung bình, có thể tốt hơn với nhiều ký tự hơn."}
-                    {displayStrength === 4 && "Mạnh, bạn đang làm tốt!"}
-                    {displayStrength === 5 && "Rất mạnh! Tuyệt vời!"}
-                  </p>
-                </FieldTooltip>
+                  <CustomPasswordInput
+                    label="Mật khẩu"
+                    name="password"
+                    icon={FaLock}
+                    error={errors.password?.message}
+                    required
+                    autoComplete="new-password"
+                    register={register("password", {
+                      onChange: (e) =>
+                        setPassTyped((e.target.value?.length ?? 0) > 0),
+                    })}
+                  />
+                  <FieldTooltip
+                    anchorRef={passAnchorRef}
+                    open={openPassTooltip}
+                    desktopMaxWidthPx={300}
+                  >
+                    <div className="text-sm font-medium text-gray-800 whitespace-nowrap">
+                      Độ mạnh: {strengthLabel}
+                    </div>
+                    <div className="mt-1 h-2 rounded-full bg-gray-200">
+                      <div
+                        className={`${barClassFor(
+                          displayStrength
+                        )} h-2 rounded-full transition-all duration-300`}
+                      />
+                    </div>
+                    <p className="mt-1.5 text-xs italic text-gray-500">
+                      {displayStrength <= 1 &&
+                        "Mật khẩu quá yếu, hãy thêm chữ hoa, số hoặc ký tự đặc biệt."}
+                      {displayStrength === 2 &&
+                        "Mật khẩu yếu, nên bổ sung thêm độ đa dạng ký tự."}
+                      {displayStrength === 3 &&
+                        "Mức độ trung bình, có thể tốt hơn với nhiều ký tự hơn."}
+                      {displayStrength === 4 && "Mạnh, bạn đang làm tốt!"}
+                      {displayStrength === 5 && "Rất mạnh! Tuyệt vời!"}
+                    </p>
+                  </FieldTooltip>
+                </div>
+
+                {/* Confirm Password + Tooltip */}
+                <div
+                  ref={confirmAnchorRef}
+                  className="relative"
+                  onFocusCapture={() => setConfirmFocused(true)}
+                  onBlurCapture={(e) => {
+                    const next = e.relatedTarget as Node | null;
+                    if (!e.currentTarget.contains(next))
+                      setConfirmFocused(false);
+                  }}
+                >
+                  <CustomPasswordInput
+                    label="Xác nhận mật khẩu"
+                    name="confirmPassword"
+                    icon={FaLock}
+                    error={errors.confirmPassword?.message}
+                    required
+                    autoComplete="new-password"
+                    register={register("confirmPassword", {
+                      onChange: (e) =>
+                        setConfirmTyped((e.target.value?.length ?? 0) > 0),
+                    })}
+                  />
+                  <FieldTooltip
+                    anchorRef={confirmAnchorRef}
+                    open={openConfirmTooltip}
+                    desktopMaxWidthPx={240}
+                  >
+                    {confirmPasswordValue &&
+                    confirmPasswordValue === passwordValue ? (
+                      <div className="flex items-center gap-1.5 text-green-600 whitespace-nowrap">
+                        <FaCheckCircle className="w-4 h-4" />
+                        <span className="text-sm font-medium">
+                          Mật khẩu xác nhận khớp !
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-red-600 whitespace-nowrap">
+                        <FaTimesCircle className="w-4 h-4" />
+                        <span className="text-sm font-medium">
+                          Mật khẩu xác nhận chưa khớp !
+                        </span>
+                      </div>
+                    )}
+                  </FieldTooltip>
+                </div>
               </div>
 
-              {/* Confirm Password + Tooltip (chỉ hiện khi đã nhập) */}
-              <div
-                ref={confirmAnchorRef}
-                className="relative"
-                onFocusCapture={() => setConfirmFocused(true)}
-                onBlurCapture={(e) => {
-                  const next = e.relatedTarget as Node | null;
-                  if (!e.currentTarget.contains(next)) setConfirmFocused(false);
-                }}
-              >
-                <CustomPasswordInput
-                  label="Xác nhận mật khẩu"
-                  name="confirmPassword"
-                  icon={FaLock}
-                  error={errors.confirmPassword?.message}
+              {/* Agree Terms (UI only) */}
+              <label className="flex items-center gap-2 text-xs md:text-sm ">
+                <input
+                  type="checkbox"
+                  className="ml-0.5 w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500"
+                  {...register("agreeTerms", { required: true })}
                   required
-                  register={register("confirmPassword", {
-                    onChange: (e) =>
-                      setConfirmTyped((e.target.value?.length ?? 0) > 0),
-                  })}
                 />
-                <FieldTooltip
-                  anchorRef={confirmAnchorRef}
-                  open={openConfirmTooltip}
-                  desktopMaxWidthPx={240}
-                >
-                  {confirmPasswordValue &&
-                  confirmPasswordValue === passwordValue ? (
-                    <div className="flex items-center gap-1.5 text-green-600 whitespace-nowrap">
-                      <FaCheckCircle className="w-4 h-4" />
-                      <span className="text-sm font-medium">
-                        Mật khẩu xác nhận khớp !
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5 text-red-600 whitespace-nowrap">
-                      <FaTimesCircle className="w-4 h-4" />
-                      <span className="text-sm font-medium">
-                        Mật khẩu xác nhận chưa khớp !
-                      </span>
-                    </div>
-                  )}
-                </FieldTooltip>
-              </div>
-            </div>
-
-            {/* Agree Terms */}
-            <label className="flex items-center gap-2 text-xs md:text-sm pt-1">
-              <input
-                type="checkbox"
-                className="w-4 h-4 text-teal-600 rounded border-gray-300 focus:ring-teal-500"
-                {...register("agreeTerms", { required: true })}
-                required
-              />
-              <span>
-                Tôi đồng ý với các{" "}
-                <a
-                  href={endPoint.TERMSOFSERVICE}
-                  className="ml-0.5 text-teal-600 hover:underline hover:brightness-75"
-                >
-                  điều khoản dịch vụ
-                </a>
-              </span>
-            </label>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={isSubmitting || isLoading}
-              className="w-full bg-gradient-to-r from-teal-600/80 via-teal-500 to-teal-600/80 hover:brightness-90
-                         disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-400 text-white font-medium py-2.5 rounded-lg
-                         transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed
-                         flex justify-center items-center"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <LoadingSpinner color="white" size="5" inline />
-                  <span>Đang đăng ký...</span>
+                <span>
+                  Tôi đồng ý với các{" "}
+                  <a
+                    href={endPoint.TERMSOFSERVICE}
+                    className="ml-0.5 text-teal-600 hover:underline hover:brightness-75"
+                  >
+                    điều khoản dịch vụ
+                  </a>
                 </span>
-              ) : (
-                "Đăng ký"
-              )}
-            </button>
+              </label>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isSubmitting || isLoading}
+                className="w-full bg-gradient-to-r from-teal-600/80 via-teal-500 to-teal-600/80 hover:brightness-90 disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-400 text-white font-medium py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+              >
+                {isSubmitting || isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <LoadingSpinner color="white" size="5" inline />
+                    <span>Đang đăng ký...</span>
+                  </span>
+                ) : (
+                  "Đăng ký"
+                )}
+              </button>
+            </div>
 
             {/* Divider */}
             <div className="my-4 flex items-center">
@@ -303,7 +327,6 @@ const Register: React.FC<RegisterProps> = ({
               </button>
             </div>
 
-            {/* Toggle login */}
             <p className="text-center text-sm text-gray-600 mt-5">
               Đã có tài khoản?{" "}
               <button
