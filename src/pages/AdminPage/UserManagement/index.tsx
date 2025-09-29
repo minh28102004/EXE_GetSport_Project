@@ -1,172 +1,222 @@
-// // src/components/UserManagement.tsx
-// import React, { useState, useEffect } from "react";
-// import {
-//   FaLock,
-//   FaUnlock,
-//   FaTrash,
-//   FaUserEdit,
-//   FaUserPlus,
-// } from "react-icons/fa";
-// import UserForm from "./UserForm";
-// import { useGetAccountsQuery } from "@redux/features/accounts/accountApi";
-// import type { Account } from "@redux/features/types/account";
-// import "./styles.css";
+import React, { useState } from "react";
+import { FaLock, FaUnlock, FaTrash, FaUserEdit, FaUserPlus } from "react-icons/fa";
+import {
+  useGetAccountsQuery,
+  useCreateAccountMutation,
+  useUpdateAccountMutation,
+  useDeleteAccountMutation,
+} from "@redux/features/account/accountApi";
+import type { Account, CreateAccountDto } from "@redux/features/account/type";
+import "./styles.css";
 
-// const UserManagement: React.FC = () => {
-//   const { data: users = [], isLoading, isError } = useGetAccountsQuery();
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const [currentUser, setCurrentUser] = useState<Account | null>(null);
-//   const [localUsers, setLocalUsers] = useState<Account[]>([]);
+// Map ngược từ UI -> DTO (BE dùng snake-ish keys)
+const mapUiToDto = (u: Partial<Account>): CreateAccountDto => ({
+  role: u.role ?? "Customer",
+  fullname: u.fullName ?? "",
+  email: u.email ?? "",
+  phonenumber: u.phoneNumber ?? null,
+  dateofbirth: u.dateOfBirth ?? null,
+  gender: u.gender ?? null,
+  membershiptype: u.membershipType ?? null,
+  skilllevel: u.skillLevel ?? null,
+  isactive: typeof u.isActive === "boolean" ? u.isActive : true,
+  totalpoint: typeof u.totalPoint === "number" ? u.totalPoint : 0,
+  status: u.status ?? null,
+});
 
-//   useEffect(() => {
-//     if (users.length) setLocalUsers(users);
-//   }, [users]);
+const UserManagement: React.FC = () => {
+  // ❗️Endpoint nhận ListParams | undefined nên truyền undefined khi không có tham số
+  const { data, isLoading, isError } = useGetAccountsQuery(undefined);
 
-//   const handleDelete = (id: number) => {
-//     setLocalUsers(localUsers.filter((user) => user.userId !== id));
-//   };
+  // Chuẩn hoá rows từ envelope (có thể là mảng hoặc phân trang)
+  const rows: Account[] = Array.isArray(data?.data)
+    ? (data?.data as Account[])
+    : (data?.data as { items?: Account[] } | undefined)?.items ?? [];
 
-//   const openModal = (user: Account | null = null) => {
-//     setCurrentUser(user);
-//     setIsModalOpen(true);
-//   };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<Account | null>(null);
 
-//   const closeModal = () => {
-//     setCurrentUser(null);
-//     setIsModalOpen(false);
-//   };
+  const [createAccount, { isLoading: creating }] = useCreateAccountMutation();
+  const [updateAccount, { isLoading: updating }] = useUpdateAccountMutation();
+  const [deleteAccount, { isLoading: deleting }] = useDeleteAccountMutation();
 
-//   const handleUserSaved = (user: Account) => {
-//     if (user.userId) {
-//       setLocalUsers(
-//         localUsers.map((u) => (u.userId === user.userId ? user : u))
-//       );
-//     } else {
-//       setLocalUsers([
-//         ...localUsers,
-//         { ...user, userId: localUsers.length + 1 },
-//       ]);
-//     }
-//     closeModal();
-//   };
+  const openModal = (user: Account | null = null) => {
+    setCurrentUser(user);
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setCurrentUser(null);
+    setIsModalOpen(false);
+  };
 
-//   if (isLoading)
-//     return <div className="text-center p-10">Đang tải dữ liệu...</div>;
-//   if (isError)
-//     return (
-//       <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>
-//     );
+  // Gọi khi form lưu (tạo mới / cập nhật)
+  const handleUserSaved = async (user: Partial<Account>) => {
+    try {
+      if (user.id) {
+        await updateAccount({
+          id: user.id,
+          body: {
+            // chỉ gửi field thay đổi, giữ đúng key của BE
+            fullname: user.fullName,
+            email: user.email,
+            role: user.role,
+            phonenumber: user.phoneNumber,
+            dateofbirth: user.dateOfBirth,
+            gender: user.gender,
+            membershiptype: user.membershipType,
+            skilllevel: user.skillLevel,
+            isactive: user.isActive,
+            status: user.status,
+          },
+        }).unwrap();
+      } else {
+        const dto = mapUiToDto(user);
+        await createAccount(dto).unwrap();
+      }
+      closeModal(); // invalidatesTags trong api sẽ tự refetch list
+    } catch (e) {
+      console.error(e);
+      // TODO: toast lỗi nếu bạn có toast
+    }
+  };
 
-//   return (
-//     <div className="min-h-screen bg-gray-100 p-8">
-//       {/* Header */}
-//       <div className="flex items-center justify-between mb-6">
-//         <div>
-//           <h1 className="text-3xl font-bold text-gray-800">
-//             Quản lý người dùng
-//           </h1>
-//           <p className="text-gray-500">
-//             Quản lý tài khoản và phân quyền trong hệ thống
-//           </p>
-//         </div>
-//         <button
-//           onClick={() => openModal(null)}
-//           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow hover:scale-105 transition"
-//         >
-//           <FaUserPlus /> Thêm người dùng
-//         </button>
-//       </div>
+  const handleToggleActive = async (u: Account) => {
+    try {
+      await updateAccount({ id: u.id, body: { isactive: !u.isActive } }).unwrap();
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-//       {/* Table */}
-//       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-//         <table className="w-full text-left border-collapse">
-//           <thead className="bg-gray-50 border-b text-gray-700">
-//             <tr>
-//               <th className="p-3">Người dùng</th>
-//               <th className="p-3">Email</th>
-//               <th className="p-3">Vai trò</th>
-//               <th className="p-3">Trạng thái</th>
-//               <th className="p-3">Ngày tạo</th>
-//               <th className="p-3">Thao tác</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {localUsers.map((u, i) => (
-//               <tr
-//                 key={u.userId}
-//                 className={`${
-//                   i % 2 === 0 ? "bg-white" : "bg-gray-50"
-//                 } hover:bg-gray-100 transition`}
-//               >
-//                 <td className="p-3 font-medium text-gray-800">{u.fullname}</td>
-//                 <td className="p-3">{u.email}</td>
-//                 <td className="p-3">{u.role}</td>
-//                 <td className="p-3">
-//                   <span
-//                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
-//                       u.status === "active"
-//                         ? "bg-green-100 text-green-700"
-//                         : "bg-red-100 text-red-700"
-//                     }`}
-//                   >
-//                     {u.status}
-//                   </span>
-//                 </td>
-//                 <td className="p-3 text-gray-600">
-//                   {new Date(u.createat).toLocaleDateString()}
-//                 </td>
-//                 <td className="p-3 flex gap-3">
-//                   <button
-//                     onClick={() => openModal(u)}
-//                     className="hover:scale-110 transition"
-//                   >
-//                     <FaUserEdit className="text-blue-500 hover:text-blue-700" />
-//                   </button>
-//                   {u.status === "active" ? (
-//                     <button className="hover:scale-110 transition">
-//                       <FaLock className="text-yellow-500 hover:text-yellow-700" />
-//                     </button>
-//                   ) : (
-//                     <button className="hover:scale-110 transition">
-//                       <FaUnlock className="text-green-500 hover:text-green-700" />
-//                     </button>
-//                   )}
-//                   <button
-//                     className="hover:scale-110 transition"
-//                     onClick={() => handleDelete(u.userId)}
-//                   >
-//                     <FaTrash className="text-red-500 hover:text-red-700" />
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteAccount(id).unwrap();
+      // invalidatesTags sẽ tự refetch; không cần setState thủ công
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-//       {/* Modal */}
-//       {isModalOpen && (
-//         <div className="modal-overlay">
-//           <div className="modal-content">
-//             <UserForm
-//               user={currentUser}
-//               onSave={handleUserSaved}
-//               onClose={closeModal}
-//             />
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
+  if (isLoading) {
+    return <div className="text-center p-10">Đang tải dữ liệu...</div>;
+  }
+  if (isError) {
+    return <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>;
+  }
 
-// export default UserManagement;
-import React from 'react'
-
-export default function index() {
   return (
-    <div>
-      
+    <div className="min-h-screen bg-gray-100 p-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Quản lý người dùng</h1>
+          <p className="text-gray-500">Quản lý tài khoản và phân quyền trong hệ thống</p>
+        </div>
+        <button
+          onClick={() => openModal(null)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow hover:scale-105 transition"
+          disabled={creating || updating || deleting}
+        >
+          <FaUserPlus /> Thêm người dùng
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-gray-50 border-b text-gray-700">
+            <tr>
+              <th className="p-3">Người dùng</th>
+              <th className="p-3">Email</th>
+              <th className="p-3">Vai trò</th>
+              <th className="p-3">Trạng thái</th>
+              <th className="p-3">Ngày tạo</th>
+              <th className="p-3">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((u, i) => (
+              <tr
+                key={u.id}
+                className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition`}
+              >
+                <td className="p-3 font-medium text-gray-800">{u.fullName}</td>
+                <td className="p-3">{u.email}</td>
+                <td className="p-3">{u.role}</td>
+                <td className="p-3">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      u.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {u.isActive ? "active" : "inactive"}
+                  </span>
+                </td>
+                <td className="p-3 text-gray-600">
+                  {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "--"}
+                </td>
+                <td className="p-3 flex gap-3">
+                  <button onClick={() => openModal(u)} className="hover:scale-110 transition" title="Sửa">
+                    <FaUserEdit className="text-blue-500 hover:text-blue-700" />
+                  </button>
+
+                  <button
+                    onClick={() => handleToggleActive(u)}
+                    className="hover:scale-110 transition"
+                    title={u.isActive ? "Khoá" : "Mở khoá"}
+                  >
+                    {u.isActive ? (
+                      <FaLock className="text-yellow-500 hover:text-yellow-700" />
+                    ) : (
+                      <FaUnlock className="text-green-500 hover:text-green-700" />
+                    )}
+                  </button>
+
+                  <button
+                    className="hover:scale-110 transition"
+                    onClick={() => handleDelete(u.id)}
+                    title="Xoá"
+                  >
+                    <FaTrash className="text-red-500 hover:text-red-700" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+
+            {rows.length === 0 && (
+              <tr>
+                <td className="p-6 text-center text-gray-500" colSpan={6}>
+                  Chưa có người dùng nào.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal (ví dụ) */}
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            {/* Nếu bạn đã có <UserForm />, truyền dữ liệu & callback vào đây */}
+            {/* <UserForm user={currentUser} onSave={handleUserSaved} onClose={() => setIsModalOpen(false)} /> */}
+            {/* Tạm placeholder để bạn cắm form thật */}
+            <div className="p-6">
+              <h3 className="text-lg font-semibold mb-4">
+                {currentUser ? "Sửa người dùng" : "Thêm người dùng"}
+              </h3>
+              <button
+                className="mt-4 px-4 py-2 rounded bg-gray-200"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
+
+export default UserManagement;

@@ -23,3 +23,4 @@ export type AuthData = {
   email: string;
   role: string;
 };
+
