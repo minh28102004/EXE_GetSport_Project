@@ -6,14 +6,13 @@ import { LuSparkles, LuShieldCheck, LuX } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-
 import { CustomTextInput, CustomPasswordInput } from "@components/Form_Input";
 import LoadingSpinner from "@components/Loading_Spinner";
 import useCustomForm from "@hooks/useReactHookForm";
 import { GiShuttlecock } from "react-icons/gi";
 import { useLoginMutation } from "@redux/features/auth/authApi";
 import { setLoggedIn } from "@redux/features/auth/authSlice";
-import endPoint from "@routes/router";
+import { routeForRole } from "@utils/routeForRole";
 
 interface FormData {
   email: string;
@@ -61,7 +60,7 @@ const Login: React.FC<LoginProps> = ({
           toast.success("Đăng nhập thành công");
           reset();
           onLogin?.(data);
-          navigate(endPoint.HOMEPAGE, { replace: true });
+          navigate(routeForRole(role), { replace: true });
         } catch (e: any) {
           toast.error(e?.data?.message || e?.error || "Đăng nhập thất bại");
         }
@@ -232,9 +231,10 @@ const Login: React.FC<LoginProps> = ({
         {/* Card */}
         <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
           <div className="bg-gradient-to-r from-teal-500 via-teal-600/70 to-teal-600/80 py-3 text-center">
-            <div className="mx-auto w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-1.5">
-              <GiShuttlecock className="w-7 h-7 text-white" />
+            <div className="mx-auto w-14 h-14 bg-white/20 rounded-2xl transition-transform duration-300 hover:rotate-12 flex items-center justify-center mb-1.5">
+              <GiShuttlecock className="w-7 h-7 text-white " />
             </div>
+
             <h1 className="text-lg md:text-xl font-bold text-white mb-1">
               Get Sport
             </h1>
@@ -299,7 +299,7 @@ const Login: React.FC<LoginProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting || isLoading}
-                className="w-full bg-gradient-to-r from-teal-600/80 via-teal-500 to-teal-600/80 hover:brightness-90 disabled:from-gray-400 disabled:via-gray-400 disabled:to-teal-600/80 text-white font-medium py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                className="w-full bg-gradient-to-r from-teal-600/80 via-teal-500 to-teal-600/80 hover:brightness-90 disabled:from-gray-400 disabled:via-gray-400 disabled:to-gray-400 text-white font-medium py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
               >
                 {isLoading ? (
                   <span className="inline-flex items-center gap-2">

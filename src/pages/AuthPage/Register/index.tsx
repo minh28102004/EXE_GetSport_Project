@@ -117,7 +117,7 @@ const Register: React.FC<RegisterProps> = ({
           {/* Header */}
           <div className="bg-gradient-to-r from-teal-500 via-teal-600/70 to-teal-600/80 py-4">
             <div className="mx-auto flex items-center justify-center gap-2">
-              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-1.5 backdrop-blur-sm">
+              <div className="w-14 h-14 bg-white/20 rounded-2xl transition-transform duration-300 hover:rotate-12 flex items-center justify-center mb-1.5 backdrop-blur-sm">
                 <GiShuttlecock className="w-7 h-7 text-white" />
               </div>
               <h1 className="ml-1 text-base md:text-lg font-bold text-white">

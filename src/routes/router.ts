@@ -15,7 +15,8 @@ const endPoint = {
   DASHBOARDLAYOUT: "/dashboard",
   UNAUTHORIZEDPAGE: "/unauthorizedpage",
   TERMSOFSERVICE: "/termsofservice",
-  PRIVACYPOLICY:"/privacypolicy"
+  PRIVACYPOLICY:"/privacypolicy",
+  ACCESSDENIED: "/access-denied",
 };
 
 export default endPoint;

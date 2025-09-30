@@ -181,7 +181,7 @@ const BadmintonFAQ: React.FC = () => {
                     <div
                       className={`flex-shrink-0 mt-1 p-2 rounded-xl transition-all duration-300 ${
                         expandedItems.has(faq.id)
-                          ? "bg-teal-100 scale-110"
+                          ? "bg-slate-100 scale-110"
                           : "bg-gray-50 group-hover:bg-teal-50"
                       }`}
                     >

@@ -28,7 +28,11 @@ import {
   useMotionValue,
   animate,
   type MotionValue,
+  AnimatePresence,
 } from "framer-motion";
+import { useSelector } from "react-redux";
+import { selectAuth } from "@redux/features/auth/authSlice";
+import UserMenu from "@components/Header/userMenu";
 
 /* ======================= Types ======================= */
 interface HeaderProps {
@@ -91,14 +95,6 @@ const SiteNav: React.FC = () => {
   const navigate = useNavigate();
   const prefersReduced = usePrefersReducedMotion();
 
-  const PILL_SPRING = {
-    type: "spring",
-    stiffness: 140,
-    damping: 24,
-    mass: 1.05,
-  };
-
-  // Active: "/" chỉ khi pathname === "/"
   const activeIndex = useMemo(() => {
     const path = location.pathname;
     const idx = navItems.findIndex((n) => {
@@ -109,11 +105,9 @@ const SiteNav: React.FC = () => {
     return idx === -1 ? 0 : idx;
   }, [location.pathname]);
 
-  // refs
   const containerRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
 
-  // indicator motion values (đo cả x,y,w,h để khớp tuyệt đối)
   const x: MotionValue<number> = useMotionValue(0);
   const y: MotionValue<number> = useMotionValue(0);
   const w: MotionValue<number> = useMotionValue(0);
@@ -135,7 +129,6 @@ const SiteNav: React.FC = () => {
     return { tx, ty, tw, th };
   };
 
-  // set vị trí ban đầu theo activeIndex
   useLayoutEffect(() => {
     const { tx, ty, tw, th } = measure(activeIndex);
     x.set(tx);
@@ -145,18 +138,15 @@ const SiteNav: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // chờ animate xong rồi mới navigate (để thấy pill chạy)
   const [pending, setPending] = useState<{ index: number; to: string } | null>(
     null
   );
   const displayIndex = pending?.index ?? activeIndex;
 
-  // khi route đã đổi xong => clear pending
   useEffect(() => {
     if (pending && activeIndex === pending.index) setPending(null);
   }, [activeIndex, pending]);
 
-  // resize => re-measure tức thì (không animate)
   useEffect(() => {
     const onResize = () => {
       const { tx, ty, tw, th } = measure(displayIndex);
@@ -169,7 +159,6 @@ const SiteNav: React.FC = () => {
     return () => window.removeEventListener("resize", onResize);
   }, [displayIndex, x, y, w, h]);
 
-  // nếu route đổi do back/forward: nhảy thẳng (không animate)
   useLayoutEffect(() => {
     if (pending) return;
     const { tx, ty, tw, th } = measure(activeIndex);
@@ -179,7 +168,6 @@ const SiteNav: React.FC = () => {
     h.set(th);
   }, [activeIndex, pending, x, y, w, h]);
 
-  // options tối thiểu
   type AnimateOpt =
     | { duration?: number }
     | { type: "spring"; stiffness?: number; damping?: number; mass?: number };
@@ -202,7 +190,7 @@ const SiteNav: React.FC = () => {
 
   const onItemClick = (e: React.MouseEvent, index: number, to?: string) => {
     if (!to) return;
-    if (index === activeIndex) return; // đã ở đúng trang
+    if (index === activeIndex) return;
     e.preventDefault();
 
     if (prefersReduced) {
@@ -223,15 +211,20 @@ const SiteNav: React.FC = () => {
       "
       style={{ isolation: "isolate" }}
     >
-      {/* Indicator bám đúng khung item (x,y,w,h) */}
+      {/* Indicator */}
       <motion.span
-        className="
-    absolute top-0 left-0  // quan trọng: neo gốc (0,0) của container
-    rounded-lg bg-teal-50 ring-1 ring-[#23AEB1]/30 shadow-sm
-    pointer-events-none
-  "
+        className="absolute top-0 left-0 rounded-lg pointer-events-none overflow-hidden"
         style={{ x, y, width: w, height: h }}
-      />
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-[#23AEB1]/10 via-[#1e9ea1]/10 to-[#23AEB1]/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#23AEB1]/5 to-[#1e9ea1]/5 backdrop-blur-sm" />
+        <div className="absolute inset-0 ring-1 ring-[#23AEB1]/20 rounded-lg" />
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          animate={{ x: ["-100%", "100%"] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        />
+      </motion.span>
 
       {navItems.map((item, i) => {
         const isActive = i === activeIndex;
@@ -270,14 +263,8 @@ const SiteNav: React.FC = () => {
               )}
             </span>
 
-            {/* Hover underline (nhẹ, chỉ khi chưa active) */}
             {!isActive && (
-              <span
-                className="absolute bottom-0 left-1/2 w-0 h-[1.5px] 
-          bg-[#23AEB1] group-hover:w-full group-hover:left-0 
-          transition-all duration-500 ease-out
-          rounded-b-lg"
-              />
+              <span className="absolute bottom-0 left-1/2 w-0 h-[1.5px] bg-[#23AEB1] group-hover:w-full group-hover:left-0 transition-all duration-500 ease-out rounded-b-lg" />
             )}
           </div>
         );
@@ -300,104 +287,150 @@ const SiteNav: React.FC = () => {
 const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   isOpen,
   onClose,
-}) => (
-  <div
-    className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ${
-      isOpen ? "opacity-100 visible" : "opacity-0 invisible"
-    }`}
-  >
-    <div
-      className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-      onClick={onClose}
-    />
+}) => {
+  const { accessToken } = useSelector(selectAuth);
 
-    <div
-      className={`absolute right-0 top-0 h-full w-75 bg-white shadow-2xl transform transition-transform duration-300 ${
-        isOpen ? "translate-x-0" : "translate-x-full"
-      }`}
-    >
-      <div className="p-4 border-b border-gray-100">
-        <div className="flex items-center justify-between">
-          <Brand />
-          <button
+  // Khoá scroll nền khi mở
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isOpen]);
+
+  // ESC để đóng
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Overlay */}
+          <motion.div
+            key="overlay"
+            className="fixed inset-0 z-50 md:hidden bg-black/50 backdrop-blur-[2px]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-hidden="true"
+          />
+          {/* Panel */}
+          <motion.aside
+            key="panel"
+            className="fixed right-0 top-0 h-full w-[60vw] max-w-[360px] z-[60] bg-white shadow-2xl flex flex-col md:hidden"
+            role="dialog"
+            aria-modal="true"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 260, damping: 28 }}
           >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-      </div>
-
-      <nav className="p-3 space-y-2">
-        {navItems.map((item, index) => {
-          const content = (
-            <div className="flex items-center gap-3 p-3 rounded-lg text-gray-700 font-medium transition-all duration-200 hover:text-[#23AEB1] hover:bg-[#23AEB1]/5 group">
-              <item.icon className="w-5 h-5 transition-transform group-hover:scale-110" />
-              <span>{item.label}</span>
-              {item.hasDropdown && (
-                <ChevronDown className="w-4 h-4 ml-auto transition-transform group-hover:rotate-180" />
-              )}
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <Brand />
+              <motion.button
+                whileHover={{ rotate: 90 }}
+                transition={{ type: "spring", stiffness: 500, damping: 18 }}
+                className="p-2 rounded-md hover:bg-slate-100"
+                onClick={onClose}
+                aria-label="Đóng"
+              >
+                <X className="w-5 h-5" />
+              </motion.button>
             </div>
-          );
-          return item.to ? (
-            <NavLink
-              key={index}
-              to={item.to}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `block ${isActive ? "text-[#23AEB1] bg-[#23AEB1]/10" : ""}`
-              }
-            >
-              {content}
-            </NavLink>
-          ) : (
-            <a
-              key={index}
-              href={item.href}
-              onClick={onClose}
-              className="block cursor-pointer"
-            >
-              {content}
-            </a>
-          );
-        })}
-      </nav>
 
-      <div className="absolute bottom-6 left-6 right-6 space-y-3">
-        <Link
-          to={endPoint.REGISTER}
-          onClick={onClose}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl 
-               border-2 border-[#23AEB1] text-[#23AEB1] font-medium 
-               transition-all duration-300 ease-in-out
-               hover:bg-[#23AEB1]/10 hover:shadow-md hover:scale-[1.02]"
-        >
-          <UserPlus className="w-4 h-4" />
-          Đăng ký
-        </Link>
+            {/* List */}
+            <nav className="p-3 space-y-1 overflow-y-auto">
+              {navItems.map((item, index) => {
+                const content = (
+                  <div className="flex items-center gap-3 p-3 rounded-lg text-gray-700 font-medium transition-all duration-200 hover:text-[#23AEB1] hover:bg-[#23AEB1]/5 group">
+                    <item.icon className="w-5 h-5 transition-transform group-hover:scale-110" />
+                    <span>{item.label}</span>
+                    {item.hasDropdown && (
+                      <ChevronDown className="w-4 h-4 ml-auto transition-transform group-hover:rotate-180" />
+                    )}
+                  </div>
+                );
+                return item.to ? (
+                  <NavLink
+                    key={index}
+                    to={item.to}
+                    onClick={onClose}
+                    className={({ isActive }) =>
+                      `block rounded-lg ${
+                        isActive ? "text-[#23AEB1] bg-[#23AEB1]/10" : ""
+                      }`
+                    }
+                  >
+                    {content}
+                  </NavLink>
+                ) : (
+                  <a
+                    key={index}
+                    href={item.href}
+                    onClick={onClose}
+                    className="block cursor-pointer rounded-lg"
+                  >
+                    {content}
+                  </a>
+                );
+              })}
+            </nav>
 
-        <Link
-          to={endPoint.LOGIN}
-          onClick={onClose}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl 
-               bg-gradient-to-r from-[#23AEB1] via-[#20a4a6] to-[#1e9ea1] 
-               text-white font-medium shadow-md
-               transition-all duration-500 ease-in-out
-               hover:shadow-xl hover:scale-[1.05] 
-               hover:from-[#1e9ea1] hover:via-[#20a4a6] hover:to-[#23AEB1]"
-        >
-          <User className="w-4 h-4" />
-          Đăng nhập
-        </Link>
-      </div>
-    </div>
-  </div>
-);
+            {/* Footer / UserMenu */}
+
+            {!accessToken ? (
+              <div className="mt-auto p-4 border-t border-gray-100 space-y-3">
+                <Link
+                  to={endPoint.REGISTER}
+                  onClick={onClose}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-[#23AEB1] text-[#23AEB1] font-medium transition-all duration-300 hover:bg-[#23AEB1]/10 hover:shadow-md"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Đăng ký
+                </Link>
+                <Link
+                  to={endPoint.LOGIN}
+                  onClick={onClose}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#23AEB1] via-[#20a4a6] to-[#1e9ea1] text-white font-medium shadow-md transition-all duration-500 hover:shadow-xl"
+                >
+                  <User className="w-4 h-4" />
+                  Đăng nhập
+                </Link>
+              </div>
+            ) : (
+              // Ở mobile: UserMenu ở footer, dropdown mở LÊN và HIỂN THỊ TÊN
+              <div className="mt-auto px-0 border-t border-gray-100 ">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="relative pl-2.5 pr-1.5 py-3 gap-3"
+                >
+                  <UserMenu placement="up" showNameOnMobile />
+                </motion.div>
+              </div>
+            )}
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
 
 /* =================== Header Wrapper =================== */
 const HeaderComponent: React.FC<HeaderProps> = ({ variant = "site" }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const { accessToken } = useSelector(selectAuth);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
@@ -406,6 +439,29 @@ const HeaderComponent: React.FC<HeaderProps> = ({ variant = "site" }) => {
       return () => window.removeEventListener("scroll", handleScroll);
     }
   }, [variant]);
+
+  // Tự đóng menu khi vượt md (fix case tắt F12)
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      const matches =
+        "matches" in e ? e.matches : (e as MediaQueryList).matches;
+      if (matches) setIsMobileNavOpen(false);
+    };
+    onChange(mq);
+    if (mq.addEventListener) mq.addEventListener("change", onChange as any);
+    else mq.addListener(onChange as any);
+    return () => {
+      if (mq.removeEventListener)
+        mq.removeEventListener("change", onChange as any);
+      else mq.removeListener(onChange as any);
+    };
+  }, []);
+
+  // Đóng menu khi đổi route (back/forward)
+  useEffect(() => {
+    setIsMobileNavOpen(false);
+  }, [location.pathname]);
 
   if (variant === "auth") {
     return (
@@ -446,36 +502,38 @@ const HeaderComponent: React.FC<HeaderProps> = ({ variant = "site" }) => {
           <div className="ml-18">
             <SiteNav />
           </div>
-          <div className="hidden md:flex items-center gap-3">
-            <Link
-              to={endPoint.REGISTER}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#23AEB1] 
-               text-[#23AEB1] text-sm font-medium 
-               transition-all duration-300 ease-in-out
-               hover:bg-[#23AEB1]/10 hover:scale-105"
-            >
-              <UserPlus className="w-4 h-4" />
-              Đăng ký
-            </Link>
 
-            <Link
-              to={endPoint.LOGIN}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl 
-               bg-gradient-to-r from-[#23AEB1] to-[#1e9ea1] 
-               text-white text-sm font-medium shadow-md 
-               transition-all duration-300 ease-in-out
-               hover:shadow-lg hover:scale-105 hover:from-[#1e9ea1] hover:to-[#23AEB1]"
-            >
-              <User className="w-4 h-4" />
-              Đăng nhập
-            </Link>
+          {/* Desktop Right */}
+          <div className="hidden md:flex items-center gap-3">
+            {accessToken ? (
+              <UserMenu />
+            ) : (
+              <>
+                <Link
+                  to={endPoint.REGISTER}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#23AEB1] text-[#23AEB1] text-sm font-medium transition-all duration-300 ease-in-out hover:bg-[#23AEB1]/10 hover:scale-105"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Đăng ký
+                </Link>
+                <Link
+                  to={endPoint.LOGIN}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[#23AEB1] to-[#1e9ea1] text-white text-sm font-medium shadow-md transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 hover:from-[#1e9ea1] hover:to-[#23AEB1]"
+                >
+                  <User className="w-4 h-4" />
+                  Đăng nhập
+                </Link>
+              </>
+            )}
           </div>
 
+          {/* Mobile button */}
           <button
             onClick={() => setIsMobileNavOpen(true)}
-            className="lg:hidden p-1.5 rounded-lg hover:bg-gray-200 transition-colors"
+            className="md:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Mở menu"
           >
-            <Menu className="w-6 h-6 text-gray-600" />
+            <Menu className="w-6 h-6 text-gray-700" />
           </button>
         </div>
       </header>
