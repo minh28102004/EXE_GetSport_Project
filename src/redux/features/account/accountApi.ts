@@ -6,6 +6,9 @@ import type {
 import { mapDtoToUi } from "./map";
 import type { ApiEnvelope } from "@redux/features/auth/type";
 
+/** Đổi sang "Accounts" nếu Swagger dùng số nhiều */
+const ACCOUNT_PATH = "Account";
+
 /** ---- Helpers & type guards (no any) ---- */
 type AccountListRaw =
   | AccountDto[]
@@ -49,7 +52,7 @@ export const accountApi = baseApi.injectEndpoints({
   endpoints: (b) => ({
     /** LIST */
     getAccounts: b.query<AccountListEnvelope, ListParams | undefined>({
-      query: (params) => ({ url: `/Account${toQuery(params)}` }),
+      query: (params) => ({ url: `${ACCOUNT_PATH}${toQuery(params)}` }),
       transformResponse: (resp: AccountListRaw): AccountListEnvelope => {
         const payload = takeData<AccountDto[] | Paged<AccountDto>>(resp);
 
@@ -66,7 +69,7 @@ export const accountApi = baseApi.injectEndpoints({
           return isEnvelope(resp) ? { ...resp, data: mapped } : okEnvelope(mapped);
         }
 
-        return okEnvelope<Account[]>([]); // fallback
+        return okEnvelope<Account[]>([]);
       },
       providesTags: (result) => {
         const list =
@@ -85,7 +88,7 @@ export const accountApi = baseApi.injectEndpoints({
 
     /** DETAIL */
     getAccount: b.query<AccountEnvelope, number | string>({
-      query: (id) => ({ url: `/Account/${id}` }),
+      query: (id) => ({ url: `${ACCOUNT_PATH}/${id}` }),
       transformResponse: (resp: AccountRaw): AccountEnvelope => {
         const dto = takeData<AccountDto>(resp);
         const mapped = mapDtoToUi(dto);
@@ -96,7 +99,7 @@ export const accountApi = baseApi.injectEndpoints({
 
     /** CREATE */
     createAccount: b.mutation<AccountEnvelope, CreateAccountDto>({
-      query: (body) => ({ url: `/Account`, method: "POST", body }),
+      query: (body) => ({ url: `${ACCOUNT_PATH}`, method: "POST", body }),
       transformResponse: (resp: AccountRaw): AccountEnvelope => {
         const dto = takeData<AccountDto>(resp);
         const mapped = mapDtoToUi(dto);
@@ -105,9 +108,13 @@ export const accountApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: "Account", id: "LIST" }],
     }),
 
-    /** UPDATE */
+    /** UPDATE — id ở PATH: /api/Account/{id} */
     updateAccount: b.mutation<AccountEnvelope, { id: number | string; body: UpdateAccountDto }>({
-      query: ({ id, body }) => ({ url: `/Account/${id}`, method: "PUT", body }),
+      query: ({ id, body }) => ({
+        url: `${ACCOUNT_PATH}/${id}`,
+        method: "PUT",
+        body,
+      }),
       transformResponse: (resp: AccountRaw): AccountEnvelope => {
         const dto = takeData<AccountDto>(resp);
         const mapped = mapDtoToUi(dto);
@@ -119,9 +126,9 @@ export const accountApi = baseApi.injectEndpoints({
           : [{ type: "Account", id: "LIST" }],
     }),
 
-    /** DELETE */
+    /** DELETE — id ở PATH: /api/Account/{id} */
     deleteAccount: b.mutation<ApiEnvelope<null>, number | string>({
-      query: (id) => ({ url: `/Account/${id}`, method: "DELETE" }),
+      query: (id) => ({ url: `${ACCOUNT_PATH}/${id}`, method: "DELETE" }),
       invalidatesTags: (res, _err, id) => [
         { type: "Account", id },
         { type: "Account", id: "LIST" },

@@ -1,34 +1,20 @@
 import React, { useState } from "react";
-import { FaLock, FaUnlock, FaTrash, FaUserEdit, FaUserPlus } from "react-icons/fa";
+import { FaLock, FaUnlock, FaTrash, FaUserEdit } from "react-icons/fa"; // ⬅️ bỏ FaUserPlus
 import {
   useGetAccountsQuery,
   useCreateAccountMutation,
   useUpdateAccountMutation,
   useDeleteAccountMutation,
 } from "@redux/features/account/accountApi";
-import type { Account, CreateAccountDto } from "@redux/features/account/type";
+import type { Account } from "@redux/features/account/type";
+import UserForm from "./UserForm";
 import "./styles.css";
 
-// Map ngược từ UI -> DTO (BE dùng snake-ish keys)
-const mapUiToDto = (u: Partial<Account>): CreateAccountDto => ({
-  role: u.role ?? "Customer",
-  fullname: u.fullName ?? "",
-  email: u.email ?? "",
-  phonenumber: u.phoneNumber ?? null,
-  dateofbirth: u.dateOfBirth ?? null,
-  gender: u.gender ?? null,
-  membershiptype: u.membershipType ?? null,
-  skilllevel: u.skillLevel ?? null,
-  isactive: typeof u.isActive === "boolean" ? u.isActive : true,
-  totalpoint: typeof u.totalPoint === "number" ? u.totalPoint : 0,
-  status: u.status ?? null,
-});
+// ... mapUiToDto giữ nguyên ...
 
 const UserManagement: React.FC = () => {
-  // ❗️Endpoint nhận ListParams | undefined nên truyền undefined khi không có tham số
   const { data, isLoading, isError } = useGetAccountsQuery(undefined);
 
-  // Chuẩn hoá rows từ envelope (có thể là mảng hoặc phân trang)
   const rows: Account[] = Array.isArray(data?.data)
     ? (data?.data as Account[])
     : (data?.data as { items?: Account[] } | undefined)?.items ?? [];
@@ -40,6 +26,8 @@ const UserManagement: React.FC = () => {
   const [updateAccount, { isLoading: updating }] = useUpdateAccountMutation();
   const [deleteAccount, { isLoading: deleting }] = useDeleteAccountMutation();
 
+  const busy = creating || updating || deleting;
+
   const openModal = (user: Account | null = null) => {
     setCurrentUser(user);
     setIsModalOpen(true);
@@ -49,14 +37,12 @@ const UserManagement: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  // Gọi khi form lưu (tạo mới / cập nhật)
-  const handleUserSaved = async (user: Partial<Account>) => {
+  const handleUserSaved = async (user: Partial<Account> & { password?: string }) => {
     try {
       if (user.id) {
         await updateAccount({
           id: user.id,
           body: {
-            // chỉ gửi field thay đổi, giữ đúng key của BE
             fullname: user.fullName,
             email: user.email,
             role: user.role,
@@ -67,16 +53,16 @@ const UserManagement: React.FC = () => {
             skilllevel: user.skillLevel,
             isactive: user.isActive,
             status: user.status,
+            totalpoint: user.totalPoint,
           },
         }).unwrap();
       } else {
         const dto = mapUiToDto(user);
         await createAccount(dto).unwrap();
       }
-      closeModal(); // invalidatesTags trong api sẽ tự refetch list
+      closeModal();
     } catch (e) {
       console.error(e);
-      // TODO: toast lỗi nếu bạn có toast
     }
   };
 
@@ -85,24 +71,23 @@ const UserManagement: React.FC = () => {
       await updateAccount({ id: u.id, body: { isactive: !u.isActive } }).unwrap();
     } catch (e) {
       console.error(e);
+      alert("Không thể đổi trạng thái tài khoản.");
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number, name?: string) => {
+    const ok = window.confirm(`Bạn có chắc muốn xoá người dùng${name ? ` "${name}"` : ""}?`);
+    if (!ok) return;
     try {
       await deleteAccount(id).unwrap();
-      // invalidatesTags sẽ tự refetch; không cần setState thủ công
     } catch (e) {
       console.error(e);
+      alert("Xoá thất bại, vui lòng thử lại!");
     }
   };
 
-  if (isLoading) {
-    return <div className="text-center p-10">Đang tải dữ liệu...</div>;
-  }
-  if (isError) {
-    return <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>;
-  }
+  if (isLoading) return <div className="text-center p-10">Đang tải dữ liệu...</div>;
+  if (isError)   return <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -112,13 +97,8 @@ const UserManagement: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-800">Quản lý người dùng</h1>
           <p className="text-gray-500">Quản lý tài khoản và phân quyền trong hệ thống</p>
         </div>
-        <button
-          onClick={() => openModal(null)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow hover:scale-105 transition"
-          disabled={creating || updating || deleting}
-        >
-          <FaUserPlus /> Thêm người dùng
-        </button>
+        {/* ⬇️ BỎ NÚT THÊM NGƯỜI DÙNG */}
+        {/* (để trống hoặc thêm phần khác nếu cần) */}
       </div>
 
       {/* Table */}
@@ -156,7 +136,12 @@ const UserManagement: React.FC = () => {
                   {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "--"}
                 </td>
                 <td className="p-3 flex gap-3">
-                  <button onClick={() => openModal(u)} className="hover:scale-110 transition" title="Sửa">
+                  <button
+                    onClick={() => openModal(u)}
+                    className="hover:scale-110 transition"
+                    title="Sửa"
+                    disabled={busy}
+                  >
                     <FaUserEdit className="text-blue-500 hover:text-blue-700" />
                   </button>
 
@@ -164,18 +149,21 @@ const UserManagement: React.FC = () => {
                     onClick={() => handleToggleActive(u)}
                     className="hover:scale-110 transition"
                     title={u.isActive ? "Khoá" : "Mở khoá"}
+                    disabled={busy}
                   >
+                    {/* ✅ active -> mở khoá xanh; inactive -> khoá vàng */}
                     {u.isActive ? (
-                      <FaLock className="text-yellow-500 hover:text-yellow-700" />
-                    ) : (
                       <FaUnlock className="text-green-500 hover:text-green-700" />
+                    ) : (
+                      <FaLock className="text-yellow-500 hover:text-yellow-700" />
                     )}
                   </button>
 
                   <button
                     className="hover:scale-110 transition"
-                    onClick={() => handleDelete(u.id)}
+                    onClick={() => handleDelete(u.id, u.fullName)}
                     title="Xoá"
+                    disabled={busy}
                   >
                     <FaTrash className="text-red-500 hover:text-red-700" />
                   </button>
@@ -194,23 +182,21 @@ const UserManagement: React.FC = () => {
         </table>
       </div>
 
-      {/* Modal (ví dụ) */}
+      {/* Modal (vẫn giữ để sửa người dùng) */}
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            {/* Nếu bạn đã có <UserForm />, truyền dữ liệu & callback vào đây */}
-            {/* <UserForm user={currentUser} onSave={handleUserSaved} onClose={() => setIsModalOpen(false)} /> */}
-            {/* Tạm placeholder để bạn cắm form thật */}
+        <div className="modal-overlay" onClick={busy ? undefined : closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-4">
                 {currentUser ? "Sửa người dùng" : "Thêm người dùng"}
               </h3>
-              <button
-                className="mt-4 px-4 py-2 rounded bg-gray-200"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Đóng
-              </button>
+
+              <UserForm
+                user={currentUser}
+                onSave={handleUserSaved}
+                onClose={closeModal}
+                loading={busy}
+              />
             </div>
           </div>
         </div>

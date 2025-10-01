@@ -41,16 +41,17 @@ export type CreateAccountDto = {
   role: string;
   fullname: string;
   email: string;
-  password?: string;
+  password: string;        // ⬅️ required
   gender?: string | null;
   phonenumber?: string | null;
-  dateofbirth?: string | null;
+  dateofbirth?: string | null; // "YYYY-MM-DD"
   skilllevel?: string | null;
   membershiptype?: string | null;
   totalpoint?: number;
   isactive?: boolean;
   status?: string | null;
 };
+
 export type UpdateAccountDto = Partial<CreateAccountDto>;
 
 export type ListParams = { page?: number; pageSize?: number; search?: string; sort?: string };
