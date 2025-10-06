@@ -10,6 +10,10 @@ import type { Account } from "@redux/features/account/type";
 import UserForm from "./UserForm";
 import "./styles.css";
 
+// 🟢 THÊM: Toastify
+import { ToastContainer, toast } from "react-toastify";                 // 🟢 THÊM
+import "react-toastify/dist/ReactToastify.css";                         // 🟢 THÊM
+
 // ... mapUiToDto giữ nguyên ...
 
 const UserManagement: React.FC = () => {
@@ -56,9 +60,17 @@ const UserManagement: React.FC = () => {
             totalpoint: user.totalPoint,
           },
         }).unwrap();
+
+        toast.success("Cập nhật người dùng thành công!", {               // 🟢 THÊM
+          position: "top-right",
+          autoClose: 2200,
+          theme: "colored",
+          newestOnTop: true,
+        });                                                               // 🟢 THÊM
       } else {
         const dto = mapUiToDto(user);
         await createAccount(dto).unwrap();
+        // (Giữ nguyên yêu cầu: chỉ toast cho cập nhật/xoá)
       }
       closeModal();
     } catch (e) {
@@ -69,6 +81,7 @@ const UserManagement: React.FC = () => {
   const handleToggleActive = async (u: Account) => {
     try {
       await updateAccount({ id: u.id, body: { isactive: !u.isActive } }).unwrap();
+      // (Giữ nguyên: không thêm toast cho toggle theo yêu cầu)
     } catch (e) {
       console.error(e);
       alert("Không thể đổi trạng thái tài khoản.");
@@ -80,6 +93,12 @@ const UserManagement: React.FC = () => {
     if (!ok) return;
     try {
       await deleteAccount(id).unwrap();
+      toast.success(`Đã xoá${name ? ` "${name}"` : ""}!`, {              // 🟢 THÊM
+        position: "top-right",
+        autoClose: 2200,
+        theme: "colored",
+        newestOnTop: true,
+      });                                                                 // 🟢 THÊM
     } catch (e) {
       console.error(e);
       alert("Xoá thất bại, vui lòng thử lại!");
@@ -91,6 +110,9 @@ const UserManagement: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
+      {/* 🟢 THÊM: Container cho toast */}
+      <ToastContainer />                                                  {/* 🟢 THÊM */}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
