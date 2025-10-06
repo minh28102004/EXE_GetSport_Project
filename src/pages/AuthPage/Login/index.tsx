@@ -120,7 +120,7 @@ const Login: React.FC<LoginProps> = ({
       {/* Wrapper phải relative + overflow-visible để coachmark không bị cắt */}
       <div
         ref={wrapperRef}
-        className="relative w-full max-w-sm sm:max-w-md overflow-visible"
+        className="relative w-full max-w-sm sm:max-w-[420px] overflow-visible"
       >
         {/* COACHMARK — bên phải form khi >= sm, canh dọc ngang inputs */}
         {coachmark && showCoach && (
@@ -129,7 +129,7 @@ const Login: React.FC<LoginProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10 }}
             className="
-              hidden sm:block                /*  Ẩn trên mobile */
+              hidden sm:block                /*  Ẩn trên mobile */F
               pointer-events-auto
               sm:absolute sm:left-full sm:ml-4 sm:w-80
               w-[92%] mx-auto sm:mx-0 mt-2 sm:mt-0

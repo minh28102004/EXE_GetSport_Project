@@ -30,7 +30,7 @@ export const areas: Area[] = [
 
 export const contactInfo = [
   {
-    icon: <MapPin className="w-5 h-5 text-white" />,
+    icon: <MapPin className="w-4.5 h-4.5 text-white" />,
     title: "Địa Chỉ Văn Phòng",
     content: (
       <>
@@ -44,7 +44,7 @@ export const contactInfo = [
     ),
   },
   {
-    icon: <Phone className="w-5 h-5 text-white" />,
+    icon: <Phone className="w-4.5 h-4.5 text-white" />,
     title: "Điện Thoại",
     content: (
       <>
@@ -58,22 +58,23 @@ export const contactInfo = [
     ),
   },
   {
-    icon: <Mail className="w-5 h-5 text-white" />,
+    icon: <Mail className="w-4.5 h-4.5 text-white" />,
     title: "Email",
-    content: (
-      <div>
-        <div className="flex items-center gap-2 text-sm md:text-base">
-          <p className="text-slate-700">Hỗ trợ khách hàng:</p>
-          <p className="text-teal-600 font-medium">GSSupport@gmail.com</p>
-        </div>
-        <div className="flex items-center gap-2 text-sm md:text-base mt-2 mb-1">
-          <p className="text-slate-700">Hợp tác kinh doanh:</p>
-          <p className="text-teal-600 font-medium">GSBusiness@gmail.com</p>
-        </div>
-        <p className="text-xs md:text-sm text-slate-500 mt-2">
-          Phản hồi trong 24h làm việc
-        </p>
-      </div>
-    ),
+  content: (
+  <div className="text-center">
+    <div className="flex justify-center items-center gap-2 text-sm md:text-base">
+      <p className="text-slate-700">CSKH:</p>
+      <p className="text-teal-600 font-medium">GSSupport@gmail.com</p>
+    </div>
+    <div className="flex justify-center items-center gap-2 text-sm md:text-base mt-2 mb-1">
+      <p className="text-slate-700">Hợp tác:</p>
+      <p className="text-teal-600 font-medium">GSBusiness@gmail.com</p>
+    </div>
+    <p className="text-xs md:text-sm text-slate-500 mt-2">
+      Phản hồi trong 24h làm việc
+    </p>
+  </div>
+),
+
   },
 ];

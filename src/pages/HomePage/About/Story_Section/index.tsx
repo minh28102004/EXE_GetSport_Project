@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, Heart, Calendar, Sparkles, Quote, Eye } from "lucide-react";
 import { bannerImages } from "./data";
 
@@ -35,8 +35,8 @@ const StorySection = () => {
   }, []);
 
   return (
-    <section className="py-12 sm:py-18 bg-white" id="story">
-      <div className="container mx-auto px-6">
+    <section className=" py-8 sm:py-14 px-6 sm:px-30 bg-white" id="story">
+      <div className="container mx-auto">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
           <div
@@ -48,13 +48,13 @@ const StorySection = () => {
             id="story"
             data-animate
           >
-            <div className="mb-8">
-              <div className="inline-flex items-center bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-800 px-4 py-2 rounded-full text-sm font-medium mb-3">
+            <div className="mb-4">
+              <div className="inline-flex items-center bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-800 px-5 py-1.5 rounded-full text-sm font-medium mb-3">
                 <Heart className="w-4 h-4 mr-2" />
                 Về chúng tôi
               </div>
 
-              <h2 className="text-5xl font-bold text-gray-900 mb-4 leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
                 <span className="relative">Câu Chuyện Của</span>
                 <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-500 bg-clip-text text-transparent">
                   {" "}
@@ -63,22 +63,22 @@ const StorySection = () => {
               </h2>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6">
               {/* Quote */}
-              <div className="relative bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl p-6 border-l-4 border-teal-500">
-                <Quote className="w-8 h-8 text-teal-500 mb-4" />
-                <p className="text-xl text-gray-800 font-medium leading-relaxed italic">
+              <div className="relative bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl p-4 sm:p-6 border-l-4 border-teal-500">
+                <Quote className="h-4 w-4 sm:w-6 sm:h-6 text-teal-500 mb-4" />
+                <p className="text-base sm:text-xl text-gray-800 font-medium leading-relaxed italic">
                   "Làm thế nào để việc đặt sân cầu lông trở nên dễ dàng và thuận
                   tiện hơn?"
                 </p>
-                <div className="text-sm text-teal-600 font-semibold mt-2">
+                <div className="text-xs sm:text-sm text-teal-600 font-semibold mt-2">
                   - Ý tưởng khởi nguồn
                 </div>
               </div>
 
               {/* Story */}
-              <div className="prose prose-lg max-w-none">
-                <p className="text-lg text-gray-700 leading-relaxed mb-6">
+              <div className="ml-2 prose prose-lg max-w-none">
+                <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6">
                   Get Sport ra đời từ một ý tưởng đơn giản nhưng đầy ý nghĩa.
                   Chúng tôi hiểu rằng{" "}
                   <span className="font-semibold text-teal-600">
@@ -88,7 +88,7 @@ const StorySection = () => {
                   không cần thiết.
                 </p>
 
-                <p className="text-lg text-gray-700 leading-relaxed mb-6">
+                <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6">
                   Từ những ngày đầu khiêm tốn với chỉ vài chục sân cầu lông, Get
                   Sport đã{" "}
                   <span className="font-semibold text-teal-600">
@@ -110,7 +110,7 @@ const StorySection = () => {
                 : "translate-x-10 opacity-0"
             }`}
           >
-            <div className="relative h-112 rounded-3xl overflow-hidden shadow-2xl -mt-15 sm:mt-12">
+            <div className="relative h-100 rounded-3xl overflow-hidden shadow-2xl -mt-15 sm:mt-21">
               <img
                 src={bannerImages[currentIndex]}
                 alt="Story Banner"
@@ -163,7 +163,7 @@ const StorySection = () => {
         </div>
 
         {/* Mission & Vision Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mt-10 sm:mt-4">
+        <div className="grid md:grid-cols-2 gap-4 sm:gap-8 mt-10 sm:mt-2">
           {/* Mission */}
           <div
             id="mission"
@@ -174,23 +174,23 @@ const StorySection = () => {
                 : "translate-y-10 opacity-0"
             }`}
           >
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 relative overflow-hidden">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-teal-100 to-transparent rounded-bl-full opacity-50"></div>
               <div className="relative z-10">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mr-4">
-                    <Sparkles className="w-6 h-6 text-white" />
+                <div className="flex items-center mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mr-3">
+                    <Sparkles className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Sứ Mệnh</h3>
+                  <h3 className="text-xl font-bold text-gray-900">Sứ Mệnh</h3>
                 </div>
-                <p className="text-lg text-gray-700 leading-relaxed">
+                <p className="text-base text-gray-700 leading-relaxed">
                   Chúng tôi xây dựng Get Sport không chỉ là nền tảng đặt sân
                   tiện lợi, mà còn là{" "}
                   <span className="font-semibold text-teal-600">
                     cầu nối đam mê thể thao và cộng đồng
                   </span>
                   . Thể thao là sức mạnh thay đổi cuộc sống, gắn kết tình bạn và
-                  tạo nên những kỷ niệm khó quên.
+                  tạo nên những kỷ niệm đẹp.
                 </p>
               </div>
             </div>
@@ -206,16 +206,16 @@ const StorySection = () => {
                 : "translate-y-10 opacity-0"
             }`}
           >
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 relative overflow-hidden">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-100 to-transparent rounded-bl-full opacity-50"></div>
               <div className="relative z-10">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mr-4">
-                    <Eye className="w-6 h-6 text-white" />
+                <div className="flex items-center mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mr-3">
+                    <Eye className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Tầm Nhìn</h3>
+                  <h3 className="text-xl font-bold text-gray-900">Tầm Nhìn</h3>
                 </div>
-                <p className="text-lg text-gray-700 leading-relaxed">
+                <p className="text-base text-gray-700 leading-relaxed">
                   Tầm nhìn của chúng tôi là trở thành{" "}
                   <span className="font-semibold text-teal-600">
                     nền tảng thể thao hàng đầu

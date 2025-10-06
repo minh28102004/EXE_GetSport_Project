@@ -83,36 +83,5 @@ export const mainBenefits: Benefit[] = [
     color: "from-cyan-600 to-teal-500",
     stats: "VIP",
   },
-  // {
-  //   icon: Trophy,
-  //   title: "Giải Đấu Thú Vị",
-  //   details:
-  //     "Thường xuyên tổ chức các giải đấu thể thao quy mô lớn nhỏ, mang đến cơ hội tranh tài, kết nối và khẳng định kỹ năng của bạn.",
-  //   color: "from-yellow-500 to-orange-500",
-  //   stats: "🔥",
-  // },
-  // {
-  //   icon: Dumbbell,
-  //   title: "Huấn Luyện Chuyên Nghiệp",
-  //   details:
-  //     "Hợp tác cùng các huấn luyện viên giàu kinh nghiệm, hỗ trợ bạn nâng cao kỹ năng và cải thiện phong độ trong thời gian ngắn.",
-  //   color: "from-purple-500 to-indigo-500",
-  //   stats: "Pro",
-  // },
-  // {
-  //   icon: Smartphone,
-  //   title: "Ứng Dụng Thông Minh",
-  //   details:
-  //     "Trải nghiệm đặt sân dễ dàng qua ứng dụng di động hiện đại. Quản lý lịch chơi, thanh toán và nhận thông báo chỉ với một chạm.",
-  //   color: "from-pink-500 to-rose-500",
-  //   stats: "App",
-  // },
-  // {
-  //   icon: CalendarCheck,
-  //   title: "Lịch Trình Linh Hoạt",
-  //   details:
-  //     "Chủ động đặt sân theo giờ phù hợp. Hệ thống tự động nhắc nhở và hỗ trợ thay đổi lịch trình nhanh chóng khi có nhu cầu.",
-  //   color: "from-green-500 to-emerald-500",
-  //   stats: "✔",
-  // },
+ 
 ];

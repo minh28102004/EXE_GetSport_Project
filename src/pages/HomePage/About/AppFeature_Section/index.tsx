@@ -59,31 +59,31 @@ const AppFeatureSection = () => {
     <>
       {/* App Features Showcase */}
       <section
-        className="py-12 sm:py-18 bg-gradient-to-b from-gray-50 to-white"
+        className="py-8 sm:py-14 px-6 sm:px-30 bg-gradient-to-b from-gray-50 to-white"
         id="app-features"
         data-animate
       >
         <div
-          className={`container mx-auto px-5 sm:pl-12 transform transition-all duration-1000 ${
+          className={`container mx-auto transform transition-all duration-1000 ${
             isVisible["app-features"]
               ? "translate-y-0 opacity-100"
               : "translate-y-10 opacity-0"
           }`}
         >
-          <div className="text-center mb-12 relative">
+          <div className="text-center mb-6 sm:mb-10 relative">
             {/* Background Decorative Elements */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="w-32 h-32 bg-gradient-to-r from-teal-200/30 to-cyan-200/30 rounded-full blur-3xl"></div>
             </div>
 
             {/* Badge */}
-            <div className="inline-flex items-center bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-800 px-6 py-3 rounded-full text-sm font-medium mb-3 relative z-10">
+            <div className="inline-flex items-center bg-gradient-to-r from-teal-100 to-cyan-100 text-teal-800 px-5 py-1.5 rounded-full text-sm font-medium mb-3 relative z-10">
               <Sparkles className="w-4 h-4 mr-2" />
               Tính năng độc quyền
             </div>
 
             {/* Main Title */}
-            <h2 className="text-4xl font-bold text-gray-900 mb-3 leading-tight relative z-10">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 leading-tight relative z-10">
               <span className="relative">
                 Tính Năng
                 {/* Decorative underline */}
@@ -96,7 +96,7 @@ const AppFeatureSection = () => {
             </h2>
 
             {/* Subtitle */}
-            <p className="text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed relative z-10">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed relative z-10">
               Khám phá những
               <span className="font-semibold text-teal-600">
                 {" "}
@@ -109,8 +109,8 @@ const AppFeatureSection = () => {
               </span>
               giúp Get Sport trở thành
               <span className="relative">
-                <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent font-bold">
-                  lựa chọn hàng đầu
+                <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent font-semibold">
+                {" "}  lựa chọn hàng đầu
                 </span>
                 <Star className="w-5 h-5 text-yellow-500 inline-block ml-1 animate-bounce" />
               </span>
@@ -128,7 +128,7 @@ const AppFeatureSection = () => {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 px-3 sm:px-0 items-center">
+         <div className="grid md:[grid-template-columns:1.65fr_1.35fr] gap-12 items-center">
             {/* Left: Features list */}
             <div className="space-y-7">
               {appFeatures.map((feature, index) => {
@@ -136,11 +136,11 @@ const AppFeatureSection = () => {
                 return (
                   <div
                     key={index}
-                    className={`p-6 rounded-2xl shadow-md transition-all duration-500 cursor-pointer ${
+                    className={`p-4 sm:py-5 sm:px-6 rounded-2xl shadow-md transition-all duration-500 cursor-pointer ${
                       currentFeature === index
                         ? "bg-gradient-to-r " +
                           feature.color +
-                          " text-white shadow-2xl scale-105"
+                          " text-white shadow-2xl scale-[1.03]"
                         : "bg-white hover:shadow-lg border border-gray-100"
                     }`}
                     onClick={() => setCurrentFeature(index)}
@@ -162,7 +162,7 @@ const AppFeatureSection = () => {
                         />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-2">
+                        <h3 className="text-lg sm:text-xl font-bold mb-2">
                           {feature.title}
                         </h3>
                         <p

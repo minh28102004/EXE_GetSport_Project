@@ -141,17 +141,24 @@ const UserMenu: React.FC<UserMenuProps> = ({
       <button
         ref={btnRef}
         onClick={() => !isLoggingOut && setOpen((o) => !o)}
-        className={`group relative flex items-center gap-2.5 rounded-full bg-white transition-all duration-300 px-3 py-1.5 overflow-hidden ${
-          isLoggingOut ? "cursor-wait opacity-90" : "hover:shadow-md"
-        }`}
+        className={`group relative flex items-center gap-2.5 rounded-full bg-white px-3 py-1.5 overflow-hidden transition-all duration-300
+    ${isLoggingOut ? "cursor-wait opacity-90" : "hover:shadow-md"}`}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-busy={isLoggingOut}
         disabled={isLoggingOut}
       >
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="absolute inset-[1px] rounded-full bg-white" />
-
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-full border border-transparent
+               opacity-0 group-hover:opacity-100 transition-opacity duration-300
+               [background:linear-gradient(#fff,#fff)_padding-box,linear-gradient(90deg,#14b8a6,#10b981,#22c55e)_border-box]"
+        />{" "}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-emerald-500/50
+               group-hover:ring-transparent transition"
+        />
         <div className="relative flex items-center gap-2">
           <div className="relative">
             <AvatarUserImage
@@ -242,7 +249,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
               }}
               className={`absolute right-0 ${
                 placement === "up" ? "bottom-full mb-3" : "mt-3"
-              } w-[264px] rounded-2xl border border-gray-200/80 bg-white/95 shadow-xl z-50 overflow-hidden`}
+              } w-[248px] rounded-2xl border border-gray-200 bg-white shadow-xl z-50 overflow-hidden`}
             >
               {/* Header */}
               <div className="relative px-6 py-3 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 border-b border-gray-100">
@@ -282,7 +289,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
                   >
                     <Link
                       to={item.to}
-                      className={`group flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${item.color} ${item.hoverColor}`}
+                      className={`group flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${item.color} ${item.hoverColor}`}
                     >
                       <div
                         className={`flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 ${item.iconBg} transition-colors duration-200`}
@@ -317,7 +324,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
                   whileHover="hover"
                   className="group w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
                 >
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 group-hover:bg-red-100 transition-colors duration-200">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-md bg-red-50 group-hover:bg-red-100 transition-colors duration-200">
                     <LogOut className="w-4 h-4" />
                   </div>
                   <span className="font-medium">Đăng xuất</span>

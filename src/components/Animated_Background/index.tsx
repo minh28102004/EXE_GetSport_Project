@@ -51,59 +51,62 @@ const SportCourtAnimatedBackground: React.FC<SportCourtBackgroundProps> = ({
     opacity: number;
     rotation: number;
     rotationSpeed: number;
+    time: number; // để tính sine wave
 
     constructor(canvas: HTMLCanvasElement) {
       this.x = Math.random() * canvas.width;
       this.y = Math.random() * canvas.height;
-      this.vx =
-        (Math.random() - 0.5) *
-        (intensity === "calm" ? 0.5 : intensity === "energetic" ? 2 : 1);
-      this.vy =
-        (Math.random() - 0.5) *
-        (intensity === "calm" ? 0.5 : intensity === "energetic" ? 2 : 1);
+
+      const speedFactor =
+        intensity === "calm" ? 0.5 : intensity === "energetic" ? 2 : 1;
+
+      this.vx = (Math.random() - 0.5) * speedFactor;
+      this.vy = (Math.random() - 0.5) * speedFactor;
+
       this.size =
         Math.random() *
           (intensity === "calm" ? 8 : intensity === "energetic" ? 15 : 12) +
         3;
+
       this.color =
         currentTheme.particleColors[
           Math.floor(Math.random() * currentTheme.particleColors.length)
         ];
+
       this.type =
         Math.random() < 0.7
           ? "circle"
           : Math.random() < 0.5
           ? "shuttlecock"
           : "triangle";
-      this.opacity = Math.random() * 0.4 + 0.1;
+
+      this.opacity = Math.random() * 0.4 + 0.6;
       this.rotation = Math.random() * Math.PI * 2;
       this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+      this.time = Math.random() * 1000;
     }
 
     update(canvas: HTMLCanvasElement) {
       this.x += this.vx;
       this.y += this.vy;
-      this.vy += 0.01; // gravity
       this.rotation += this.rotationSpeed;
+      this.time += 0.02;
 
-      // chạm đáy -> nảy lên
-      if (this.y + this.size >= canvas.height) {
-        this.y = canvas.height - this.size;
-        this.vy *= -0.6;
+      // lơ lửng: dao động theo sine wave
+      this.y += Math.sin(this.time) * 0.3;
+      this.x += Math.cos(this.time * 0.5) * 0.2;
+
+      // bounce từ mọi cạnh
+      if (this.x - this.size < 0 || this.x + this.size > canvas.width) {
+        this.vx *= -1;
+      }
+      if (this.y - this.size < 0 || this.y + this.size > canvas.height) {
+        this.vy *= -1;
       }
 
-      // gần như dừng ở đáy -> mờ dần
-      if (this.y + this.size >= canvas.height - 2 && Math.abs(this.vy) < 0.5) {
-        this.opacity -= 0.01;
-      }
-
-      // biến mất -> reset rơi lại từ trên
-      if (this.opacity <= 0) {
-        this.x = Math.random() * canvas.width;
-        this.y = -this.size;
-        this.vy = Math.random() * 2 + 2;
-        this.opacity = Math.random() * 0.5 + 0.5;
-      }
+      // nhấp nháy nhẹ (dao động alpha theo sine wave)
+      this.opacity = 0.6 + Math.sin(this.time * 2) * 0.2;
+      this.opacity = Math.max(0.3, Math.min(0.9, this.opacity));
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -118,35 +121,21 @@ const SportCourtAnimatedBackground: React.FC<SportCourtBackgroundProps> = ({
           ctx.arc(0, 0, this.size, 0, Math.PI * 2);
           ctx.fillStyle = this.color;
           ctx.fill();
-
-          // inner glow
-          const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size);
-          gradient.addColorStop(0, this.color + "80");
-          gradient.addColorStop(1, this.color + "00");
-          ctx.fillStyle = gradient;
-          ctx.fill();
           break;
         }
         case "shuttlecock": {
           ctx.beginPath();
-          ctx.ellipse(0, 0, this.size*0.8, this.size*1.2, 0, 0, Math.PI*2);
+          ctx.ellipse(
+            0,
+            0,
+            this.size * 0.8,
+            this.size * 1.2,
+            0,
+            0,
+            Math.PI * 2
+          );
           ctx.fillStyle = this.color;
           ctx.fill();
-
-          // feathers
-          for (let i = 0; i < 5; i++) {
-            const angle = (i * Math.PI * 2) / 5;
-            ctx.save();
-            ctx.rotate(angle);
-            ctx.beginPath();
-            ctx.moveTo(0, -this.size * 0.6);
-            ctx.lineTo(this.size * 0.3, -this.size * 1.2);
-            ctx.lineTo(-this.size * 0.3, -this.size * 1.2);
-            ctx.closePath();
-            ctx.fillStyle = this.color + "60";
-            ctx.fill();
-            ctx.restore();
-          }
           break;
         }
         case "triangle": {

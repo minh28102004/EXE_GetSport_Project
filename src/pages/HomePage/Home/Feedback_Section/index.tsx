@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MapPin, CheckCircle, Heart, } from "lucide-react";
+import { MapPin, CheckCircle, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { reviews } from "./data";
 
@@ -114,37 +114,37 @@ const FeedbackSection: React.FC = () => {
   };
 
   return (
-    <div className="py-12 sm:py-18 px-4 sm:px-6 lg:px-15 bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="mx-auto">
+    <div className="py-8 sm:py-14 px-4 sm:px-6 lg:px-20 bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className=" mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-10">
-          <h2 className="text-4xl font-bold text-gray-800 mb-3">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
             Khách Hàng Nói Gì Về Chúng Tôi
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Hàng nghìn người chơi cầu lông đã tin tưởng và sử dụng dịch vụ của
             chúng tôi. Dưới đây là một số đánh giá từ họ.
           </p>
         </div>
 
         {/* Reviews Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
           {reviews.map((review) => {
             const state = reviewState[review.id];
             return (
               <div
                 key={review.id}
-                className="h-full flex flex-col bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-6 border border-gray-100 hover:border-teal-200 group relative"
+                className="h-full flex flex-col bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 px-6 py-5 border border-gray-100 hover:border-teal-200 group relative"
               >
                 {/* Header */}
-                <div className="flex flex-col space-y-2 mb-4">
+                <div className="flex flex-col space-y-2 mb-3.5">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-gray-700">
                         {formatDate(review.datePosted)}
                       </span>
                       {review.isVerified && (
-                        <div className="flex items-center bg-teal-50 text-teal-600 px-2 py-1 rounded-full text-xs font-medium">
+                        <div className="flex items-center bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full text-xs font-medium">
                           <CheckCircle className="w-3 h-3 mr-1" />
                           Xác thực
                         </div>
@@ -156,13 +156,13 @@ const FeedbackSection: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-lg inline-flex items-center w-fit">
+                  <div className="text-xs text-gray-500 bg-gray-50 px-2.5 py-1 rounded-lg inline-flex items-center w-fit">
                     {formatDateTime(review.datePosted, review.timePosted)}
                   </div>
                 </div>
 
                 {/* Stars */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center space-x-2">
                     <div className="flex">{renderStars(review.rating)}</div>
                     <span className="text-sm font-medium text-gray-600">
@@ -177,7 +177,7 @@ const FeedbackSection: React.FC = () => {
                 </div>
 
                 {/* Comment */}
-                <div className="flex-1 text-gray-700 leading-relaxed mb-6 text-left">
+                <div className="flex-1 text-gray-700 leading-relaxed mb-5 text-left">
                   <p
                     ref={(el) => {
                       pRefs.current[review.id] = el;
@@ -202,13 +202,13 @@ const FeedbackSection: React.FC = () => {
                 {/* Footer */}
                 <div className="mt-auto flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center mr-4 group-hover:scale-110 transition-transform duration-300 shadow-md">
-                      <span className="text-white font-semibold text-sm">
+                    <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300 shadow-md">
+                      <span className="text-white font-semibold text-[13px]">
                         {review.avatar}
                       </span>
                     </div>
                     <div className="text-left">
-                      <h4 className="font-semibold text-gray-800 mb-1">
+                      <h4 className="font-semibold text-gray-800 mb-0.5">
                         {review.author}
                       </h4>
                       <p className="text-sm text-gray-500">{review.role}</p>
@@ -216,7 +216,7 @@ const FeedbackSection: React.FC = () => {
                   </div>
 
                   <button className="flex items-center space-x-1 text-gray-400 hover:text-red-500 transition-colors duration-200 group/like">
-                    <Heart className="w-5 h-5 group-hover/like:scale-110 transition-transform duration-200" />
+                    <Heart className="w-4 h-4 group-hover/like:scale-110 transition-transform duration-200" />
                     <span className="text-sm font-medium">{review.likes}</span>
                   </button>
                 </div>
@@ -226,10 +226,10 @@ const FeedbackSection: React.FC = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-10">
           <Link
             to="/blogPost"
-            className="group inline-flex items-center gap-1 px-3 py-2 border-2 border-teal-200 text-teal-600 rounded-xl font-medium
+            className="group inline-flex items-center gap-1 px-3 py-1.5 border-2 border-teal-200 text-teal-600 rounded-xl font-medium
                hover:bg-teal-50 hover:border-teal-300 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
           >
             Xem Thêm Đánh Giá

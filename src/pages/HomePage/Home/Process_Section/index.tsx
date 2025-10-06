@@ -68,28 +68,28 @@ const ProcessSection = () => {
   ];
 
   return (
-    <section className="relative py-12 sm:py-18 bg-gradient-to-t from-teal-50 via-slate-100 to-teal-50 overflow-hidden">
-      <div className="relative mx-auto px-10 sm:px-15 lg:px-30">
+    <section className="relative py-8 sm:py-14 bg-gradient-to-t from-teal-50 via-slate-100 to-teal-50 overflow-hidden">
+      <div className="relative mx-auto px-4 sm:px-6 lg:px-30">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-4 py-2 rounded-full text-sm font-medium mb-3.5">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium mb-3">
             <Play className="w-4 h-4" />
             Quy trình đơn giản
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-3">
+          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-teal-900 to-cyan-900 bg-clip-text text-transparent mb-2.5">
             Đặt Sân Chỉ Trong
-            <span className="block text-4xl md:text-5xl bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+            <span className="block text-3xl md:text-4xl bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
               3 Bước
             </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Trải nghiệm đặt sân cầu lông hiện đại, nhanh chóng và tiện lợi với
             quy trình được tối ưu hóa
           </p>
         </div>
 
         {/* Process Steps */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-10">
+        <div className="grid lg:grid-cols-3 gap-6 mb-8">
           {processSteps.map((step, index) => (
             <div
               key={step.id}
@@ -103,36 +103,36 @@ const ProcessSection = () => {
             >
               {/* Card */}
               <div
-                className={`relative p-8 rounded-3xl rounded-br-none rounded-bl-none transition-all duration-500 border-2 ${
+                className={`relative p-6 rounded-3xl rounded-br-none rounded-bl-none transition-all duration-500 border-2 ${
                   activeStep === index
-                    ? "bg-white shadow-2xl border-transparent scale-105 -translate-y-2"
-                    : "bg-white/80 shadow-lg border-gray-100 hover:shadow-xl hover:scale-102"
+                    ? "bg-white shadow-2xl border-transparent scale-105 -translate-y-1.5"
+                    : "bg-white/80 shadow-lg border-gray-100 hover:shadow-xl hover:scale-[1.02]"
                 }`}
               >
                 {/* Step Number Badge */}
                 <div
-                  className={`absolute -top-4 -left-4 w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg bg-gradient-to-r ${step.color}`}
+                  className={`absolute -top-3.5 -left-3.5 w-10 h-10 rounded-2xl flex items-center justify-center text-white font-bold text-base shadow-lg bg-gradient-to-r ${step.color}`}
                 >
                   {step.id}
                 </div>
 
                 {/* Icon Container */}
                 <div
-                  className={`w-15 h-15 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 bg-gradient-to-r ${
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-all duration-500 bg-gradient-to-r ${
                     step.color
                   } ${activeStep === index ? "scale-110 shadow-lg" : ""}`}
                 >
-                  <step.icon className="w-10 h-10 text-white" />
+                  <step.icon className="w-8 h-8 text-white" />
                 </div>
 
                 {/* Content */}
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-1.5">
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">
                       {step.title}
                     </h3>
                     <p
-                      className={`text-lg font-medium mb-1.5 bg-gradient-to-r ${step.color} bg-clip-text text-transparent`}
+                      className={`text-base font-medium mb-1 bg-gradient-to-r ${step.color} bg-clip-text text-transparent`}
                     >
                       {step.subtitle}
                     </p>
@@ -142,7 +142,7 @@ const ProcessSection = () => {
                   </div>
 
                   {/* Features */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {step.features.map((feature, idx) => (
                       <div
                         key={idx}
@@ -150,7 +150,7 @@ const ProcessSection = () => {
                       >
                         <div
                           className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${step.color}`}
-                        ></div>
+                        />
                         {feature}
                       </div>
                     ))}
@@ -161,15 +161,15 @@ const ProcessSection = () => {
                 <div
                   className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${
                     step.color
-                  } transition-all duration-500 rounded-b-3xl ${
+                  } transition-all duration-500  ${
                     activeStep === index ? "w-full" : "w-0"
                   }`}
-                ></div>
+                />
               </div>
 
               {/* Connection Arrow */}
               {index < processSteps.length - 1 && (
-                <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+                <div className="hidden lg:block absolute top-1/2 -right-4 -translate-y-1/2 z-10">
                   <div
                     className={`w-8 h-8 rounded-full bg-gradient-to-r ${
                       step.color
@@ -185,9 +185,9 @@ const ProcessSection = () => {
           ))}
         </div>
 
-        {/* CTA Section */}
+        {/* CTA note */}
         <div className="text-center">
-          <p className="text-gray-500">
+          <p className="text-gray-500 text-sm sm:text-base">
             ⚡ Chỉ mất 2 phút để hoàn tất • 🔒 Bảo mật tuyệt đối • ⭐ Đánh giá
             4.9/5
           </p>

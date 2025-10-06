@@ -25,19 +25,19 @@ const TimelineSection: React.FC = () => {
   const currentItem = timelineData[currentIndex];
 
   return (
-    <section className="relative py-12 sm:py-18 bg-gradient-to-br from-slate-50 via-teal-50/30 to-cyan-50/30 overflow-hidden">
+    <section className="relative py-8 sm:py-14 px-6 sm:px-35 bg-gradient-to-br from-slate-50 via-teal-50/30 to-cyan-50/30 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-50"></div>
 
-      <div className="container mx-auto px-6 sm:px-20 relative">
+      <div className="container mx-auto relative">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-6 sm:mb-10 ">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="inline-flex items-center space-x-2 bg-teal-100 text-teal-700 px-4 py-2 rounded-full text-sm font-medium mb-3"
+            className="inline-flex items-center space-x-2 bg-teal-100 text-teal-700 px-5 py-1.5 rounded-full text-sm font-medium mb-3"
           >
             <TrendingUp className="w-4 h-4" />
             <span>Hành trình phát triển</span>
@@ -48,7 +48,7 @@ const TimelineSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-4xl font-bold text-gray-900 mb-3"
+            className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2"
           >
             Câu Chuyện Của
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-600">
@@ -62,7 +62,7 @@ const TimelineSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+            className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
           >
             Từ ý tưởng đơn giản đến nền tảng đặt sân cầu lông hàng đầu Việt Nam
             - hành trình 3 năm kiến tạo tương lai thể thao số
@@ -74,9 +74,9 @@ const TimelineSection: React.FC = () => {
           <div className="relative bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
             <div className="px-6 pb-4 lg:px-12 lg:pt-0 lg:pb-8">
               {/* Timeline Navigation Dots */}
-              <div className="mb-12">
+              <div className="mb-10">
                 {/* Progress Track Container */}
-                <div className="relative max-w-6xl mx-auto px-4">
+                <div className="relative max-w-5xl mx-auto px-4">
                   {/* Background Track */}
                   <div className="absolute top-7 left-0 right-0 h-2 bg-gray-200 rounded-full shadow-inner">
                     <div
@@ -113,7 +113,7 @@ const TimelineSection: React.FC = () => {
 
                           {/* Node */}
                           <div
-                            className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg transition-all duration-500 relative z-10 ${
+                            className={`w-13 h-13 rounded-2xl flex items-center justify-center text-white shadow-lg transition-all duration-500 relative z-10 ${
                               index === currentIndex
                                 ? "bg-gradient-to-r from-teal-500 to-cyan-500 ring-4 ring-white shadow-2xl"
                                 : index < currentIndex

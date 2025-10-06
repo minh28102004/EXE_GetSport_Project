@@ -53,9 +53,9 @@ const CTASection = () => {
   return (
     <section
       id="cta-section"
-      className="py-12 sm:py-16 bg-gradient-to-br from-[#1a999b] to-[#23AEB1] text-white"
+      className=" py-8 sm:py-14 px-6 sm:px-35 bg-gradient-to-br from-[#1a999b] to-[#23AEB1] text-white"
     >
-      <div className="container mx-auto px-6 md:px-20 grid md:grid-cols-2 gap-12 items-end">
+      <div className="container mx-auto grid md:grid-cols-2 gap-12 items-end">
         {/* Text + Contact support */}
         <motion.div
           className="flex flex-col rounded-2xl bg-transparent"

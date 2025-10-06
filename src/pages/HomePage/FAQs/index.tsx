@@ -58,16 +58,16 @@ const BadmintonFAQ: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-50">
       {/* Header */}
       <div className="bg-gradient-to-bl from-teal-600 via-teal-500 to-teal-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 pt-10 pb-2 text-center">
+        <div className="max-w-7xl mx-auto px-4 pt-8 pb-2 text-center">
           <div className="mb-6 relative flex flex-col items-center">
-            <h1 className="inline-flex flex-wrap items-center justify-center text-3xl sm:text-4xl md:text-5xl font-bold mb-3 bg-clip-text bg-gradient-to-r from-white to-teal-100 text-center">
+            <h2 className="inline-flex flex-wrap items-center justify-center text-3xl sm:text-4xl md:text-5xl font-bold mb-3 bg-clip-text bg-gradient-to-r from-white to-teal-100 text-center">
               Câu hỏi thường gặp
-              <span className="ml-3 mt-2 flex-shrink-0 flex items-center justify-center w-12 h-12 bg-white bg-opacity-20 rounded-full backdrop-blur-sm">
-                <MessageCircleQuestion className="w-8 h-8 text-teal-500" />
+              <span className="ml-3 mt-0 sm:mt-2 flex-shrink-0 flex items-center justify-center h-10 w-10 sm:w-12 sm:h-12 bg-white bg-opacity-20 rounded-full backdrop-blur-sm">
+                <MessageCircleQuestion className="w-6 h-6 sm:w-8 sm:h-8 text-teal-500" />
               </span>
-            </h1>
+            </h2>
 
-            <p className="text-base sm:text-xl text-teal-100 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-teal-100 max-w-2xl mx-auto">
               Tìm câu trả lời cho các thắc mắc về nền tảng đặt sân cầu lông của
               chúng tôi
             </p>
@@ -76,7 +76,7 @@ const BadmintonFAQ: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 sm:px-4 py-12">
+      <div className="max-w-5xl mx-auto px-6 sm:px-4 py-10">
         {/* Search & Filter */}
         <div className="mb-10 flex flex-col gap-4 md:flex-row md:justify-center items-center">
           {/* Search */}
@@ -90,7 +90,7 @@ const BadmintonFAQ: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 hover:border-teal-500/50 focus:border-teal-400 focus:ring-1 focus:ring-teal-500 outline-none transition-all duration-300 shadow-lg"
+              className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-gray-300 bg-white hover:border-teal-500/50 focus:border-teal-400 focus:ring-1 focus:ring-teal-500 outline-none transition-all duration-300 shadow-sm"
             />
           </div>
 
@@ -104,7 +104,7 @@ const BadmintonFAQ: React.FC = () => {
               }}
             >
               <div className="relative">
-                <Listbox.Button className="w-full flex items-center justify-between px-5 py-3 bg-white rounded-2xl shadow-md hover:border-teal-500/50 border border-gray-200 focus:ring-1 focus:ring-teal-400 transition">
+                <Listbox.Button className="w-full flex items-center justify-between px-5 py-2.5 bg-white rounded-xl shadow-md hover:border-teal-500/50 border border-gray-200 focus:ring-1 focus:ring-teal-400 transition">
                   <span className="flex items-center gap-2">
                     {categories.find((c) => c.name === selectedCategory)?.icon}
                     {getCategoryName(selectedCategory)}
@@ -155,17 +155,17 @@ const BadmintonFAQ: React.FC = () => {
         </div>
 
         {/* FAQ Items */}
-        <div className="space-y-5">
+        <div className="space-y-4">
           {currentFAQs.map((faq, index) => (
             <div key={faq.id} className="relative">
               {/* Number badge */}
-              <div className="absolute -top-2 -left-2 z-20 w-8 h-8 bg-gradient-to-br from-teal-400 to-teal-600 text-white text-sm font-bold rounded-full flex items-center justify-center shadow-lg">
+              <div className="absolute -top-2 -left-2 z-20 w-8 h-8 bg-gradient-to-br from-teal-400 to-teal-600 text-white text-sm font-bold rounded-full flex items-center justify-center shadow-md">
                 {String(startIndex + index + 1).padStart(2, "0")}
               </div>
 
               {/* Card */}
               <div
-                className={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-l-4 ${
+                className={`bg-white rounded-2xl shadow-sm sm:shadow-md hover:shadow-md sm:hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-l-4 ${
                   expandedItems.has(faq.id)
                     ? "border-teal-500 ring-2 ring-teal-100"
                     : "border-transparent hover:border-teal-500/50"
@@ -199,7 +199,7 @@ const BadmintonFAQ: React.FC = () => {
                       </h3>
                       {!expandedItems.has(faq.id) && (
                         <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                          {faq.answer.substring(0, 80)}...
+                          {faq.answer.substring(0, 120)}...
                         </p>
                       )}
                     </div>
@@ -222,7 +222,7 @@ const BadmintonFAQ: React.FC = () => {
                 </button>
 
                 <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  className={`overflow-auto custom-scrollbar transition-all duration-500 ease-in-out ${
                     expandedItems.has(faq.id)
                       ? "max-h-96 opacity-100"
                       : "max-h-0 opacity-0"
@@ -256,7 +256,7 @@ const BadmintonFAQ: React.FC = () => {
 
         {/* Pagination */}
         {filteredFAQs.length > pageSize && (
-          <div className="mt-10 flex justify-center">
+          <div className="flex justify-center">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

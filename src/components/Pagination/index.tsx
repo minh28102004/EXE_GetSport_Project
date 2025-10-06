@@ -49,7 +49,7 @@ const Pagination = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex flex-col items-center space-y-4 mt-8">
+    <div className="flex flex-col items-center space-y-4 mt-8 sm:mt-10">
       {/* Main Pagination */}
       <div className="flex items-center justify-center space-x-2 flex-wrap">
         {/* Prev */}
@@ -57,7 +57,7 @@ const Pagination = ({
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg border border-gray-200 transition-all duration-300 ${
+            className={`flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200/60 transition-all duration-300 ${
               currentPage === 1
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-white text-[#23AEB1] hover:bg-[#5FC5CB] hover:text-white shadow-md hover:shadow-lg transform hover:scale-105"
@@ -73,15 +73,15 @@ const Pagination = ({
             page === "..." ? (
               <div
                 key={`dots-${index}`}
-                className="flex items-center justify-center w-8.5 h-8.5 text-gray-400"
+                className="flex items-center justify-center w-8 h-8 text-gray-400"
               >
-                <MoreHorizontal className="w-5 h-5" />
+                <MoreHorizontal className="w-4.5 h-4.5" />
               </div>
             ) : (
               <button
                 key={page}
                 onClick={() => handlePageChange(Number(page))}
-                className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg font-bold text-lg transition-all duration-300 shadow-md transform hover:scale-105 ${
+                className={`flex items-center justify-center w-8 h-8 rounded-lg font-medium text-lg transition-all duration-300 shadow-md transform hover:scale-105 ${
                   page === currentPage
                     ? "bg-[#23AEB1] text-white shadow-lg scale-105 ring-1 ring-[#b2e2e5]"
                     : "bg-white text-[#23AEB1] hover:bg-[#5FC5CB] hover:text-white"
@@ -98,7 +98,7 @@ const Pagination = ({
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`flex items-center justify-center w-8.5 h-8.5 rounded-lg border border-gray-200 transition-all duration-300 ${
+            className={`flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200/60 transition-all duration-300 ${
               currentPage === totalPages
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-white text-[#23AEB1] hover:bg-[#5FC5CB] hover:text-white shadow-md hover:shadow-lg transform hover:scale-105"
@@ -113,12 +113,12 @@ const Pagination = ({
       <div className="flex items-center justify-center space-x-2 text-sm">
         <div className="bg-white px-4 py-2 rounded-2xl shadow-md text-gray-700">
           Trang{" "}
-          <span className="font-semibold text-[#23AEB1]">{currentPage}</span> /{" "}
+          <span className="font-medium text-[#23AEB1]">{currentPage}</span> /{" "}
           {totalPages}
         </div>
 
         {/* Input + GO */}
-        {totalPages > 2 && (
+        {totalPages > 5 && (
           <div className="bg-white p-1 rounded-lg shadow-md text-gray-700">
             <div className="flex items-center space-x-2">
               <Tooltip title="Nhập số trang muốn tới" arrow>

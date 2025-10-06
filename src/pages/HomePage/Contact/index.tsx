@@ -1,11 +1,5 @@
 import React, { useState, useRef } from "react";
-import {
-  Clock,
-  Users,
-  Shield,
-  Send,
-  ChevronDown,
-} from "lucide-react";
+import { Clock, Users, Shield, Send, ChevronDown } from "lucide-react";
 import LoadingSpinner from "@components/Loading_Spinner";
 import { useClickOutside } from "@hooks/useClickOutSide";
 import { areas, contactInfo } from "./data";
@@ -16,7 +10,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ icon, title, children }) => (
   <div className="bg-white rounded-xl shadow-md hover:shadow-lg overflow-hidden transform transition-transform duration-300">
     <div className="bg-teal-600/80 p-2">
       <div className="flex items-center">
-        <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center mr-3">
+        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3">
           {icon}
         </div>
         <h3 className="font-semibold text-white text-lg">{title}</h3>
@@ -76,10 +70,10 @@ const ContactPage: React.FC = () => {
 
   return (
     <div className="bg-gray-100">
-      <div className="mx-auto px-4 sm:px-6 lg:px-50 py-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-50 py-8 sm:pt-8 sm:pb-10">
         <div className="grid lg:grid-cols-[1.75fr_4.25fr] gap-8">
           {/* Left Contact Info */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {contactInfo.map((info, idx) => (
               <InfoCard key={idx} icon={info.icon} title={info.title}>
                 {info.content}
@@ -87,12 +81,12 @@ const ContactPage: React.FC = () => {
             ))}
 
             {/* Working Hours */}
-            <div className="bg-white rounded-xl shadow-lg px-6 py-2">
-              <h3 className="font-semibold text-xl text-slate-800 mb-4 flex items-center">
+            <div className="bg-white rounded-xl shadow-lg px-6 py-3">
+              <h3 className="font-semibold text-lg text-slate-800 mb-3 flex items-center">
                 <Clock className="w-5 h-5 text-teal-500 mr-2" />
                 Giờ Làm Việc
               </h3>
-              <div className="space-y-3 text-sm md:text-base">
+              <div className="space-y-2 text-sm ">
                 {[
                   { day: "Thứ Hai - Thứ Sáu", time: "8:00 - 18:00" },
                   { day: "Thứ Bảy", time: "9:00 - 17:00" },
@@ -116,19 +110,19 @@ const ContactPage: React.FC = () => {
           {/* Contact Form */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden grid md:grid-cols-10">
             {/* Left Panel */}
-            <div className="bg-teal-600 p-8 flex flex-col md:col-span-4 justify-between">
+            <div className="bg-teal-600 p-6 flex flex-col md:col-span-4 justify-between">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2.5">
                   Gửi Thông Tin Liên Hệ
                 </h2>
-                <p className="text-teal-100 mb-8">
+                <p className="text-teal-100 mb-4">
                   Hãy điền thông tin vào form bên cạnh, chúng tôi sẽ liên hệ lại
                   với bạn trong thời gian sớm nhất.
                 </p>
 
-                <div className="space-y-6">
+                <div className="space-y-5">
                   <div className="flex items-start gap-3">
-                    <div className="w-14 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <div className="w-16 h-10 rounded-full bg-white/20 flex items-center justify-center">
                       <Users className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -142,7 +136,7 @@ const ContactPage: React.FC = () => {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <div className="w-14 h-10 rounded-full bg-white/20 flex items-center justify-center">
                       <Clock className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -156,7 +150,7 @@ const ContactPage: React.FC = () => {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <div className="w-14 h-10 rounded-full bg-white/20 flex items-center justify-center">
                       <Shield className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -195,7 +189,7 @@ const ContactPage: React.FC = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 sm:px-4 sm:py-2 border border-slate-300 rounded-lg focus:ring-1 hover:border-teal-500/50 focus:ring-teal-500 focus:border-teal-500 focus:outline-none text-sm sm:text-base"
+                      className="w-full px-3 py-1.5 sm:px-4 sm:py-1.5 border border-slate-300 rounded-lg focus:ring-1 hover:border-teal-500/50 focus:ring-teal-500 focus:outline-none text-sm sm:text-base"
                       placeholder="Nhập họ và tên"
                       required
                     />
@@ -209,7 +203,7 @@ const ContactPage: React.FC = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 sm:px-4 sm:py-2 border border-slate-300 rounded-lg focus:ring-1 hover:border-teal-500/50 focus:ring-teal-500 focus:border-teal-500 focus:outline-none text-sm sm:text-base"
+                      className="w-full px-3 py-1.5 sm:px-4 sm:py-1.5 border border-slate-300 rounded-lg focus:ring-1 hover:border-teal-500/50 focus:ring-teal-500 focus:outline-none text-sm sm:text-base"
                       placeholder="Nhập địa chỉ email"
                       required
                     />
@@ -227,7 +221,7 @@ const ContactPage: React.FC = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 sm:px-4 sm:py-2 border border-slate-300 rounded-lg focus:ring-1 hover:border-teal-500/50 focus:ring-teal-500 focus:border-teal-500 focus:outline-none text-sm sm:text-base"
+                      className="w-full px-3 py-1.5 sm:px-4 sm:py-1.5 border border-slate-300 rounded-lg focus:ring-1 hover:border-teal-500/50 focus:ring-teal-500 focus:outline-none text-sm sm:text-base"
                       placeholder="Nhập số điện thoại"
                     />
                   </div>
@@ -240,7 +234,7 @@ const ContactPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setOpen(!open)}
-                      className="w-full flex items-center justify-between px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm  hover:border-teal-500/80 focus:ring-1 focus:outline-none focus:ring-[#1e9ea1] transition-all"
+                      className="w-full flex items-center justify-between px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm  hover:border-teal-500/50 focus:ring-1 focus:outline-none focus:ring-teal-500 transition-all"
                     >
                       <span>
                         {selectedArea ? selectedArea.label : "Chọn chủ đề"}

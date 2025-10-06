@@ -1,558 +1,373 @@
-import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import {
-  Search,
+  ChevronLeft,
+  ChevronRight,
   Star,
   ArrowRight,
-  CheckCircle,
-  Award,
+  Sun,
+  Search,
   Shield,
+  CheckCircle,
+  MapPin,
 } from "lucide-react";
-import { courtImageList, packages, stats } from "./data";
 import endPoint from "@routes/router";
+import { courtImageList, stats } from "./data";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * ✅ Goals
+ * - Keep desktop layout exactly as-is
+ * - Make mobile feel polished: spacing, alignment, safe-area, thumb targets
+ * - Pause autoplay on hover & when user prefers reduced motion
+ * - No entrance animations
+ */
 const BannerSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [_activeFeature, setActiveFeature] = useState(0);
-  const [current, setCurrent] = useState(0);
-  const [currentPackage, setCurrentPackage] = useState(0);
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const [_translateZ, setTranslateZ] = useState<number>(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHover, setIsHover] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [prefersReducedMotion, setPRM] = useState(false);
+  const autoplayMs = 5000;
   const navigate = useNavigate();
 
-  const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % courtImageList.length);
-  };
-
-  const nextPackage = () => {
-    setCurrentPackage((prev) => (prev + 1) % 3);
-  };
-
-  const prevPackage = () => {
-    setCurrentPackage((prev) => (prev - 1 + 3) % 3);
-  };
-
-  // Auto slide sau 5 giây
+  // Coachmark state for mobile weather pill (hover/tap)
+  const [showCoach, setShowCoach] = useState(false);
+  const pillRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    const interval = setInterval(nextSlide, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Auto slide packages
-  useEffect(() => {
-    const interval = setInterval(nextPackage, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    setIsVisible(true);
-
-    // Auto-rotate features
-    const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % 4);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (cardRef.current) {
-        const width = cardRef.current.offsetWidth;
-        const n = packages.length;
-        setTranslateZ(width / (2 * Math.tan(Math.PI / n)));
-      }
+    const onDocClick = (e: MouseEvent) => {
+      if (!pillRef.current) return;
+      if (!pillRef.current.contains(e.target as Node)) setShowCoach(false);
     };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [packages.length]);
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowCoach(false);
+    };
+    document.addEventListener("click", onDocClick);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("click", onDocClick);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, []);
+
+  // Weather data (mock)
+  const weather = {
+    temp: "28°C",
+    humidity: "75%",
+    location: "Hà Nội, Việt Nam",
+    date: new Date().toLocaleDateString("vi-VN"),
+  };
+
+  // --- Autoplay with requestAnimationFrame (stutter-free & PRM aware) ---
+  const rafId = useRef<number | null>(null);
+  const startRef = useRef<number>(0);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setPRM(!!mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (courtImageList.length <= 1) return; // nothing to autoplay
+
+    const loop = (now: number) => {
+      // Start baseline
+      if (!startRef.current) startRef.current = now;
+
+      // Pause when hover or PRM
+      if (isHover || prefersReducedMotion) {
+        startRef.current = now - (progress / 100) * autoplayMs;
+      } else {
+        const pct = Math.min(
+          100,
+          ((now - startRef.current) / autoplayMs) * 100
+        );
+        setProgress(pct);
+        if (pct >= 100) {
+          setCurrentIndex((p) => (p + 1) % courtImageList.length);
+          setProgress(0);
+          startRef.current = now;
+        }
+      }
+      rafId.current = requestAnimationFrame(loop);
+    };
+
+    rafId.current = requestAnimationFrame(loop);
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+      startRef.current = 0;
+    };
+  }, [isHover, prefersReducedMotion, autoplayMs]);
+
+  const goTo = (i: number) => {
+    setCurrentIndex((i + courtImageList.length) % courtImageList.length);
+    setProgress(0);
+    startRef.current = 0; // reset cycle so progress restarts smoothly
+  };
+
+  const next = () => goTo(currentIndex + 1);
+  const prev = () => goTo(currentIndex - 1);
 
   return (
-    <div className="pb-12">
-      {/* Hero Background Banner - Improved */}
-      <div className="absolute inset-0 h-screen">
-        <div className="relative h-screen w-full">
-          {/* Background image with better quality */}
-          <div className="absolute w-full h-full">
+    <section
+      className={
+        // Use 100svh to avoid browser URL bar jump on mobile
+        "relative w-full min-h-[100svh] sm:min-h-[93vh] sm:h-[93vh] overflow-visible sm:overflow-hidden"
+      }
+    >
+      {/* Background Image Slider */}
+      <div
+        className="absolute inset-0"
+        onMouseEnter={() => setIsHover(true)}
+        onMouseLeave={() => setIsHover(false)}
+      >
+        {courtImageList.map((img, i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              i === currentIndex ? "opacity-100" : "opacity-0"
+            }`}
+            aria-hidden={i !== currentIndex}
+          >
             <img
-              src={courtImageList[current]}
-              alt={`Badminton Court ${current + 1}`}
-              className="w-full h-full object-cover transition-all duration-1000 ease-in-out transform"
-              style={{
-                filter: "brightness(1.1) contrast(1.1) saturate(1.2)",
-                imageRendering: "crisp-edges",
-              }}
+              src={img}
+              alt={`Sân ${i + 1}`}
+              className="w-full h-full object-cover"
+              decoding="async"
             />
+            {/* Gradient Overlays */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           </div>
+        ))}
+      </div>
 
-          {/* Enhanced overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/95 via-white/85 to-teal-50/90"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-teal-900/20 via-transparent to-transparent"></div>
+      {/* Content Container */}
+      <div className="relative z-10 h-full flex items-start sm:items-center pt-[calc(theme(spacing.16)+env(safe-area-inset-top,0px))] pb-12 sm:pb-0 sm:pt-0">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-20">
+          <div className="max-w-4xl sm:max-w-3xl lg:max-w-4xl text-center sm:text-left">
+            {/* Top Badge */}
+            <div className="inline-flex items-center px-4 sm:px-5 py-1.5 sm:py-2 bg-gradient-to-r from-teal-50 to-teal-50 rounded-full text-teal-700 text-xs sm:text-sm font-medium mb-4 sm:mb-4 shadow-md">
+              <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 fill-current text-teal-500" />
+              Nền tảng đặt sân #1 Việt Nam 🏆
+            </div>
 
-          {/* Improved indicator dots */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-4">
-            {courtImageList.map((_, i) => (
+            {/* Main Heading */}
+            <h1 className="text-4xl xs:text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4 sm:mb-4">
+              Đặt Sân Cầu Lông Dễ Dàng,
+              <span className="block mt-1.5 sm:mt-2 bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent leading-tight">
+                Nhanh Chóng
+              </span>
+            </h1>
+
+            {/* Description */}
+            <p className="text-base xs:text-lg sm:text-xl text-gray-200 leading-relaxed mb-6 sm:mb-8 max-w-2xl mx-auto sm:mx-0">
+              Hệ thống đặt sân hiện đại tích hợp AI giúp bạn tìm và đặt sân cầu
+              lông một cách thuận tiện. Tiết kiệm thời gian và tận hưởng trải
+              nghiệm chơi thể thao...
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-10 w-full sm:w-auto">
               <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                className={`relative transition-all duration-300 ${
-                  i === current ? "w-12 h-4" : "w-4 h-4 hover:w-6"
-                }`}
+                type="button"
+                className="group w-full sm:w-auto min-h-12 px-4 py-3 sm:px-6 sm:py-2.5 text-sm sm:text-lg bg-gradient-to-r from-teal-600 via-teal-500 to-cyan-500 text-white rounded-2xl font-bold overflow-hidden transition-all duration-300 hover:scale-[1.03] active:scale-100 relative"
+                onClick={() => navigate(endPoint.COURTBOOKING)}
               >
-                <div
-                  className={`absolute inset-0 rounded-full transition-all duration-300 ${
-                    i === current
-                      ? "bg-gradient-to-r from-teal-500 to-teal-600 shadow-lg shadow-teal-500/50"
-                      : "bg-white/60 hover:bg-white/80 shadow-md"
-                  }`}
-                ></div>
+                <span className="relative z-10 flex items-center justify-center gap-1">
+                  Đặt Sân Ngay{" "}
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               </button>
-            ))}
+
+              <button
+                type="button"
+                className="group w-full sm:w-auto min-h-12 px-4 py-3 sm:px-4 sm:py-2.5 text-sm sm:text-lg bg-white text-teal-700 rounded-2xl font-bold hover:bg-teal-50 hover:scale-[1.03] active:scale-100 transition-all flex items-center justify-center"
+                onClick={() => navigate(endPoint.ABOUT)}
+              >
+                <Search className="mr-2 w-5 h-5" /> Tìm hiểu thêm
+              </button>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
+              {stats.map((item, idx) => {
+                const Icon = item.icon as React.ElementType;
+                return (
+                  <div
+                    key={idx}
+                    className="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon className={`w-5 h-5 ${item.color}`} />
+                      <span className="text-xs sm:text-sm text-gray-300">
+                        {item.label}
+                      </span>
+                    </div>
+                    <div className="text-xl sm:text-2xl font-bold text-white">
+                      {item.number}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative mt-19 sm:pb-18 pb-0 z-10">
-        <div className=" mx-auto  sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-[1.70fr_1.30fr] gap-4 items-center">
-            {/* Clean White Content Card */}
-            <div
-              className={`transform transition-all duration-1000 ${
-                isVisible
-                  ? "translate-x-0 opacity-100"
-                  : "-translate-x-12 opacity-0"
-              }`}
-            >
-              {/* Clean White Card Design */}
-              <div className="relative mx-auto w-full max-w-[90vw] sm:max-w-4xl">
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-400/10 to-blue-400/10 rounded-3xl transform rotate-6"></div>
-                <div className="relative bg-white rounded-3xl shadow-2xl p-6 sm:p-10 transform -rotate-1 hover:rotate-0 transition-transform duration-500 border border-gray-100">
-                  {/* Premium badge */}
-                  <div className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-teal-100 to-teal-50 rounded-full text-teal-700 text-sm sm:text-base font-medium mb-6 sm:mb-8 shadow-md">
-                    <Star className="w-4 h-4 sm:w-5 sm:h-5 mr-2 fill-current text-teal-500" />
-                    Ứng dụng đặt sân #1 Việt Nam 🏆
-                  </div>
+      {/* Trust Badges – Mobile inline */}
+      <div className="sm:hidden mt-3 flex justify-center gap-3 text-xs text-white/90">
+        <span className="inline-flex items-center gap-1">
+          <Shield className="w-4 h-4 text-green-400" /> Bảo mật SSL
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <CheckCircle className="w-4 h-4 text-green-400" /> Thanh toán an toàn
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <Star className="w-4 h-4 text-yellow-400 fill-current" /> 4.9/5
+        </span>
+      </div>
 
-                  <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 leading-tight mb-4 sm:mb-6">
-                    Đặt Sân Cầu Lông
-                    <span className="block text-2xl sm:text-3xl md:text-4xl bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
-                      Chỉ Trong 30 Giây
-                    </span>
-                  </h1>
-
-                  {/* Clean description */}
-                  <div className="flex flex-wrap items-baseline">
-                    <span className="text-lg sm:text-2xl text-gray-600 leading-relaxed font-medium">
-                      Hệ thống đặt sân thông minh với{" "}
-                      <span className="text-teal-600 font-semibold">
-                        AI tiên tiến
-                      </span>
-                      , giúp bạn tìm và đặt sân cầu lông phù hợp nhất...
-                    </span>
-
-                    <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-600 ml-auto sm:pb-2 sm:pt-1 py-3">
-                      <span className="inline-flex items-center gap-1">
-                        <Shield className="w-4 h-4 text-green-600" /> Bảo mật
-                        SSL
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <CheckCircle className="w-4 h-4 text-green-600" /> Thanh
-                        toán an toàn
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-500 fill-current" />{" "}
-                        4.9/5 đánh giá
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Clean CTA Buttons */}
-                  <div className="flex flex-row sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12">
-                    <button className="group w-1/2 sm:w-auto px-2 py-2 sm:px-6 sm:py-3 text-xs sm:text-lg bg-gradient-to-r from-teal-600 via-teal-500 to-cyan-500 text-white rounded-xl sm:rounded-2xl font-bold overflow-hidden transform transition-all duration-300 hover:scale-[1.03] hover:brightness-90 relative">
-                      <span className="relative z-10 flex items-center justify-center gap-1">
-                        Đặt Sân Ngay
-                        <ArrowRight className="w-4 sm:w-6 h-4 sm:h-6 transform group-hover:translate-x-2 transition-transform " />
-                      </span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                      <div className="absolute inset-0 rounded-2xl bg-teal-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </button>
-
-                    <button className="group w-1/2 sm:w-auto px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-lg border-2 border-teal-200 text-teal-700 rounded-xl sm:rounded-2xl font-bold hover:bg-teal-50 hover:scale-[1.03] hover:brightness-90  transition-all duration-300 flex items-center justify-center hover:border-teal-300"
-                    onClick={() => navigate(endPoint.ABOUT)}>
-                      <Search className="mr-1 sm:mr-3 w-4 sm:w-6 h-4 sm:h-6" />
-                      Tìm hiểu thêm
-                    </button>
-                  </div>
-
-                  {/* Clean Quick Stats */}
-                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                    {stats.map((stat, index) => (
-                      <div
-                        key={index}
-                        className={`text-center transform transition-all duration-700 ${
-                          isVisible
-                            ? "translate-y-0 opacity-100"
-                            : "translate-y-4 opacity-0"
-                        }`}
-                        style={{ transitionDelay: `${index * 200 + 600}ms` }}
-                      >
-                        <stat.icon
-                          className={`w-5 h-5 sm:w-6 sm:h-6 mx-auto text-teal-600 mb-1 sm:mb-2`}
-                        />
-                        <div className="text-lg sm:text-2xl font-bold text-gray-900">
-                          {stat.number}
-                        </div>
-                        <div className="text-xs sm:text-sm text-gray-600">
-                          {stat.label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+      {/* Weather – Desktop Card */}
+      <div className="hidden sm:block absolute top-6 right-6 z-20">
+        <div className="bg-white rounded-2xl px-4 py-3 shadow-md border border-gray-100 min-w-[240px]">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-slate-800">
+              Thời Tiết Hôm Nay
+            </h3>
+            <Sun className="w-5 h-5 text-yellow-500" />
+          </div>
+          <div className="flex items-start justify-between">
+            <div className="text-3xl font-semibold text-slate-800">
+              {weather.temp}
             </div>
-
-            {/* 3D Premium Packages Slider */}
-            <div
-              className={`relative transform transition-all duration-1000 ${
-                isVisible
-                  ? "translate-x-0 opacity-100"
-                  : "translate-x-12 opacity-0"
-              }`}
-            >
-              {/* Enhanced Section Header */}
-              <div className="text-center relative z-20 sm:mt-[-17px] mt-[110px] mb-5">
-                {/* Badge */}
-                <div
-                  className="inline-flex items-center px-6 sm:py-1 py-0 bg-gradient-to-r from-violet-500/10 via-fuchsia-500/10 to-pink-500/10 
-                  rounded-full border border-violet-300/50 shadow-md backdrop-blur-md"
-                >
-                  <Award className="w-5 h-5 mr-2 text-violet-600 animate-pulse" />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-pink-600 font-semibold  tracking-wide">
-                    PREMIUM PACKAGE
-                  </span>
-                </div>
+            <div className="flex flex-col items-end text-xs text-slate-600 gap-1 relative top-1.5">
+              <div>
+                Độ ẩm: <span className="font-medium">{weather.humidity}</span>
               </div>
-
-              {/* 3D Triangle Container - FIXED ALIGNMENT */}
-              <div className="relative w-full flex justify-center">
-                <div
-                  className=" w-84 sm:w-96 h-[550px]"
-                  style={{
-                    perspective: "2000px",
-                    perspectiveOrigin: "center center",
-                  }}
-                >
-                  {/* Rotating Triangle Container */}
-                  <div
-                    ref={cardRef}
-                    className="relative w-full h-full"
-                    style={{
-                      transform: `rotateY(${
-                        -currentPackage * (360 / packages.length)
-                      }deg)`,
-                      transformStyle: "preserve-3d",
-                      transition: "transform 1s cubic-bezier(0.23, 1, 0.32, 1)",
-                    }}
-                  >
-                    {packages.map((pkg, index) => {
-                      const angle = index * 120;
-                      const isActive = index === currentPackage;
-
-                      return (
-                        <div
-                          key={pkg.id}
-                          className={`absolute w-full h-full transition-all duration-700 ${
-                            isActive
-                              ? "z-40 opacity-100 scale-90"
-                              : "z-10 opacity-30 scale-80"
-                          }`}
-                          style={{
-                            transform: `rotateY(${angle}deg) translateZ(250px)`,
-                            transformStyle: "preserve-3d",
-                          }}
-                        >
-                          {/* Premium Badge */}
-                          {pkg.badge && (
-                            <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 z-50">
-                              <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs px-6 py-2 rounded-full font-bold shadow-lg">
-                                {pkg.badge}
-                              </div>
-                            </div>
-                          )}
-                          {/* Enhanced Premium Card */}
-                          <div
-                            className={`relative w-full h-full rounded-3xl overflow-hidden transition-all duration-700 scale-95 ${
-                              isActive
-                                ? "sm:opacity-100  shadow-2xl"
-                                : "sm:opacity-90  shadow-xl"
-                            }`}
-                            style={{
-                              background: pkg.gradient
-                                ? "linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #67e8f9 100%)"
-                                : pkg.isVip
-                                ? "linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #f59e0b 100%)"
-                                : "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)",
-                              boxShadow: isActive
-                                ? `0 25px 60px -12px ${
-                                    pkg.gradient
-                                      ? "rgba(6, 182, 212, 0.4)"
-                                      : pkg.isVip
-                                      ? "rgba(245, 158, 11, 0.4)"
-                                      : "rgba(0, 0, 0, 0.25)"
-                                  }`
-                                : "0 15px 40px -10px rgba(0, 0, 0, 0.2)",
-                            }}
-                          >
-                            {/* Glassmorphism Overlay */}
-                            <div className="absolute inset-0 bg-white/10 backdrop-blur-sm border border-white/20" />
-
-                            {/* Animated Background Pattern */}
-                            <div className="absolute inset-0 opacity-10">
-                              <div
-                                className={`absolute inset-0 ${
-                                  pkg.gradient
-                                    ? "bg-gradient-to-br from-cyan-300 via-teal-400 to-blue-400"
-                                    : pkg.isVip
-                                    ? "bg-gradient-to-br from-yellow-300 via-amber-300 to-orange-400"
-                                    : "bg-gradient-to-br from-slate-300 via-gray-300 to-zinc-400"
-                                } animate-pulse`}
-                                style={{ animationDuration: "4s" }}
-                              />
-                            </div>
-
-                            {/* Card Content */}
-                            <div className="relative z-10 p-8 h-full flex flex-col">
-                              {/* VIP Crown Icon */}
-                              {pkg.isVip && (
-                                <div className="absolute -top-4 -right-4">
-                                  <div className="relative">
-                                    <div className="bg-gradient-to-r from-yellow-400 to-amber-500 p-3 rounded-2xl shadow-xl rotate-12 hover:rotate-0 transition-transform duration-300">
-                                      <Award className="w-6 h-6 text-amber-900" />
-                                    </div>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-300 to-amber-400 rounded-2xl animate-pulse opacity-50" />
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Header Section */}
-                              <div className="text-center mb-3">
-                                <h3
-                                  className={`text-xl md:text-2xl font-bold mb-1 ${
-                                    pkg.gradient
-                                      ? "text-white drop-shadow-lg"
-                                      : pkg.isVip
-                                      ? "text-amber-900"
-                                      : "text-gray-900"
-                                  }`}
-                                >
-                                  {pkg.name}
-                                </h3>
-                                <p
-                                  className={`text-sm md:text-base font-medium ${
-                                    pkg.gradient
-                                      ? "text-cyan-100"
-                                      : pkg.isVip
-                                      ? "text-amber-700"
-                                      : "text-gray-600"
-                                  }`}
-                                >
-                                  {pkg.subtitle}
-                                </p>
-                              </div>
-
-                              {/* Premium Price Display */}
-                              <div className="text-center mb-6 relative">
-                                <div
-                                  className={`text-3xl md:text-4xl font-extrabold mb-2 ${
-                                    pkg.gradient
-                                      ? "text-white drop-shadow-xl"
-                                      : pkg.isVip
-                                      ? "text-amber-900"
-                                      : "text-gray-900"
-                                  }`}
-                                >
-                                  {pkg.price}
-                                </div>
-
-                                <div className="relative">
-                                  <span
-                                    className={`text-sm md:text-base line-through ${
-                                      pkg.gradient
-                                        ? "text-cyan-200"
-                                        : pkg.isVip
-                                        ? "text-amber-600"
-                                        : "text-gray-500"
-                                    }`}
-                                  >
-                                    {pkg.originalPrice}
-                                  </span>
-
-                                  <div
-                                    className={`inline-block ml-2 px-3 py-1 rounded-xl text-xs md:text-sm font-bold shadow-md ${
-                                      pkg.gradient
-                                        ? "bg-white/20 text-white backdrop-blur-sm border border-white/30"
-                                        : pkg.isVip
-                                        ? "bg-amber-100 text-amber-800 border border-amber-200"
-                                        : "bg-gradient-to-r from-blue-500 to-teal-500 text-white"
-                                    }`}
-                                  >
-                                    🔥 -{pkg.discount}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Enhanced Features List */}
-                              <div className="space-y-2 mb-4 flex-grow">
-                                {pkg.features.map((feature, idx) => (
-                                  <div
-                                    key={idx}
-                                    className={`flex items-center p-3 rounded-xl transition-all duration-300 hover:scale-105 ${
-                                      pkg.gradient
-                                        ? "bg-white/10 backdrop-blur-sm border border-white/20"
-                                        : pkg.isVip
-                                        ? "bg-amber-50/80 border border-amber-200/50"
-                                        : "bg-white/80 border border-gray-200/50 shadow-sm"
-                                    }`}
-                                  >
-                                    <div
-                                      className={`p-1 rounded-lg mr-4 ${
-                                        pkg.gradient
-                                          ? "bg-white/20"
-                                          : pkg.isVip
-                                          ? "bg-amber-200"
-                                          : "bg-green-100"
-                                      }`}
-                                    >
-                                      <CheckCircle
-                                        className={`w-5 h-5 ${
-                                          pkg.gradient
-                                            ? "text-white"
-                                            : pkg.isVip
-                                            ? "text-amber-700"
-                                            : "text-green-600"
-                                        }`}
-                                      />
-                                    </div>
-                                    <span
-                                      className={`font-medium ${
-                                        pkg.gradient
-                                          ? "text-white"
-                                          : pkg.isVip
-                                          ? "text-amber-900"
-                                          : "text-gray-800"
-                                      }`}
-                                    >
-                                      {feature}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-
-                              {/* Enhanced CTA Button */}
-                              <button
-                                className={`group relative w-full py-2.5 rounded-xl font-semibold text-base overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-xl ${
-                                  pkg.gradient
-                                    ? "bg-white text-teal-700 hover:bg-cyan-50"
-                                    : pkg.isVip
-                                    ? "bg-gradient-to-r from-amber-600 to-yellow-600 text-white hover:from-amber-700 hover:to-yellow-700"
-                                    : "bg-gradient-to-r from-teal-600 to-cyan-600 text-white hover:from-teal-700 hover:to-cyan-700"
-                                }`}
-                              >
-                                <span className="relative z-10 flex items-center justify-center gap-2">
-                                  Chọn Gói Này
-                                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                                </span>
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                              </button>
-                            </div>
-                          </div>
-                          {isActive && (
-                            <>
-                              <button
-                                onClick={prevPackage}
-                                className={`absolute -left-4 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg transition-all duration-300
-        ${
-          pkg.gradient
-            ? "bg-white/20 backdrop-blur-sm"
-            : pkg.isVip
-            ? "bg-amber-100/30 backdrop-blur-sm"
-            : "bg-gray-200/30 backdrop-blur-sm"
-        } hover:scale-110 hover:brightness-110 z-50 border ${
-                                  pkg.gradient
-                                    ? "border-white/40"
-                                    : pkg.isVip
-                                    ? "border-amber-300/50"
-                                    : "border-gray-300/50"
-                                }`}
-                              >
-                                <ChevronLeft
-                                  className={`w-5 h-5 ${
-                                    pkg.gradient
-                                      ? "text-white"
-                                      : pkg.isVip
-                                      ? "text-amber-900"
-                                      : "text-gray-700"
-                                  }`}
-                                />
-                              </button>
-
-                              <button
-                                onClick={nextPackage}
-                                className={`absolute -right-4 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg transition-all duration-300
-        ${
-          pkg.gradient
-            ? "bg-white/20 backdrop-blur-sm"
-            : pkg.isVip
-            ? "bg-amber-100/30 backdrop-blur-sm"
-            : "bg-gray-200/30 backdrop-blur-sm"
-        } hover:scale-110 hover:brightness-110 z-50 border ${
-                                  pkg.gradient
-                                    ? "border-white/40"
-                                    : pkg.isVip
-                                    ? "border-amber-300/50"
-                                    : "border-gray-300/50"
-                                }`}
-                              >
-                                <ChevronRight
-                                  className={`w-5 h-5 ${
-                                    pkg.gradient
-                                      ? "text-white"
-                                      : pkg.isVip
-                                      ? "text-amber-900"
-                                      : "text-gray-700"
-                                  }`}
-                                />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+              <div>{weather.date}</div>
             </div>
           </div>
+          <div className="mt-1.5 text-sm text-slate-700 flex items-center gap-1.5">
+            <MapPin className="w-4 h-4 text-blue-500" /> {weather.location}
+          </div>
+        </div>
+      </div>
+
+      {/* Weather – Mobile pill (compact, out of the way) */}
+      <div className="sm:hidden absolute top-3 left-3 z-30">
+        <div
+          ref={pillRef}
+          className="relative"
+          onMouseEnter={() => setShowCoach(true)}
+          onMouseLeave={() => setShowCoach(false)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowCoach((s) => !s);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setShowCoach((s) => !s);
+            }
+          }}
+          role="button"
+          tabIndex={0}
+          aria-haspopup="dialog"
+          aria-expanded={showCoach}
+          aria-label="Xem chi tiết thời tiết"
+        >
+          <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-[13px] shadow border border-white/60 flex items-center gap-2">
+            <Sun className="w-4 h-4 text-yellow-500" />
+            <span className="font-medium text-slate-800">{weather.temp}</span>
+            <span className="text-slate-700">• {weather.humidity}</span>
+          </div>
+
+          {showCoach && (
+            <div className="absolute left-0 mt-2 w-[260px] rounded-2xl bg-white shadow-xl border border-gray-200 p-3">
+              <div className="absolute left-6 -top-2 w-4 h-4 bg-white rotate-45 border-l border-t border-gray-200" />
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-semibold text-slate-900">
+                  Thời tiết hôm nay
+                </div>
+                <Sun className="w-4 h-4 text-yellow-500" />
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-[13px] text-slate-700">
+                <div>Địa điểm</div>
+                <div className="text-right font-medium">{weather.location}</div>
+                <div>Ngày</div>
+                <div className="text-right">{weather.date}</div>
+                <div>Nhiệt độ</div>
+                <div className="text-right font-medium">{weather.temp}</div>
+                <div>Độ ẩm</div>
+                <div className="text-right">{weather.humidity}</div>
+              </div>
+              <div className="mt-2 text-xs text-slate-500">
+                Chạm ra ngoài để đóng
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Trust Badges – Desktop */}
+      <div className="hidden sm:flex absolute z-20 flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-200 left-20 bottom-6">
+        <span className="inline-flex items-center gap-1">
+          <Shield className="w-4 h-4 text-green-400" /> Bảo mật SSL
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <CheckCircle className="w-4 h-4 text-green-400" /> Thanh toán an toàn
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <Star className="w-4 h-4 text-yellow-400 fill-current" /> 4.9/5 đánh
+          giá
+        </span>
+      </div>
+
+      {/* Navigation Controls */}
+      <div className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 z-20 flex items-center gap-4">
+        {/* Dots */}
+        <div className="flex items-center gap-2">
+          {courtImageList.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              className={`h-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/70 ${
+                i === currentIndex
+                  ? "w-8 bg-white shadow-lg"
+                  : "w-2 bg-white/40 hover:bg-white/60"
+              }`}
+              aria-label={`Slide ${i + 1}`}
+            />
+          ))}
         </div>
 
-        {/* Enhanced Background Pattern */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-gradient-to-r from-teal-200/40 to-blue-300/40 rounded-full blur-3xl animate-pulse"></div>
-          <div
-            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-blue-100/50 to-teal-200/50 rounded-full blur-3xl animate-pulse"
-            style={{ animationDelay: "3s" }}
-          ></div>
-          <div
-            className="absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-r from-purple-200/30 to-pink-200/30 rounded-full blur-3xl animate-pulse"
-            style={{ animationDelay: "1.5s" }}
-          ></div>
+        {/* Arrows */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={prev}
+            className="p-3 sm:p-3.5 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/70 active:scale-100"
+            aria-label="Previous"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            className="p-3 sm:p-3.5 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 border border-white/20 text-white transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/70 active:scale-100"
+            aria-label="Next"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
-      </section>
-    </div>
+      </div>
+
+      {/* Removed custom animations */}
+    </section>
   );
 };
 

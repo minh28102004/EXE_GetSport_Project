@@ -31,18 +31,18 @@ const BenefitSection = () => {
   }, []);
 
   return (
-    <section className="py-12 sm:py-18 bg-white" id="benefits">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-3">
+    <section className="py-8 sm:py-14 px-6 sm:px-20 bg-white" id="benefits">
+      <div className="container mx-auto">
+        <div className="text-center mb-6 sm:mb-10">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
             Tại Sao Chọn Get Sport?
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-lg sm:text-xl text-gray-600">
             Những lợi ích vượt trội chỉ có tại Get Sport
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {mainBenefits.map((benefit, index) => {
             const IconComponent = benefit.icon;
             return (
@@ -55,21 +55,18 @@ const BenefitSection = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="relative group bg-gradient-to-br from-teal-50 to-cyan-50 p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 text-center"
               >
-                {/* Stats badge */}
-                <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-teal-500 to-cyan-500 shadow-md">
-                  {benefit.stats}
-                </div>
+             
 
                 {/* Icon */}
-                <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <IconComponent className="w-8 h-8 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <IconComponent className="w-7 h-7 text-white" />
                 </div>
 
                 {/* Title + details */}
                 <h3 className="font-bold text-gray-900 mb-2">
                   {benefit.title}
                 </h3>
-                <p className="text-sm text-gray-600">{benefit.details}</p>
+                <p className="text-sm sm:text-base text-gray-600">{benefit.details}</p>
               </motion.div>
             );
           })}

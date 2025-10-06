@@ -13,6 +13,8 @@ import {
   UserPlus,
   X,
   MessageCircleQuestion,
+  ShieldCheck,
+  FileText,
 } from "lucide-react";
 import React, {
   memo,
@@ -71,6 +73,27 @@ const navItems: NavItem[] = [
   { label: "Liên hệ", to: endPoint.CONTACT, icon: Phone },
 ];
 
+const legalItems: NavItem[] = [
+  {
+    label: "Chính sách bảo mật",
+    to: endPoint.PRIVACYPOLICY,
+    icon: ShieldCheck,
+  },
+  { label: "Điều khoản dịch vụ", to: endPoint.TERMSOFSERVICE, icon: FileText },
+];
+
+// Tên hiển thị riêng cho mobile theo từng route
+const MOBILE_LABELS: Partial<Record<string, string>> = {
+  [endPoint.HOMEPAGE]: "Trang chủ của sân",
+  [endPoint.ABOUT]: "Giới thiệu về nền tảng",
+  [endPoint.BLOGPOST]: "Các bài viết",
+  [endPoint.FAQS]: "Các câu hỏi thường gặp",
+  [endPoint.COURTBOOKING]: "Đặt sân ngay",
+  [endPoint.CONTACT]: "Liên hệ hỗ trợ",
+  [endPoint.PRIVACYPOLICY]: "Chính sách bảo mật",
+  [endPoint.TERMSOFSERVICE]: "Điều khoản dịch vụ",
+};
+
 /* ======================= Utils ======================= */
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -95,6 +118,32 @@ const SiteNav: React.FC = () => {
   const navigate = useNavigate();
   const prefersReduced = usePrefersReducedMotion();
 
+  // Dropdown “Khác”
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreWrapRef = useRef<HTMLDivElement | null>(null);
+  const moreBtnRef = useRef<HTMLButtonElement | null>(null);
+  const hoverTimerRef = useRef<number | null>(null);
+
+  const openSoon = () => {
+    if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current);
+    setMoreOpen(true);
+  };
+  const closeSoon = () => {
+    if (hoverTimerRef.current) window.clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = window.setTimeout(() => setMoreOpen(false), 120);
+  };
+
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (!moreOpen) return;
+      const t = e.target as Node;
+      if (!moreWrapRef.current?.contains(t)) setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [moreOpen]);
+
+  // index active của nhóm nav chính
   const activeIndex = useMemo(() => {
     const path = location.pathname;
     const idx = navItems.findIndex((n) => {
@@ -105,32 +154,48 @@ const SiteNav: React.FC = () => {
     return idx === -1 ? 0 : idx;
   }, [location.pathname]);
 
+  // Đang ở route pháp lý?
+  const isLegalRoute = useMemo(() => {
+    const path = location.pathname;
+    return legalItems.some(
+      (l) => l.to && (path === l.to || path.startsWith(l.to + "/"))
+    );
+  }, [location.pathname]);
+
+  // Khi dropdown mở, “Khác” không còn active
+  const isKhacActive = isLegalRoute && !moreOpen;
+
+  // Refs & indicator
   const containerRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
 
-  const x: MotionValue<number> = useMotionValue(0);
-  const y: MotionValue<number> = useMotionValue(0);
-  const w: MotionValue<number> = useMotionValue(0);
-  const h: MotionValue<number> = useMotionValue(0);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const w = useMotionValue(0);
+  const h = useMotionValue(0);
 
-  const measure = (index: number) => {
-    const el = itemRefs.current[index];
+  const measureRect = (el: HTMLElement | null) => {
     const wrap = containerRef.current;
     if (!el || !wrap) return { tx: 0, ty: 0, tw: 0, th: 0 };
-
     const a = el.getBoundingClientRect();
     const b = wrap.getBoundingClientRect();
-
-    const tx = Math.round(a.left - b.left);
-    const ty = Math.round(a.top - b.top);
-    const tw = Math.round(a.width);
-    const th = Math.round(a.height);
-
-    return { tx, ty, tw, th };
+    return {
+      tx: Math.round(a.left - b.left),
+      ty: Math.round(a.top - b.top),
+      tw: Math.round(a.width),
+      th: Math.round(a.height),
+    };
   };
 
+  const measureByIndex = (index: number) =>
+    measureRect(itemRefs.current[index]);
+  const measureMoreBtn = () => measureRect(moreBtnRef.current);
+
+  // init
   useLayoutEffect(() => {
-    const { tx, ty, tw, th } = measure(activeIndex);
+    const { tx, ty, tw, th } = isKhacActive
+      ? measureMoreBtn()
+      : measureByIndex(activeIndex);
     x.set(tx);
     y.set(ty);
     w.set(tw);
@@ -147,9 +212,12 @@ const SiteNav: React.FC = () => {
     if (pending && activeIndex === pending.index) setPending(null);
   }, [activeIndex, pending]);
 
+  // resize
   useEffect(() => {
     const onResize = () => {
-      const { tx, ty, tw, th } = measure(displayIndex);
+      const { tx, ty, tw, th } = isKhacActive
+        ? measureMoreBtn()
+        : measureByIndex(displayIndex);
       x.set(tx);
       y.set(ty);
       w.set(tw);
@@ -157,32 +225,35 @@ const SiteNav: React.FC = () => {
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [displayIndex, x, y, w, h]);
+  }, [displayIndex, isKhacActive, x, y, w, h]);
 
+  // update khi route / trạng thái menu đổi
   useLayoutEffect(() => {
     if (pending) return;
-    const { tx, ty, tw, th } = measure(activeIndex);
+    const { tx, ty, tw, th } = isKhacActive
+      ? measureMoreBtn()
+      : measureByIndex(activeIndex);
     x.set(tx);
     y.set(ty);
     w.set(tw);
     h.set(th);
-  }, [activeIndex, pending, x, y, w, h]);
+  }, [activeIndex, pending, isKhacActive, x, y, w, h]);
 
   type AnimateOpt =
     | { duration?: number }
     | { type: "spring"; stiffness?: number; damping?: number; mass?: number };
 
-  const animateTo = (index: number, onDone?: () => void) => {
-    const { tx, ty, tw, th } = measure(index);
+  const animateTo = (
+    rect: { tx: number; ty: number; tw: number; th: number },
+    onDone?: () => void
+  ) => {
     const opt: AnimateOpt = prefersReduced
       ? { duration: 0 }
       : { type: "spring", stiffness: 140, damping: 24, mass: 1.05 };
-
-    const a1 = animate(x, tx, opt);
-    const a2 = animate(y, ty, opt);
-    const a3 = animate(w, tw, opt);
-    const a4 = animate(h, th, opt);
-
+    const a1 = animate(x, rect.tx, opt);
+    const a2 = animate(y, rect.ty, opt);
+    const a3 = animate(w, rect.tw, opt);
+    const a4 = animate(h, rect.th, opt);
     Promise.all([a1.finished, a2.finished, a3.finished, a4.finished]).then(() =>
       onDone?.()
     );
@@ -192,28 +263,26 @@ const SiteNav: React.FC = () => {
     if (!to) return;
     if (index === activeIndex) return;
     e.preventDefault();
-
     if (prefersReduced) {
       navigate(to);
       return;
     }
+    const rect = measureByIndex(index);
     setPending({ index, to });
-    animateTo(index, () => navigate(to));
+    animateTo(rect, () => navigate(to));
   };
 
   return (
     <div
       ref={containerRef}
-      className="
-        hidden lg:flex items-center gap-1 relative
-        rounded-xl bg-white shadow-md ring-1 ring-slate-200
-        backdrop-blur-xl p-1
-      "
+      className="hidden lg:flex items-center gap-1 relative rounded-xl bg-white ring-1 ring-slate-200 p-1"
       style={{ isolation: "isolate" }}
     >
-      {/* Indicator */}
+      {/* Indicator: ẩn khi đang ở legal và dropdown đang mở */}
       <motion.span
-        className="absolute top-0 left-0 rounded-lg pointer-events-none overflow-hidden"
+        className={`absolute top-0 left-0 rounded-lg pointer-events-none overflow-hidden transition-opacity duration-150 ${
+          isLegalRoute && moreOpen ? "opacity-0" : "opacity-100"
+        }`}
         style={{ x, y, width: w, height: h }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-[#23AEB1]/10 via-[#1e9ea1]/10 to-[#23AEB1]/10" />
@@ -226,25 +295,19 @@ const SiteNav: React.FC = () => {
         />
       </motion.span>
 
+      {/* Nhóm chính: không active khi đang ở legal */}
       {navItems.map((item, i) => {
-        const isActive = i === activeIndex;
-
+        const isActive = !isLegalRoute && i === activeIndex;
         const inner = (
           <div
             ref={(el) => {
               itemRefs.current[i] = el;
             }}
-            className={`
-              relative group
-              flex items-center gap-1.5
-              px-3.5 py-[7px] rounded-lg text-[14px] overflow-hidden
-              transition-colors
-              ${
-                isActive
-                  ? "text-[#077377]"
-                  : "text-gray-700 hover:text-[#23AEB1] hover:bg-[#23AEB1]/5"
-              }
-            `}
+            className={`relative group flex items-center gap-1.5 px-3.5 py-[7px] rounded-lg text-[14px] overflow-hidden transition-colors ${
+              isActive
+                ? "text-[#077377]"
+                : "text-gray-700 hover:text-[#23AEB1] hover:bg-[#23AEB1]/5"
+            }`}
             onClick={(e) => onItemClick(e, i, item.to)}
           >
             <span className="relative z-10 flex items-center gap-1.5">
@@ -262,13 +325,11 @@ const SiteNav: React.FC = () => {
                 <ChevronDown className="w-4 h-4 opacity-70" />
               )}
             </span>
-
             {!isActive && (
-              <span className="absolute bottom-0 left-1/2 w-0 h-[1.5px] bg-[#23AEB1] group-hover:w-full group-hover:left-0 transition-all duration-500 ease-out rounded-b-lg" />
+              <span className="absolute bottom-0 left-1/2 w-0 h-[1.5px] bg-[#23AEB1]/70 group-hover:w-full group-hover:left-0 transition-all duration-500 ease-out rounded-b-lg" />
             )}
           </div>
         );
-
         return item.to ? (
           <NavLink key={i} to={item.to} className="rounded-lg">
             {inner}
@@ -279,6 +340,95 @@ const SiteNav: React.FC = () => {
           </a>
         );
       })}
+
+      {/* “Khác” – chỉ active khi đang ở legal & dropdown ĐÓNG */}
+      <div
+        ref={moreWrapRef}
+        className="relative"
+        onMouseEnter={openSoon}
+        onMouseLeave={closeSoon}
+      >
+        {(() => {
+          const suppressHover = isLegalRoute && moreOpen;
+
+          return (
+            <button
+              ref={moreBtnRef}
+              type="button"
+              onClick={() => setMoreOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={moreOpen}
+              aria-current={isKhacActive ? "page" : undefined}
+              className={`flex items-center gap-1 px-3.5 py-[7px] rounded-lg text-[14px] transition-colors ${
+                isKhacActive
+                  ? // Đang active & dropdown ĐÓNG: giữ màu active
+                    "text-[#077377]"
+                  : suppressHover
+                  ? // Đang mở dropdown trên route pháp lý: KHÔNG ăn hover (trung tính)
+                    "text-gray-700"
+                  : // Trạng thái bình thường: có hover
+                    "text-gray-700 hover:text-[#23AEB1] hover:bg-[#23AEB1]/5"
+              }`}
+            >
+              <span> Pháp lý </span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${
+                  moreOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+          );
+        })()}
+
+        <AnimatePresence>
+          {moreOpen && (
+            <motion.div
+              onMouseEnter={openSoon}
+              onMouseLeave={closeSoon}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="absolute right-0 top-full mt-1.5 z-50 w-50 rounded-xl bg-white shadow-lg ring-1 ring-slate-200 overflow-hidden origin-top-right transform-gpu will-change-transform"
+              role="menu"
+            >
+              <nav className="p-1 space-y-0.5">
+                {legalItems.map((item) => {
+                  const isActive =
+                    !!item.to &&
+                    (location.pathname === item.to ||
+                      location.pathname.startsWith(item.to + "/"));
+                  return (
+                    <NavLink
+                      key={item.to}
+                      to={item.to!}
+                      className={({ isActive }) =>
+                        `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                          isActive
+                            ? "text-[#077377] bg-[#23AEB1]/15"
+                            : "text-gray-700 hover:text-[#23AEB1] hover:bg-[#23AEB1]/5"
+                        }`
+                      }
+                      onClick={() => setMoreOpen(false)}
+                    >
+                      <item.icon
+                        className={`w-4 h-4 shrink-0 transition-transform ${
+                          isActive ? "scale-110" : "group-hover:scale-110"
+                        }`}
+                      />
+                      <span
+                        className={isActive ? "font-medium" : "font-normal"}
+                      >
+                        {item.label}
+                      </span>
+                    </NavLink>
+                  );
+                })}
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
@@ -289,6 +439,24 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   onClose,
 }) => {
   const { accessToken } = useSelector(selectAuth);
+
+  // Build danh sách cho mobile với label override
+  const mobileMain = useMemo(
+    () =>
+      navItems.map((i) => ({
+        ...i,
+        label: (i.to && MOBILE_LABELS[i.to]) || i.label,
+      })),
+    []
+  );
+  const mobileLegal = useMemo(
+    () =>
+      legalItems.map((i) => ({
+        ...i,
+        label: (i.to && MOBILE_LABELS[i.to]) || i.label,
+      })),
+    []
+  );
 
   // Khoá scroll nền khi mở
   useEffect(() => {
@@ -322,10 +490,11 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
             onClick={onClose}
             aria-hidden="true"
           />
+
           {/* Panel */}
           <motion.aside
             key="panel"
-            className="fixed right-0 top-0 h-full w-[60vw] max-w-[360px] z-[60] bg-white shadow-2xl flex flex-col md:hidden"
+            className="fixed right-0 top-0 h-full w-[64vw] max-w-[360px] z-[60] bg-white shadow-2xl flex flex-col md:hidden"
             role="dialog"
             aria-modal="true"
             initial={{ x: "100%" }}
@@ -348,14 +517,15 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
             {/* List */}
             <nav className="p-3 space-y-1 overflow-y-auto">
-              {navItems.map((item, index) => {
+              {/* Section: Khám phá */}
+              <div className="px-3 pt-2 pb-1 text-[11px] uppercase tracking-wide text-slate-500">
+                Khám phá
+              </div>
+              {mobileMain.map((item, index) => {
                 const content = (
-                  <div className="flex items-center gap-3 p-3 rounded-lg text-gray-700 font-medium transition-all duration-200 hover:text-[#23AEB1] hover:bg-[#23AEB1]/5 group">
-                    <item.icon className="w-5 h-5 transition-transform group-hover:scale-110" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg font-medium transition-all duration-200 hover:bg-[#23AEB1]/5 group">
+                    <item.icon className="w-5 h-5 transition-transform group-hover:scale-105" />
                     <span>{item.label}</span>
-                    {item.hasDropdown && (
-                      <ChevronDown className="w-4 h-4 ml-auto transition-transform group-hover:rotate-180" />
-                    )}
                   </div>
                 );
                 return item.to ? (
@@ -365,7 +535,9 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                     onClick={onClose}
                     className={({ isActive }) =>
                       `block rounded-lg ${
-                        isActive ? "text-[#23AEB1] bg-[#23AEB1]/10" : ""
+                        isActive
+                          ? "text-[#23AEB1] bg-[#23AEB1]/10"
+                          : "text-gray-700  hover:bg-[#23AEB1]/5"
                       }`
                     }
                   >
@@ -382,16 +554,39 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                   </a>
                 );
               })}
+
+              {/* Section: Pháp lý & điều khoản */}
+              <div className="px-3 pt-3 pb-1 text-[11px] uppercase tracking-wide text-slate-500">
+                Pháp lý & điều khoản
+              </div>
+              {mobileLegal.map((item, idx) => (
+                <NavLink
+                  key={idx}
+                  to={item.to!}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    `block rounded-lg ${
+                      isActive
+                        ? "text-[#23AEB1] bg-[#23AEB1]/10"
+                        : "text-gray-700 hover:bg-[#23AEB1]/5"
+                    }`
+                  }
+                >
+                  <div className="flex items-center gap-3 p-3 rounded-lg font-medium transition-all duration-200 hover:bg-[#23AEB1]/5 group">
+                    <item.icon className="w-5 h-5 transition-transform group-hover:scale-105" />
+                    <span>{item.label}</span>
+                  </div>
+                </NavLink>
+              ))}
             </nav>
 
             {/* Footer / UserMenu */}
-
             {!accessToken ? (
               <div className="mt-auto p-4 border-t border-gray-100 space-y-3">
                 <Link
                   to={endPoint.REGISTER}
                   onClick={onClose}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-[#23AEB1] text-[#23AEB1] font-medium transition-all duration-300 hover:bg-[#23AEB1]/10 hover:shadow-md"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-[#23AEB1] text-[#23AEB1] font-medium transition-all duration-300 hover:bg-[#23AEB1]/10 hover:shadow-md"
                 >
                   <UserPlus className="w-4 h-4" />
                   Đăng ký
@@ -399,14 +594,13 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                 <Link
                   to={endPoint.LOGIN}
                   onClick={onClose}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#23AEB1] via-[#20a4a6] to-[#1e9ea1] text-white font-medium shadow-md transition-all duration-500 hover:shadow-xl"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#23AEB1] via-[#20a4a6] to-[#1e9ea1] hover:brightness-90 text-white font-medium shadow-md transition-all duration-500 hover:shadow-xl"
                 >
                   <User className="w-4 h-4" />
                   Đăng nhập
                 </Link>
               </div>
             ) : (
-              // Ở mobile: UserMenu ở footer, dropdown mở LÊN và HIỂN THỊ TÊN
               <div className="mt-auto px-0 border-t border-gray-100 ">
                 <motion.div
                   initial={{ opacity: 0, y: -20 }}
@@ -497,7 +691,7 @@ const HeaderComponent: React.FC<HeaderProps> = ({ variant = "site" }) => {
             : "bg-white/90 backdrop-blur-sm border-b border-gray-100"
         }`}
       >
-        <div className="w-full px-8 py-2 flex items-center justify-between">
+        <div className="w-full pl-5 pr-4 sm:px-8 py-1.5 flex items-center justify-between">
           <Brand />
           <div className="ml-18">
             <SiteNav />

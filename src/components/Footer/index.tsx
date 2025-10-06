@@ -125,7 +125,7 @@ const Footer: React.FC = () => {
       </div>
 
       {/* Bottom bar */}
-      <div className="w-full px-4 sm:px-10 py-3 flex flex-col md:flex-row items-center justify-between border-t border-white/10 text-xs sm:text-sm md:text-base text-gray-300">
+      <div className="w-full px-4 sm:px-10 py-3 flex flex-col md:flex-row items-center justify-between border-t border-white/10 text-xs sm:text-sm text-gray-300">
         <p className="text-center md:text-left">
           © 2025 GetSport. Tất cả quyền được bảo lưu.
         </p>

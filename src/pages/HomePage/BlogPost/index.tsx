@@ -3,44 +3,49 @@ import { Clock, Star } from "lucide-react";
 import Pagination from "@components/Pagination";
 import { posts } from "./data";
 import type { Post } from "./data";
+
 const POSTS_PER_PAGE = 9;
 
+/* ====== Post Card (compact @100% zoom) ====== */
 const PostCard = ({ post }: { post: Post }) => {
   const [isLiked, setIsLiked] = useState(false);
 
   return (
     <article
-      className="group relative bg-white rounded-2xl shadow-lg overflow-hidden 
-      hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3 "
+      className="group relative bg-white rounded-2xl shadow-lg overflow-hidden
+                 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
     >
       {/* Featured Badge */}
       {post.featured && (
-        <div className="absolute top-4 right-4 z-10 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+        <div className="absolute top-3.5 right-3.5 z-10 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1">
           <Star className="w-3 h-3 fill-current" />
           NỔI BẬT
         </div>
       )}
 
+      {/* Cover */}
       <div className="relative">
         <img
           src={post.image}
           alt={post.title}
-          className="w-full h-64 object-cover transition-transform duration-700 group-hover:scale-110"
+          className="w-full h-56 md:h-60 object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
 
-        {/* Author Info Overlay */}
-        <div className="absolute bottom-4 left-4 right-4">
+        {/* Author Overlay */}
+        <div className="absolute bottom-3 left-3 right-3">
           <div className="flex items-center justify-between text-white">
             <div className="flex items-center gap-3">
               <div
-                className={`w-10 h-10 rounded-full ${post.avatarColor} flex items-center justify-center text-sm font-bold border-2 border-white/30`}
+                className={`w-9 h-9 rounded-full ${post.avatarColor} flex items-center justify-center text-xs font-bold border-2 border-white/30`}
               >
                 {post.initials}
               </div>
               <div>
-                <div className="font-semibold text-sm">{post.author}</div>
-                <div className="text-xs opacity-80 flex items-center gap-1 mt-0.5">
+                <div className="font-semibold text-[13px] leading-none">
+                  {post.author}
+                </div>
+                <div className="text-[11px] opacity-85 flex items-center gap-1 mt-0.5">
                   <Clock className="w-3 h-3 shrink-0 relative top-[0.5px]" />
                   <span className="leading-none relative bottom-[-1px] ml-0.5">
                     {post.date} • {post.time}
@@ -48,7 +53,7 @@ const PostCard = ({ post }: { post: Post }) => {
                 </div>
               </div>
             </div>
-            <div className="bg-black/30 backdrop-blur-sm px-2 py-1 rounded-lg text-xs">
+            <div className="bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-md text-[11px]">
               {post.category}
             </div>
           </div>
@@ -56,17 +61,17 @@ const PostCard = ({ post }: { post: Post }) => {
       </div>
 
       {/* Content */}
-      <div className="p-6">
-        <h3 className="font-bold text-gray-900 mb-3 group-hover:text-teal-600 transition-colors leading-tight text-xl">
+      <div className="p-5">
+        <h3 className="font-bold text-gray-900 mb-2.5 group-hover:text-teal-600 transition-colors leading-snug text-lg md:text-xl">
           {post.title}
         </h3>
-        <p className="text-gray-600 mb-6 leading-relaxed text-sm line-clamp-2">
+        <p className="text-gray-600 mb-5 leading-relaxed text-[13px] md:text-sm line-clamp-2">
           {post.description}
         </p>
 
         {/* Stats & CTA */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6 text-sm text-gray-500">
+          <div className="flex items-center gap-5 text-[13px] md:text-sm text-gray-500">
             {/* Like */}
             <span
               className="flex items-center gap-1 hover:text-blue-500 transition-colors cursor-pointer"
@@ -100,7 +105,7 @@ const PostCard = ({ post }: { post: Post }) => {
           </div>
 
           {/* Read More */}
-          <button className="group relative text-teal-600 font-medium text-sm flex items-center gap-1 transition-all duration-300 hover:brightness-60 hover:translate-x-1">
+          <button className="group relative text-teal-600 font-medium text-[13px] md:text-sm flex items-center gap-1 transition-all duration-200 hover:brightness-95 hover:translate-x-1">
             Đọc Thêm »
           </button>
         </div>
@@ -109,6 +114,7 @@ const PostCard = ({ post }: { post: Post }) => {
   );
 };
 
+/* ====== Blog Post Page (compact @100%) ====== */
 const BlogPost = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -119,27 +125,30 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Custom CSS for animations */}
-
-      {/* Title */}
       {/* Title Section */}
-      <section className="relative py-6 text-center overflow-hidden">
-        <div className="relative mx-auto px-4">
-          {/* Sub-title nhỏ 🏸 */}
-          <div className="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent text-lg font-bold mb-1">
-            🏸 BLOG CẦU LÔNG CHUYÊN NGHIỆP
-          </div>
+      <section className="relative py-8 sm:pt-7 sm:pb-10 text-center overflow-hidden">
+        <div className="mx-auto w-full max-w-7xl px-5 md:px-8">
+          {/* Main title */}
+          <h2 className="font-bold text-gray-900 tracking-tight">
+            {/* Line 1: icon + text, nhỏ hơn dòng gradient để cân đối */}
+            <span className="flex items-center justify-center gap-2 text-2xl md:text-3xl">
+              <span aria-hidden className="leading-none">
+                🏸
+              </span>
+              <span>Cộng đồng &amp; Kiến thức</span>
+            </span>
 
-          {/* Tiêu đề chính */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 leading-snug">
-            Cộng Đồng & Kiến Thức
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 mt-1">
+            {/* Line 2: gradient nổi bật hơn */}
+            <span className="block text-2xl sm:text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 mt-1.5">
               Cầu Lông Việt Nam
             </span>
-          </h1>
+          </h2>
 
-          {/* Mô tả */}
-          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto mb-4 leading-relaxed">
+          {/* Divider nhỏ để “chốt” thị giác */}
+          <div className="mx-auto mt-3 h-0.5 w-40 rounded-full bg-gradient-to-r from-teal-500 to-cyan-500" />
+
+          {/* Description */}
+          <p className="mt-3.5 text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Chia sẻ kinh nghiệm, tips hữu ích và kết nối với cộng đồng người
             chơi cầu lông trên khắp cả nước. Từ người mới bắt đầu đến pro
             player.
@@ -148,31 +157,29 @@ const BlogPost = () => {
       </section>
 
       {/* Posts Grid */}
-      <section className="sm:px-20 px-5 pb-13">
-        <div className="mx-auto">
+      <section className="px-5 md:px-8 pb-10">
+        <div className="mx-auto w-full max-w-7xl">
           {paginatedPosts.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {paginatedPosts.map((post) => (
                   <PostCard key={post.id} post={post} />
                 ))}
               </div>
 
               {/* Pagination */}
-              <div className="mt-14">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                />
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
             </>
           ) : (
-            <div className="text-center py-16">
-              <h3 className="text-2xl font-bold text-gray-600 mb-2">
+            <div className="text-center py-14">
+              <h3 className="text-xl md:text-2xl font-bold text-gray-600 mb-1.5">
                 Không tìm thấy bài viết
               </h3>
-              <p className="text-gray-500">
+              <p className="text-gray-500 text-sm md:text-base">
                 Thử tìm kiếm với từ khóa khác hoặc chọn category khác
               </p>
             </div>
