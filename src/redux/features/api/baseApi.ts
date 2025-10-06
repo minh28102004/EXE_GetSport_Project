@@ -1,4 +1,3 @@
-// src/redux/features/api/baseApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type {
   BaseQueryFn,
@@ -9,40 +8,44 @@ import type {
 import type { RootState } from "@redux/store/store";
 import { logout } from "@redux/features/auth/authSlice";
 
-/** Luôn gọi trực tiếp lên host thật (không dùng proxy localhost) */
+// PROD: dùng biến môi trường hoặc fallback; DEV: dùng proxy /api
+const PROD_BASE =
+  (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(
+    /\/+$/,
+    ""
+  ) || "https://api.getsport.3docorp.vn/api";
+
+// Kết thúc bằng "/" để RTK join đúng
 const API_BASE =
-  ((import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/+$/, "")) ||
-  "https://api.getsport.3docorp.vn/api";
+  (import.meta.env.DEV ? "/api" : PROD_BASE).replace(/\/+$/, "") + "/";
 
-/** Chuẩn hoá args: bỏ leading '/' ở URL tương đối để không cắt mất path của baseUrl */
+// Bỏ dấu "/" đầu ở url tương đối (an toàn khi lỡ viết "/Auth/login")
 const normalizeArgs = (args: string | FetchArgs): string | FetchArgs => {
-  const isAbs = (u: string) => /^https?:\/\//i.test(u);
-
-  if (typeof args === "string") {
-    return isAbs(args) ? args : args.replace(/^\/+/, "");
-  }
-  if (typeof args.url === "string" && !isAbs(args.url)) {
+  if (typeof args === "string") return args.replace(/^\/+/, "");
+  if (typeof args.url === "string")
     return { ...args, url: args.url.replace(/^\/+/, "") };
-  }
   return args;
 };
 
 const rawBase = fetchBaseQuery({
   baseUrl: API_BASE,
-  // Nếu backend dùng cookie, bật thêm: credentials: "include",
+  // credentials: "include", // bật nếu dùng cookie
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.accessToken;
     if (token) headers.set("Authorization", `Bearer ${token}`);
-    if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+    // KHÔNG ép Content-Type cho mọi request; RTK sẽ set cho JSON POST
     return headers;
   },
 });
+
+// Lấy đúng kiểu extra từ rawBase để tránh lệch generic
+type RawExtra = Parameters<typeof rawBase>[2];
 
 const baseQueryWithAuth: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError,
-  unknown,
+  RawExtra,
   FetchBaseQueryMeta
 > = async (args, api, extra) => {
   const res = await rawBase(normalizeArgs(args), api, extra);
@@ -51,17 +54,16 @@ const baseQueryWithAuth: BaseQueryFn<
     const err = res.error;
     if (err?.status === 401) api.dispatch(logout());
 
-    // Nếu server trả HTML (IIS 404/405), hiển thị message dễ hiểu hơn
+    // Nếu server trả HTML (IIS 404/405/OPTIONS), gợi ý dễ hiểu hơn
     const data = (err as FetchBaseQueryError).data as unknown;
     if (typeof data === "string" && /^\s*<!doctype html/i.test(data)) {
       (err as FetchBaseQueryError).data = {
         message:
-          "Server trả về HTML (không phải JSON) — thường do sai route/method hoặc IIS/WebDAV chặn PUT/DELETE.",
+          "Server trả về HTML (sai route/method hoặc IIS/WebDAV chặn PUT/DELETE/OPTIONS).",
         htmlSnippet: data.slice(0, 200),
       };
     }
   }
-
   return res;
 };
 

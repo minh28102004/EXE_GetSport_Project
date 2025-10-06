@@ -1,4 +1,3 @@
-// vite.config.ts
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 // @ts-ignore
@@ -40,13 +39,13 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target,
           changeOrigin: true,
-          secure: false, // giữ dòng này trong DEV để bỏ qua TLS errors
+          secure: false, // DEV bỏ qua TLS
         },
       },
     },
     preview: {
       proxy: {
-        "/api": { target, changeOrigin: true, secure: false }, 
+        "/api": { target, changeOrigin: true, secure: false },
       },
     },
   };
