@@ -1,5 +1,16 @@
 import React, { useMemo, useState } from "react";
-import { FaLock, FaUnlock, FaTrash, FaUserEdit, FaSearch, FaFilter, FaTimes } from "react-icons/fa"; // ⬅️ thêm icon search/filter
+import {
+  FaLock,
+  FaUnlock,
+  FaTrash,
+  FaUserEdit,
+  FaSearch,
+  FaFilter,
+  FaTimes,
+  FaUserPlus,
+} from "react-icons/fa";
+import Tooltip from "@mui/material/Tooltip";
+import { toast } from "react-toastify";
 import {
   useGetAccountsQuery,
   useCreateAccountMutation,
@@ -8,14 +19,20 @@ import {
 } from "@redux/api/account/accountApi";
 import type { Account } from "@redux/api/account/type";
 import { mapUiToDto } from "@/redux/api/account/map";
-import UserForm from "./UserForm";
-import "./styles.css";
+import UserForm, { UserFormModal } from "./UserForm";
 
-// 🟢 Toastify
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+const initials = (name?: string) =>
+  (name || "")
+    .trim()
+    .split(/\s+/)
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
-// ... mapUiToDto giữ nguyên ...
+const filterInputCls =
+  "h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm " +
+  "focus:outline-none focus:ring-1 focus:ring-teal-200 focus:border-teal-400";
 
 const UserManagement: React.FC = () => {
   const { data, isLoading, isError } = useGetAccountsQuery(undefined);
@@ -30,13 +47,14 @@ const UserManagement: React.FC = () => {
   const [createAccount, { isLoading: creating }] = useCreateAccountMutation();
   const [updateAccount, { isLoading: updating }] = useUpdateAccountMutation();
   const [deleteAccount, { isLoading: deleting }] = useDeleteAccountMutation();
-
   const busy = creating || updating || deleting;
 
-  /* ---------------- Filters state ---------------- */
+  /* ---------------- Filters ---------------- */
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "active" | "inactive"
+  >("all");
 
   const roleOptions = useMemo(() => {
     const set = new Set<string>();
@@ -52,10 +70,13 @@ const UserManagement: React.FC = () => {
         (u.fullName?.toLowerCase().includes(q) ?? false) ||
         (u.email?.toLowerCase().includes(q) ?? false);
 
-      const matchesRole = roleFilter === "all" || String(u.role).toLowerCase() === roleFilter.toLowerCase();
+      const matchesRole =
+        roleFilter === "all" ||
+        String(u.role).toLowerCase() === roleFilter.toLowerCase();
 
       const matchesStatus =
-        statusFilter === "all" || (statusFilter === "active" ? u.isActive : !u.isActive);
+        statusFilter === "all" ||
+        (statusFilter === "active" ? u.isActive : !u.isActive);
 
       return matchesSearch && matchesRole && matchesStatus;
     });
@@ -97,21 +118,16 @@ const UserManagement: React.FC = () => {
             totalpoint: user.totalPoint,
           },
         }).unwrap();
-
-        toast.success("Cập nhật người dùng thành công!", {
-          position: "top-right",
-          autoClose: 2200,
-          theme: "colored",
-          newestOnTop: true,
-        });
+        toast.success("Cập nhật người dùng thành công!");
       } else {
         const dto = mapUiToDto(user);
         await createAccount(dto).unwrap();
-        // chỉ toast cho cập nhật/xoá theo yêu cầu cũ
+        toast.success("Tạo người dùng mới thành công!");
       }
       closeModal();
     } catch (e) {
       console.error(e);
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại.");
     }
   };
 
@@ -121,9 +137,12 @@ const UserManagement: React.FC = () => {
         id: u.id,
         body: { isactive: !u.isActive },
       }).unwrap();
+      toast.info(
+        `Tài khoản "${u.fullName}" đã được ${u.isActive ? "khóa" : "mở khóa"}.`
+      );
     } catch (e) {
       console.error(e);
-      alert("Không thể đổi trạng thái tài khoản.");
+      toast.error("Không thể đổi trạng thái tài khoản.");
     }
   };
 
@@ -134,47 +153,59 @@ const UserManagement: React.FC = () => {
     if (!ok) return;
     try {
       await deleteAccount(id).unwrap();
-      toast.success(`Đã xoá${name ? ` "${name}"` : ""}!`, {
-        position: "top-right",
-        autoClose: 2200,
-        theme: "colored",
-        newestOnTop: true,
-      });
+      toast.success(`Đã xoá${name ? ` "${name}"` : ""}!`);
     } catch (e) {
       console.error(e);
-      alert("Xoá thất bại, vui lòng thử lại!");
+      toast.error("Xoá thất bại, vui lòng thử lại!");
     }
   };
 
-  if (isLoading) return <div className="text-center p-10">Đang tải dữ liệu...</div>;
-  if (isError) return <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>;
+  if (isLoading)
+    return <div className="text-center p-10">Đang tải dữ liệu...</div>;
+  if (isError)
+    return (
+      <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>
+    );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <ToastContainer />
-
+    <div className="min-h-screen bg-[#F7FAFC] p-6 md:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Quản lý người dùng</h1>
-          <p className="text-gray-500">Quản lý tài khoản và phân quyền trong hệ thống</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+            Quản lý người dùng
+          </h2>
+          <p className="text-gray-500">
+            Quản lý tài khoản và phân quyền trong hệ thống
+          </p>
         </div>
-        {/* (bỏ nút thêm như trước) */}
+
+        <button
+          type="button"
+          onClick={() => openModal(null)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[#23AEB1] px-4 py-2 text-sm text-white shadow-sm transition hover:brightness-95 focus:outline-none focus:ring-1 focus:ring-teal-300 disabled:opacity-70"
+          disabled={busy}
+        >
+          <FaUserPlus />
+          Tạo tài khoản
+        </button>
       </div>
 
-      {/* 🔎 Filter bar */}
-      <div className="bg-blue/80 backdrop-blur rounded-xl border border-gray-200 p-3 md:p-4 mb-4">
+      {/* Filter bar */}
+      <div className="bg-white/70 backdrop-blur rounded-xl border border-gray-200 p-3 md:p-4 mb-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           {/* Search */}
           <div className="md:col-span-5">
-            <label className="text-xs font-semibold text-gray-500 mb-1 block">Tìm kiếm</label>
+            <label className="text-xs font-semibold text-gray-500 mb-1 block">
+              Tìm kiếm
+            </label>
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Tên hoặc email..."
-                className="w-full pl-9 pr-9 py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400"
+                className={`${filterInputCls} pl-9 pr-9`}
               />
               {search && (
                 <button
@@ -191,13 +222,15 @@ const UserManagement: React.FC = () => {
 
           {/* Role */}
           <div className="md:col-span-3">
-            <label className="text-xs font-semibold text-gray-500 mb-1 block">Vai trò</label>
+            <label className="text-xs font-semibold text-gray-500 mb-1 block">
+              Vai trò
+            </label>
             <div className="relative">
               <FaFilter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400"
+                className={`${filterInputCls} pl-9 pr-3`}
               >
                 {roleOptions.map((r) => (
                   <option key={r} value={r}>
@@ -210,11 +243,13 @@ const UserManagement: React.FC = () => {
 
           {/* Status */}
           <div className="md:col-span-3">
-            <label className="text-xs font-semibold text-gray-500 mb-1 block">Trạng thái</label>
+            <label className="text-xs font-semibold text-gray-500 mb-1 block">
+              Trạng thái
+            </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="w-full px-3 py-2.5 rounded-lg border border-gray-300 bg-white focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400"
+              className={filterInputCls}
             >
               <option value="all">Tất cả</option>
               <option value="active">Active</option>
@@ -224,11 +259,11 @@ const UserManagement: React.FC = () => {
 
           {/* Actions / count */}
           <div className="md:col-span-1 flex md:justify-end items-end">
-            {(search || roleFilter !== "all" || statusFilter !== "all") ? (
+            {search || roleFilter !== "all" || statusFilter !== "all" ? (
               <button
                 type="button"
                 onClick={resetFilters}
-                className="w-full md:w-auto px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50"
+                className="h-10 w-full md:w-auto px-3 rounded-lg border border-gray-300 hover:bg-gray-50"
               >
                 Reset
               </button>
@@ -240,16 +275,17 @@ const UserManagement: React.FC = () => {
           </div>
         </div>
 
-        {/* Match count */}
         <div className="mt-2 text-xs text-gray-500">
-          Đang hiển thị <span className="font-semibold">{filteredRows.length}</span> / {rows.length} người dùng
+          Đang hiển thị{" "}
+          <span className="font-semibold">{filteredRows.length}</span> /{" "}
+          {rows.length} người dùng
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="rounded-xl overflow-hidden shadow border border-gray-200">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-50 border-b text-gray-700">
+          <thead className="bg-gradient-to-r from-teal-50 to-sky-50 border-b border-teal-100 text-gray-700">
             <tr>
               <th className="p-3">Người dùng</th>
               <th className="p-3">Email</th>
@@ -264,10 +300,17 @@ const UserManagement: React.FC = () => {
               <tr
                 key={u.id}
                 className={`${
-                  i % 2 === 0 ? "bg-white" : "bg-gray-50"
-                } hover:bg-gray-100 transition`}
+                  i % 2 === 0 ? "bg-white" : "bg-slate-50"
+                } hover:bg-slate-100 transition`}
               >
-                <td className="p-3 font-medium text-gray-800">{u.fullName}</td>
+                <td className="p-3 font-medium text-gray-800">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-teal-100 text-teal-700 grid place-items-center text-sm font-semibold">
+                      {initials(u.fullName)}
+                    </div>
+                    <span>{u.fullName}</span>
+                  </div>
+                </td>
                 <td className="p-3">{u.email}</td>
                 <td className="p-3">{u.role}</td>
                 <td className="p-3">
@@ -286,37 +329,40 @@ const UserManagement: React.FC = () => {
                     ? new Date(u.createdAt).toLocaleDateString()
                     : "--"}
                 </td>
-                <td className="p-3 flex gap-3">
-                  <button
-                    onClick={() => openModal(u)}
-                    className="hover:scale-110 transition"
-                    title="Sửa"
-                    disabled={busy}
-                  >
-                    <FaUserEdit className="text-blue-500 hover:text-blue-700" />
-                  </button>
+                <td className="p-3 flex gap-2 items-center">
+                  <Tooltip title="Sửa" arrow>
+                    <button
+                      onClick={() => openModal(u)}
+                      className="p-2 rounded-md hover:bg-gray-100 transition"
+                      disabled={busy}
+                    >
+                      <FaUserEdit className="text-blue-500 hover:text-blue-700" />
+                    </button>
+                  </Tooltip>
 
-                  <button
-                    onClick={() => handleToggleActive(u)}
-                    className="hover:scale-110 transition"
-                    title={u.isActive ? "Khoá" : "Mở khoá"}
-                    disabled={busy}
-                  >
-                    {u.isActive ? (
-                      <FaUnlock className="text-green-500 hover:text-green-700" />
-                    ) : (
-                      <FaLock className="text-yellow-500 hover:text-yellow-700" />
-                    )}
-                  </button>
+                  <Tooltip title={u.isActive ? "Khoá" : "Mở khoá"} arrow>
+                    <button
+                      onClick={() => handleToggleActive(u)}
+                      className="p-2 rounded-md hover:bg-gray-100 transition"
+                      disabled={busy}
+                    >
+                      {u.isActive ? (
+                        <FaLock className="text-yellow-600 hover:text-yellow-700" />
+                      ) : (
+                        <FaUnlock className="text-green-600 hover:text-green-700" />
+                      )}
+                    </button>
+                  </Tooltip>
 
-                  <button
-                    className="hover:scale-110 transition"
-                    onClick={() => handleDelete(u.id, u.fullName)}
-                    title="Xoá"
-                    disabled={busy}
-                  >
-                    <FaTrash className="text-red-500 hover:text-red-700" />
-                  </button>
+                  <Tooltip title="Xoá" arrow>
+                    <button
+                      className="p-2 rounded-md hover:bg-gray-100 transition"
+                      onClick={() => handleDelete(u.id, u.fullName)}
+                      disabled={busy}
+                    >
+                      <FaTrash className="text-red-500 hover:text-red-700" />
+                    </button>
+                  </Tooltip>
                 </td>
               </tr>
             ))}
@@ -332,20 +378,14 @@ const UserManagement: React.FC = () => {
         </table>
       </div>
 
-      {/* Modal (sửa người dùng) */}
-      {isModalOpen && (
-        <div className="modal-overlay" onClick={busy ? undefined : closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
-                {currentUser ? "Sửa người dùng" : "Thêm người dùng"}
-              </h3>
-
-              <UserForm user={currentUser} onSave={handleUserSaved} onClose={closeModal} loading={busy} />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal (dùng component đã sửa) */}
+      <UserFormModal
+        open={isModalOpen}
+        user={currentUser}
+        onSave={handleUserSaved}
+        onClose={busy ? () => {} : closeModal}
+        loading={busy}
+      />
     </div>
   );
 };
