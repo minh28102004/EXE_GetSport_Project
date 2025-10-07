@@ -7,6 +7,7 @@ import type {
 } from "@reduxjs/toolkit/query";
 import type { RootState } from "@redux/store/store";
 import { logout } from "@redux/features/auth/authSlice";
+import { tagTypes } from "./tagTypes";
 
 // PROD: dùng biến môi trường hoặc fallback; DEV: dùng proxy /api
 const PROD_BASE =
@@ -70,6 +71,6 @@ const baseQueryWithAuth: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["Account"],
+  tagTypes, // dùng mảng chung tagTypes: ["Account"] => thêm thì vào tagTypes.ts mà add
   endpoints: () => ({}),
 });

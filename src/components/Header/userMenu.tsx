@@ -58,6 +58,46 @@ const UserMenu: React.FC<UserMenuProps> = ({
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
 
+  // helper tránh lỗi // hoặc thiếu /
+  const join = (base: string, rel: string) =>
+    `${base.replace(/\/$/, "")}/${rel.replace(/^\//, "")}`;
+
+  // dùng absolute path tới /userlayout/<child>
+  const menuItems = [
+    {
+      icon: User,
+      label: "Hồ sơ cá nhân",
+      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_PROFILE), // => /userlayout/profile
+      color: "text-gray-700",
+      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
+      iconBg: "group-hover:bg-blue-100",
+    },
+    {
+      icon: Calendar,
+      label: "Lịch sử đặt sân",
+      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_HISTORY), // => /userlayout/history
+      color: "text-gray-700",
+      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
+      iconBg: "group-hover:bg-blue-100",
+    },
+    {
+      icon: FileText,
+      label: "Bài viết đã đăng",
+      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_POSTS), // => /userlayout/posts
+      color: "text-gray-700",
+      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
+      iconBg: "group-hover:bg-blue-100",
+    },
+    {
+      icon: MessageSquare,
+      label: "Đánh giá của tôi",
+      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_REVIEWS), // => /userlayout/reviews
+      color: "text-gray-700",
+      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
+      iconBg: "group-hover:bg-blue-100",
+    },
+  ];
+
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
       if (!open) return;
@@ -98,42 +138,16 @@ const UserMenu: React.FC<UserMenuProps> = ({
     }
   };
 
-  const menuItems = [
-    {
-      icon: User,
-      label: "Hồ sơ cá nhân",
-      to: "/profile",
-      color: "text-gray-700",
-      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
-      iconBg: "group-hover:bg-blue-100",
-    },
-    {
-      icon: Calendar,
-      label: "Lịch sử đặt sân",
-      to: "/booking-history",
-      color: "text-gray-700",
-      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
-      iconBg: "group-hover:bg-blue-100",
-    },
-    {
-      icon: FileText,
-      label: "Bài viết đã đăng",
-      to: "/my-posts",
-      color: "text-gray-700",
-      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
-      iconBg: "group-hover:bg-blue-100",
-    },
-    {
-      icon: MessageSquare,
-      label: "Đánh giá của tôi",
-      to: "/my-reviews",
-      color: "text-gray-700",
-      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
-      iconBg: "group-hover:bg-blue-100",
-    },
-  ];
-
   const { label: roleLabel, gradient } = roleInfo(user.role);
+
+  const shortenName = (fullName: string) => {
+    if (!fullName) return "";
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0];
+    const last = parts.pop();
+    const initials = parts.map((p) => p[0].toUpperCase() + ".").join(" ");
+    return `${last} ${initials}`.trim();
+  };
 
   return (
     <div className={`relative ${className}`}>
@@ -151,13 +165,13 @@ const UserMenu: React.FC<UserMenuProps> = ({
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-full border border-transparent
-               opacity-0 group-hover:opacity-100 transition-opacity duration-300
-               [background:linear-gradient(#fff,#fff)_padding-box,linear-gradient(90deg,#14b8a6,#10b981,#22c55e)_border-box]"
-        />{" "}
+      opacity-0 group-hover:opacity-100 transition-opacity duration-300
+      [background:linear-gradient(#fff,#fff)_padding-box,linear-gradient(90deg,#14b8a6,#10b981,#22c55e)_border-box]"
+        />
         <span
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-emerald-500/50
-               group-hover:ring-transparent transition"
+      group-hover:ring-transparent transition"
         />
         <div className="relative flex items-center gap-2">
           <div className="relative">
@@ -192,14 +206,15 @@ const UserMenu: React.FC<UserMenuProps> = ({
             )}
           </div>
 
-          <span
+          {/* Tên ngắn gọn + ellipsis giữa + title đầy đủ */}
+           <span
             className={`${
               showNameOnMobile ? "" : "hidden md:block"
             } text-[15px] font-medium max-w-[180px] truncate ${
               isLoggingOut ? "text-blue-500" : "text-gray-700"
             }`}
           >
-            {isLoggingOut ? "Đang đăng xuất…" : user.fullname}
+            {isLoggingOut ? "Đang đăng xuất…" : shortenName(user.fullname)}
           </span>
 
           {!isLoggingOut && (

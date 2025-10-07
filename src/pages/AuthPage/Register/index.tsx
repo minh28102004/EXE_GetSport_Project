@@ -20,7 +20,7 @@ import {
   barClassFor,
   labelForScore,
 } from "@hooks/usePasswordStrength";
-import { useRegisterMutation } from "@redux/features/auth/authApi";
+import { useRegisterMutation } from "@/redux/api/auth/authApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -284,7 +284,7 @@ const Register: React.FC<RegisterProps> = ({
               >
                 {isSubmitting || isLoading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <LoadingSpinner color="white" size="5" inline />
+                    <LoadingSpinner color="white" size="6" inline />
                     <span>Đang đăng ký...</span>
                   </span>
                 ) : (

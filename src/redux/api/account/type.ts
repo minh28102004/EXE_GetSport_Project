@@ -1,4 +1,4 @@
-import type { ApiEnvelope } from "@redux/features/auth/type";
+import type { ApiEnvelope } from "@redux/api/auth/type";
 
 /** Giữ nguyên key theo BE */
 export type AccountDto = {
@@ -8,11 +8,11 @@ export type AccountDto = {
   gender: string | null;
   phonenumber: string | null;
   email: string;
-  dateofbirth: string | null;       // "YYYY-MM-DD"
+  dateofbirth: string | null; // "YYYY-MM-DD"
   skilllevel: string | null;
   membershiptype: string | null;
   totalpoint: number;
-  createat: string;                 // ISO datetime
+  createat: string; // ISO datetime
   isactive: boolean;
   status: string | null;
   walletBalance: number;
@@ -41,7 +41,7 @@ export type CreateAccountDto = {
   role: string;
   fullname: string;
   email: string;
-  password: string;        // ⬅️ required
+  password: string; // ⬅️ required
   gender?: string | null;
   phonenumber?: string | null;
   dateofbirth?: string | null; // "YYYY-MM-DD"
@@ -54,8 +54,18 @@ export type CreateAccountDto = {
 
 export type UpdateAccountDto = Partial<CreateAccountDto>;
 
-export type ListParams = { page?: number; pageSize?: number; search?: string; sort?: string };
-export type Paged<T> = { items: T[]; total: number; page: number; pageSize: number };
+export type ListParams = {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sort?: string;
+};
+export type Paged<T> = {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
 
 /** Envelope tiện cho FE */
 export type AccountEnvelope = ApiEnvelope<Account>;

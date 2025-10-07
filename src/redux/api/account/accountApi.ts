@@ -1,10 +1,17 @@
-import { baseApi } from "@redux/features/api/baseApi";
+// @redux/features/account/accountApi.ts
+import { baseApi } from "@redux/api/baseApi";
 import type {
-  Account, AccountDto, AccountEnvelope, AccountListEnvelope,
-  CreateAccountDto, UpdateAccountDto, ListParams, Paged
+  Account,
+  AccountDto,
+  AccountEnvelope,
+  AccountListEnvelope,
+  CreateAccountDto,
+  UpdateAccountDto,
+  ListParams,
+  Paged,
 } from "./type";
 import { mapDtoToUi } from "./map";
-import type { ApiEnvelope } from "@redux/features/auth/type";
+import type { ApiEnvelope } from "@redux/api/auth/type";
 
 /** Đổi sang "Accounts" nếu Swagger dùng số nhiều */
 const ACCOUNT_PATH = "Account";
@@ -18,18 +25,26 @@ type AccountListRaw =
 type AccountRaw = AccountDto | ApiEnvelope<AccountDto>;
 
 function isEnvelope<T>(v: unknown): v is ApiEnvelope<T> {
-  return typeof v === "object" && v !== null &&
-         "data" in (v as Record<string, unknown>) &&
-         "statusCode" in (v as Record<string, unknown>);
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    "data" in (v as Record<string, unknown>) &&
+    "statusCode" in (v as Record<string, unknown>)
+  );
 }
 function takeData<T>(v: ApiEnvelope<T> | T): T {
   return isEnvelope<T>(v) ? v.data : v;
 }
 function isPaged<T>(v: unknown): v is Paged<T> {
-  const obj = v as { items?: unknown; total?: unknown; page?: unknown; pageSize?: unknown };
+  const obj = v as {
+    items?: unknown;
+    total?: unknown;
+    page?: unknown;
+    pageSize?: unknown;
+  };
   return typeof v === "object" && v !== null && Array.isArray(obj.items);
 }
-const okEnvelope = <T,>(data: T): ApiEnvelope<T> => ({
+const okEnvelope = <T>(data: T): ApiEnvelope<T> => ({
   statusCode: 200,
   status: "OK",
   message: "",
@@ -58,7 +73,9 @@ export const accountApi = baseApi.injectEndpoints({
 
         if (Array.isArray(payload)) {
           const mapped = payload.map(mapDtoToUi);
-          return isEnvelope(resp) ? { ...resp, data: mapped } : okEnvelope(mapped);
+          return isEnvelope(resp)
+            ? { ...resp, data: mapped }
+            : okEnvelope(mapped);
         }
 
         if (isPaged<AccountDto>(payload)) {
@@ -66,16 +83,17 @@ export const accountApi = baseApi.injectEndpoints({
             ...payload,
             items: payload.items.map(mapDtoToUi),
           };
-          return isEnvelope(resp) ? { ...resp, data: mapped } : okEnvelope(mapped);
+          return isEnvelope(resp)
+            ? { ...resp, data: mapped }
+            : okEnvelope(mapped);
         }
 
         return okEnvelope<Account[]>([]);
       },
       providesTags: (result) => {
-        const list =
-          Array.isArray(result?.data)
-            ? result.data
-            : (result?.data as Paged<Account> | undefined)?.items;
+        const list = Array.isArray(result?.data)
+          ? result.data
+          : (result?.data as Paged<Account> | undefined)?.items;
 
         return list
           ? [
@@ -86,15 +104,32 @@ export const accountApi = baseApi.injectEndpoints({
       },
     }),
 
-    /** DETAIL */
+    /** DETAIL (alias cũ) */
     getAccount: b.query<AccountEnvelope, number | string>({
       query: (id) => ({ url: `${ACCOUNT_PATH}/${id}` }),
       transformResponse: (resp: AccountRaw): AccountEnvelope => {
         const dto = takeData<AccountDto>(resp);
         const mapped = mapDtoToUi(dto);
-        return isEnvelope(resp) ? { ...resp, data: mapped } : okEnvelope(mapped);
+        return isEnvelope(resp)
+          ? { ...resp, data: mapped }
+          : okEnvelope(mapped);
       },
-      providesTags: (res) => (res?.data?.id ? [{ type: "Account", id: res.data.id }] : []),
+      providesTags: (res) =>
+        res?.data?.id ? [{ type: "Account", id: res.data.id }] : [],
+    }),
+
+    /** NEW: GET USER BY ID (alias tên “getUser”) */
+    getUser: b.query<AccountEnvelope, number | string>({
+      query: (id) => ({ url: `${ACCOUNT_PATH}/${id}` }), // /api/Account/{id}
+      transformResponse: (resp: AccountRaw): AccountEnvelope => {
+        const dto = takeData<AccountDto>(resp);
+        const mapped = mapDtoToUi(dto);
+        return isEnvelope(resp)
+          ? { ...resp, data: mapped }
+          : okEnvelope(mapped);
+      },
+      providesTags: (res) =>
+        res?.data?.id ? [{ type: "Account", id: res.data.id }] : [],
     }),
 
     /** CREATE */
@@ -103,13 +138,18 @@ export const accountApi = baseApi.injectEndpoints({
       transformResponse: (resp: AccountRaw): AccountEnvelope => {
         const dto = takeData<AccountDto>(resp);
         const mapped = mapDtoToUi(dto);
-        return isEnvelope(resp) ? { ...resp, data: mapped } : okEnvelope(mapped);
+        return isEnvelope(resp)
+          ? { ...resp, data: mapped }
+          : okEnvelope(mapped);
       },
       invalidatesTags: [{ type: "Account", id: "LIST" }],
     }),
 
     /** UPDATE — id ở PATH: /api/Account/{id} */
-    updateAccount: b.mutation<AccountEnvelope, { id: number | string; body: UpdateAccountDto }>({
+    updateAccount: b.mutation<
+      AccountEnvelope,
+      { id: number | string; body: UpdateAccountDto }
+    >({
       query: ({ id, body }) => ({
         url: `${ACCOUNT_PATH}/${id}`,
         method: "PUT",
@@ -118,11 +158,16 @@ export const accountApi = baseApi.injectEndpoints({
       transformResponse: (resp: AccountRaw): AccountEnvelope => {
         const dto = takeData<AccountDto>(resp);
         const mapped = mapDtoToUi(dto);
-        return isEnvelope(resp) ? { ...resp, data: mapped } : okEnvelope(mapped);
+        return isEnvelope(resp)
+          ? { ...resp, data: mapped }
+          : okEnvelope(mapped);
       },
       invalidatesTags: (res) =>
         res?.data?.id
-          ? [{ type: "Account", id: res.data.id }, { type: "Account", id: "LIST" }]
+          ? [
+              { type: "Account", id: res.data.id },
+              { type: "Account", id: "LIST" },
+            ]
           : [{ type: "Account", id: "LIST" }],
     }),
 
@@ -141,6 +186,8 @@ export const accountApi = baseApi.injectEndpoints({
 export const {
   useGetAccountsQuery,
   useGetAccountQuery,
+  useGetUserQuery, // ⬅️ new
+  useLazyGetUserQuery, // ⬅️ optional lazy
   useCreateAccountMutation,
   useUpdateAccountMutation,
   useDeleteAccountMutation,

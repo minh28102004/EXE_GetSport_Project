@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
-import { baseApi } from "@redux/features/api/baseApi";
+import { baseApi } from "@redux/api/baseApi";
 import authReducer from "@redux/features/auth/authSlice";
 import { auth401 } from "@redux/middlewares/auth401";
 
@@ -10,8 +10,10 @@ export const store = configureStore({
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefault) =>
-    getDefault({ serializableCheck: false })
-      .concat(baseApi.middleware, auth401), //  gắn 401 middleware
+    getDefault({ serializableCheck: false }).concat(
+      baseApi.middleware,
+      auth401
+    ), //  gắn 401 middleware
   devTools: import.meta.env.DEV,
 });
 

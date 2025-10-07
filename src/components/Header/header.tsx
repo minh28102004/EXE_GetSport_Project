@@ -513,6 +513,7 @@ const MobileNav: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
               >
                 <X className="w-5 h-5" />
               </motion.button>
+              
             </div>
 
             {/* List */}

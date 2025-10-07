@@ -9,7 +9,7 @@ export type ApiEnvelope<T> = {
 
 export type LoginBody = { email: string; password: string };
 
-// ⬇️ RegisterBody chỉ còn 4 field, đều REQUIRED
+// RegisterBody chỉ còn 4 field, đều REQUIRED
 export type RegisterBody = {
   fullname: string;
   email: string;

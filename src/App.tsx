@@ -2,8 +2,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import endPoint from "@routes/router";
 import ErrorBoundary from "@components/Error_Boundary";
+import { Navigate } from "react-router-dom";
+// Layout
 import MainLayout from "@pages/HomePage/mainLayout";
-import ManagementLayout from "@layout/ManagementLayout";
+import ManagementLayout from "@layout/Admin&OwnerLayout/ManagementLayout";
+import CustomerLayout from "@layout/CustomerLayout/customerLayout";
 // Public
 import HomePage from "@pages/HomePage/Home/mainSection";
 import AboutPage from "@pages/HomePage/About/mainSection";
@@ -14,6 +17,11 @@ import ContactPage from "@pages/HomePage/Contact";
 import CourtBooking from "@pages/HomePage/CourtBooking";
 import TermsOfServicePage from "@pages/TermsOfServicePage";
 import PrivacyPolicyPage from "@pages/PrivacyPolicyPage";
+// Customer
+import Profile from "@pages/CustomerPage/Profile";
+import History from "@pages/CustomerPage/BookingHistory";
+import Posts from "@pages/CustomerPage/Post";
+import Reviews from "@pages/CustomerPage/Feedback";
 // Owner
 import Dashboard from "@pages/OwnerPage/Dashboard";
 import CourtManagement from "@pages/OwnerPage/CourtManagement";
@@ -30,6 +38,7 @@ import AdminProfile from "@pages/AdminPage/AdminProfile";
 import AuthTokenWatcher from "@utils/authTokenWatcher";
 import RequireAuth from "@routes/RequireAuth";
 import RequireRole from "@routes/RequireRole";
+import CurrentUserHydrator from "@redux/features/auth/CurrentUserHydrator";
 // Access Denied
 import AccessDeniedPage from "@pages/UnauthorizedPage";
 
@@ -61,6 +70,30 @@ function AppRoutes() {
 
         {/* Access denied */}
         <Route path={endPoint.ACCESSDENIED} element={<AccessDeniedPage />} />
+
+        {/* USER Information protected */}
+        <Route
+          path={endPoint.CUSTOMER_BASE}
+          element={
+            <RequireAuth redirectTo={endPoint.HOMEPAGE}>
+              <RequireRole
+                allowed={["customer", "owner", "admin"]} // cho phép cả 3 role access
+                redirectTo={endPoint.ACCESSDENIED}
+              >
+                <CustomerLayout />
+              </RequireRole>
+            </RequireAuth>
+          }
+        >
+          <Route
+            index
+            element={<Navigate to={endPoint.CUSTOMER_PROFILE} replace />}
+          />
+          <Route path={endPoint.CUSTOMER_PROFILE} element={<Profile />} />
+          <Route path={endPoint.CUSTOMER_HISTORY} element={<History />} />
+          <Route path={endPoint.CUSTOMER_POSTS} element={<Posts />} />
+          <Route path={endPoint.CUSTOMER_REVIEWS} element={<Reviews />} />
+        </Route>
 
         {/* OWNER protected */}
         <Route
@@ -115,6 +148,7 @@ function App() {
   return (
     <ErrorBoundary>
       <AuthTokenWatcher />
+      <CurrentUserHydrator />   {/* Luôn bật trong suốt vòng đời app */}
       <AppRoutes />
     </ErrorBoundary>
   );

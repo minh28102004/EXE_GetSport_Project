@@ -1,4 +1,4 @@
-import { baseApi } from "@redux/features/api/baseApi";
+import { baseApi } from "@redux/api/baseApi";
 import type { ApiEnvelope, AuthData, LoginBody, RegisterBody } from "./type";
 
 type AuthProfile = Omit<AuthData, "token">;

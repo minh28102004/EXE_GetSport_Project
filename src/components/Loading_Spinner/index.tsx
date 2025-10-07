@@ -37,7 +37,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   const spinner = (
     <div
       className={`${sizeMap[size as keyof typeof sizeMap] || sizeMap["8"]}
-        border-4 
+        border-3 
         ${colorMap[color as keyof typeof colorMap] || colorMap["blue"]} 
         border-t-transparent 
         rounded-full 

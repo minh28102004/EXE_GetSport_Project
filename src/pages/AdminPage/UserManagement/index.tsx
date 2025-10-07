@@ -5,8 +5,9 @@ import {
   useCreateAccountMutation,
   useUpdateAccountMutation,
   useDeleteAccountMutation,
-} from "@redux/features/account/accountApi";
-import type { Account } from "@redux/features/account/type";
+} from "@redux/api/account/accountApi";
+import type { Account } from "@redux/api/account/type";
+import { mapUiToDto } from "@/redux/api/account/map";
 import UserForm from "./UserForm";
 import "./styles.css";
 
@@ -37,7 +38,9 @@ const UserManagement: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const handleUserSaved = async (user: Partial<Account> & { password?: string }) => {
+  const handleUserSaved = async (
+    user: Partial<Account> & { password?: string }
+  ) => {
     try {
       if (user.id) {
         await updateAccount({
@@ -68,7 +71,10 @@ const UserManagement: React.FC = () => {
 
   const handleToggleActive = async (u: Account) => {
     try {
-      await updateAccount({ id: u.id, body: { isactive: !u.isActive } }).unwrap();
+      await updateAccount({
+        id: u.id,
+        body: { isactive: !u.isActive },
+      }).unwrap();
     } catch (e) {
       console.error(e);
       alert("Không thể đổi trạng thái tài khoản.");
@@ -76,7 +82,9 @@ const UserManagement: React.FC = () => {
   };
 
   const handleDelete = async (id: number, name?: string) => {
-    const ok = window.confirm(`Bạn có chắc muốn xoá người dùng${name ? ` "${name}"` : ""}?`);
+    const ok = window.confirm(
+      `Bạn có chắc muốn xoá người dùng${name ? ` "${name}"` : ""}?`
+    );
     if (!ok) return;
     try {
       await deleteAccount(id).unwrap();
@@ -86,16 +94,24 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  if (isLoading) return <div className="text-center p-10">Đang tải dữ liệu...</div>;
-  if (isError)   return <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>;
+  if (isLoading)
+    return <div className="text-center p-10">Đang tải dữ liệu...</div>;
+  if (isError)
+    return (
+      <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>
+    );
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Quản lý người dùng</h1>
-          <p className="text-gray-500">Quản lý tài khoản và phân quyền trong hệ thống</p>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Quản lý người dùng
+          </h1>
+          <p className="text-gray-500">
+            Quản lý tài khoản và phân quyền trong hệ thống
+          </p>
         </div>
         {/* ⬇️ BỎ NÚT THÊM NGƯỜI DÙNG */}
         {/* (để trống hoặc thêm phần khác nếu cần) */}
@@ -118,7 +134,9 @@ const UserManagement: React.FC = () => {
             {rows.map((u, i) => (
               <tr
                 key={u.id}
-                className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition`}
+                className={`${
+                  i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                } hover:bg-gray-100 transition`}
               >
                 <td className="p-3 font-medium text-gray-800">{u.fullName}</td>
                 <td className="p-3">{u.email}</td>
@@ -126,14 +144,18 @@ const UserManagement: React.FC = () => {
                 <td className="p-3">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      u.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                      u.isActive
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
                     }`}
                   >
                     {u.isActive ? "active" : "inactive"}
                   </span>
                 </td>
                 <td className="p-3 text-gray-600">
-                  {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "--"}
+                  {u.createdAt
+                    ? new Date(u.createdAt).toLocaleDateString()
+                    : "--"}
                 </td>
                 <td className="p-3 flex gap-3">
                   <button

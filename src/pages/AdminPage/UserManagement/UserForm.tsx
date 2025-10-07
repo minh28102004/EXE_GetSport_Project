@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import type { Account } from "@redux/features/account/type";
+import type { Account } from "@redux/api/account/type";
 
 type Props = {
-  user: Account | null;                 // null = create, khác null = edit
+  user: Account | null; // null = create, khác null = edit
   onSave: (user: Partial<Account>) => void;
   onClose: () => void;
   loading?: boolean;
@@ -22,15 +22,13 @@ const defaultNew: Partial<Account> = {
 
 const UserForm: React.FC<Props> = ({ user, onSave, onClose, loading }) => {
   const [form, setForm] = useState<Partial<Account>>(
-    user
-      ? { ...user }
-      : { ...defaultNew }
+    user ? { ...user } : { ...defaultNew }
   );
 
- const setField = <K extends keyof Account>(
-  name: K,
-  value: Partial<Account>[K]
-) => setForm((s) => ({ ...s, [name]: value }));
+  const setField = <K extends keyof Account>(
+    name: K,
+    value: Partial<Account>[K]
+  ) => setForm((s) => ({ ...s, [name]: value }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,7 +88,9 @@ const UserForm: React.FC<Props> = ({ user, onSave, onClose, loading }) => {
             className="h-5 w-5"
             disabled={loading}
           />
-          <label htmlFor="isActive" className="text-sm text-gray-700">Hoạt động</label>
+          <label htmlFor="isActive" className="text-sm text-gray-700">
+            Hoạt động
+          </label>
         </div>
       </div>
 

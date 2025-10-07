@@ -10,7 +10,7 @@ import { CustomTextInput, CustomPasswordInput } from "@components/Form_Input";
 import LoadingSpinner from "@components/Loading_Spinner";
 import useCustomForm from "@hooks/useReactHookForm";
 import { GiShuttlecock } from "react-icons/gi";
-import { useLoginMutation } from "@redux/features/auth/authApi";
+import { useLoginMutation } from "@/redux/api/auth/authApi";
 import { setLoggedIn } from "@redux/features/auth/authSlice";
 import { routeForRole } from "@utils/routeForRole";
 
@@ -196,15 +196,6 @@ const Login: React.FC<LoginProps> = ({
                         Dùng trên thiết bị cá nhân để lần sau không cần nhập
                         lại.
                       </div>
-                      {!rememberChecked && (
-                        <button
-                          type="button"
-                          onClick={turnOnRemember}
-                          className="mt-1.5 inline-flex items-center px-2 py-1 rounded bg-teal-600 text-white text-[12px] font-medium hover:brightness-110"
-                        >
-                          Bật ngay
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -303,7 +294,7 @@ const Login: React.FC<LoginProps> = ({
               >
                 {isLoading ? (
                   <span className="inline-flex items-center gap-2">
-                    <LoadingSpinner color="white" size="5" inline />
+                    <LoadingSpinner color="white" size="6" inline />
                     <span>Đang đăng nhập...</span>
                   </span>
                 ) : (
