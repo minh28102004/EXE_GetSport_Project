@@ -15,10 +15,8 @@ export default function RequireAuth({
 }) {
   const { accessToken } = useSelector(selectAuth);
 
-  // Theo dõi mất token & hard refresh nếu cần
   useTokenGuard(redirectTo);
 
   if (!accessToken) return <Navigate to={redirectTo} replace />;
-  // Nếu có children => bọc trực tiếp element, nếu không thì dùng Outlet như cũ
   return children ? <>{children}</> : <Outlet />;
 }

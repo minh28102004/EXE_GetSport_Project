@@ -67,8 +67,43 @@ const ManagementLayout: React.FC<{ user?: any; role?: "admin" | "owner" }> = ({
             icon: <Grid size={24} />,
           },
           {
+            name: "Quản lý blog",
+            path: "/layoutAdmin/BlogManagement",
+            icon: <Grid size={24} />,
+          },
+          {
+            name: "Quản lý gói",
+            path: "/layoutAdmin/PackageManagement",
+            icon: <Grid size={24} />,
+          },
+          {
             name: "Quản lý đơn đặt sân",
             path: "/layoutAdmin/BookingManagement",
+            icon: <Calendar size={24} />,
+          },
+            {
+            name: "Quản lý đơn đặt sân",
+            path: "/layoutAdmin/CourtBookingManagement",
+            icon: <Calendar size={24} />,
+          },
+            {
+            name: "Quản lý slot sân",
+            path: "/layoutAdmin/CourtSlotManagement",
+            icon: <Calendar size={24} />,
+          },
+            {
+            name: "Quản lý feedback",
+            path: "/layoutAdmin/FeedbackManagement",
+            icon: <Calendar size={24} />,
+          },
+            {
+            name: "Quản lý playmate post",
+            path: "/layoutAdmin/PlaymatePostManagement",
+            icon: <Calendar size={24} />,
+          },
+           {
+            name: "Quản lý playmate join",
+            path: "/layoutAdmin/PlaymateJoinManagement",
             icon: <Calendar size={24} />,
           },
           {

@@ -41,6 +41,22 @@ import RequireRole from "@routes/RequireRole";
 import CurrentUserHydrator from "@redux/features/auth/CurrentUserHydrator";
 // Access Denied
 import AccessDeniedPage from "@pages/UnauthorizedPage";
+import BlogManagement from "./pages/AdminPage/BlogManagement";
+import PackageManagement from "./pages/AdminPage/PackageManagement";
+import CourtBookingManagement from "./pages/AdminPage/CourtBookingManagement";
+import CourtSlotManagement from "./pages/AdminPage/CourtSlotManagement";
+import CourtSlotsByCourt from "./pages/AdminPage/CourtSlotManagement/CourtSlotsByCourt";
+import FeedbacksByCourt from "./pages/AdminPage/FeedbackManagement/FeedbacksByCourt";
+import FeedbackManagement from "./pages/AdminPage/FeedbackManagement";
+import PlaymatePostManagement from "./pages/AdminPage/PlaymatePostManagement";
+import PlaymatePostsByCourt from "./pages/AdminPage/PlaymatePostManagement/PlaymatePostsByCourt";
+import PlaymateJoinManagement from "./pages/AdminPage/PlaymateJoinManagement";
+import CourtDetail from "./pages/HomePage/CourtBooking/CourtDetail";
+import CourtBookingPay from "./pages/HomePage/CourtBooking/CourtBookingPay";
+import BookingCallback from "./pages/HomePage/CourtBooking/BookingCallback";
+import BookingHistory from "@pages/CustomerPage/BookingHistory";
+import BookingDetail from "./pages/CustomerPage/BookingHistory/BookingDetail";
+import VerifyAccount from "./pages/AuthPage/VerifyAccount/VerifyAccount";
 
 function AppRoutes() {
   return (
@@ -55,6 +71,13 @@ function AppRoutes() {
           <Route path={endPoint.FAQS} element={<FAQsPage />} />
           <Route path={endPoint.CONTACT} element={<ContactPage />} />
           <Route path={endPoint.COURTBOOKING} element={<CourtBooking />} />
+          <Route path="Auth/verify" element={<VerifyAccount />} />
+          <Route path="Court/detail/:courtId" element={<CourtDetail />} />
+          <Route path="Court/booking/:courtId" element={<CourtBookingPay />} />
+          <Route path="/booking/callback/success" element={<BookingCallback />} />
+          <Route path="/booking-history" element={<BookingHistory />} />
+          <Route path="/booking-detail/:bookingId" element={<BookingDetail/>} />
+          <Route path="/booking/callback/cancel" element={<BookingCallback />} />
           <Route
             path={endPoint.TERMSOFSERVICE}
             element={<TermsOfServicePage />}
@@ -77,7 +100,7 @@ function AppRoutes() {
           element={
             <RequireAuth redirectTo={endPoint.HOMEPAGE}>
               <RequireRole
-                allowed={["customer", "owner", "admin"]} // cho phép cả 3 role access
+                allowed={["customer", "owner", "admin"]}
                 redirectTo={endPoint.ACCESSDENIED}
               >
                 <CustomerLayout />
@@ -89,6 +112,7 @@ function AppRoutes() {
             index
             element={<Navigate to={endPoint.CUSTOMER_PROFILE} replace />}
           />
+          
           <Route path={endPoint.CUSTOMER_PROFILE} element={<Profile />} />
           <Route path={endPoint.CUSTOMER_HISTORY} element={<History />} />
           <Route path={endPoint.CUSTOMER_POSTS} element={<Posts />} />
@@ -111,6 +135,7 @@ function AppRoutes() {
         >
           <Route path="Dashboard" element={<Dashboard />} />
           <Route path="CourtManagement" element={<CourtManagement />} />
+          <Route path="Feedback" element={<FeedbackManagement />} />
           <Route path="BookingManagement" element={<BookingManagement />} />
           <Route path="Settings" element={<StaffProfile />} />
         </Route>
@@ -137,7 +162,17 @@ function AppRoutes() {
           />
           <Route path="BookingReport" element={<BookingReport />} />
           <Route path="UserManagement" element={<UserManagement />} />
+          <Route path="BlogManagement" element={<BlogManagement />} />
+          <Route path="PackageManagement" element={<PackageManagement />} />
+          <Route path="CourtBookingManagement" element={<CourtBookingManagement />} />
           <Route path="Settings" element={<AdminProfile />} />
+          <Route path="CourtSlotManagement" element={<CourtSlotManagement />} />
+          <Route path="Court/:courtId/Slots" element={<CourtSlotsByCourt />} />
+          <Route path="FeedbackManagement" element={<FeedbackManagement />} />
+          <Route path="Feedback/:courtId" element={<FeedbacksByCourt />} />
+          <Route path="PlaymatePostManagement" element={<PlaymatePostManagement />} />
+          <Route path="PlaymatePost/:courtId" element={<PlaymatePostsByCourt />} />
+          <Route path="PlaymateJoinManagement" element={<PlaymateJoinManagement />} />
         </Route>
       </Routes>
     </Router>

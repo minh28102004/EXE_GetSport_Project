@@ -4,16 +4,13 @@ import {
   Calendar,
   Star,
   Check,
-  MapPin,
-  Clock,
-  Bell,
   CreditCard,
   Edit3,
   Trophy,
+  Bell,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-
 import LoadingSpinner from "@components/Loading_Spinner";
 import {
   useGetUserQuery,
@@ -26,7 +23,7 @@ type FormState = {
   fullName: string;
   email: string;
   phoneNumber: string;
-  dateOfBirth: string; // yyyy-mm-dd
+  dateOfBirth: string;
   gender: string;
   skillLevel: string;
   membershipType: string;
@@ -43,9 +40,9 @@ function fmtMoney(v?: number) {
 const Profile: React.FC = () => {
   const token = useSelector(selectToken);
   const userId = useMemo(() => getUserIdFromToken(token), [token]);
-
-  const { data, isLoading, isFetching, refetch } = useGetUserQuery(userId!, {
-    skip: !userId,
+  console.log("Extracted userId from token:", userId);  
+  const { data, isLoading, isFetching, error, refetch } = useGetUserQuery(userId!, {
+    skip: !userId || !token,
     refetchOnMountOrArgChange: true,
     refetchOnFocus: true,
     refetchOnReconnect: true,
@@ -53,7 +50,7 @@ const Profile: React.FC = () => {
 
   const [updateAccount, { isLoading: saving }] = useUpdateAccountMutation();
 
-  const account = data?.data; // Account (camelCase) từ mapDtoToUi
+  const account = data?.data;
 
   const [editMode, setEditMode] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(true);
@@ -67,14 +64,19 @@ const Profile: React.FC = () => {
     membershipType: "",
   });
 
-  // nạp form khi có data
+  // Debugging logs
+  useEffect(() => {
+    console.log("Profile Debug:", { token, userId, data, error, account });
+  }, [token, userId, data, error, account]);
+
+  // Initialize form with account data
   useEffect(() => {
     if (!account) return;
     setForm({
-      fullName: account.fullName ?? "",
-      email: account.email ?? "",
+      fullName: account.fullName ?? "Tan Kim",
+      email: account.email ?? "kimltce170469@fpt.edu.vn",
       phoneNumber: account.phoneNumber ?? "",
-      dateOfBirth: account.dateOfBirth ?? "",
+      dateOfBirth: account.dateOfBirth ? new Date(account.dateOfBirth).toISOString().split("T")[0] : "",
       gender: account.gender ?? "",
       skillLevel: account.skillLevel ?? "",
       membershipType: account.membershipType ?? "",
@@ -99,12 +101,14 @@ const Profile: React.FC = () => {
   }, [form]);
 
   const onSave = async () => {
-    if (!userId) return;
+    if (!userId) {
+      toast.error("Không tìm thấy userId. Vui lòng đăng nhập lại.");
+      return;
+    }
     try {
-      // Map về DTO field theo BE (snake của bạn là: fullname, phonenumber,...)
       const body = {
-        fullname: form.fullName,
-        email: form.email,
+        fullname: form.fullName || null,
+        email: form.email || null,
         phonenumber: form.phoneNumber || null,
         dateofbirth: form.dateOfBirth || null,
         gender: form.gender || null,
@@ -115,28 +119,73 @@ const Profile: React.FC = () => {
       await updateAccount({ id: userId, body }).unwrap();
       toast.success("Cập nhật hồ sơ thành công!");
       setEditMode(false);
-      refetch(); // refetch ngay; Hydrator cũng sẽ nhận invalidatesTags và sync header
+      refetch();
     } catch (e: any) {
-      toast.error(e?.data?.message || "Cập nhật thất bại");
+      console.error("Update error:", e);
+      toast.error(e?.data?.message || "Cập nhật thất bại. Vui lòng thử lại.");
     }
   };
 
-  if (!userId) {
+  // Handle no token or userId
+  if (!token || !userId) {
     return (
       <div className="max-w-6xl mx-auto p-6 lg:p-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
-          Token không hợp lệ hoặc thiếu userId.
+          <p className="text-red-500 text-lg">Vui lòng đăng nhập để xem hồ sơ.</p>
+          <button
+            onClick={() => (window.location.href = "/auth?view=login")}
+            className="mt-4 px-4 py-2.5 bg-gradient-to-r from-[#23AEB1] to-[#1B8E90] text-white rounded-xl hover:shadow-lg transition-all duration-200"
+          >
+            Đăng Nhập
+          </button>
         </div>
       </div>
     );
   }
 
+  // Handle API error
+  if (error) {
+    return (
+      <div className="max-w-6xl mx-auto p-6 lg:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+          <p className="text-red-500 text-lg">
+            {(error as any)?.data?.message || "Lỗi khi tải hồ sơ. Vui lòng thử lại."}
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 px-4 py-2.5 bg-gradient-to-r from-[#23AEB1] to-[#1B8E90] text-white rounded-xl hover:shadow-lg transition-all duration-200"
+          >
+            Thử Lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle loading state
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto p-10">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10">
           <LoadingSpinner size="12" />
           <p className="text-center mt-2 text-gray-500">Đang tải hồ sơ…</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle no account data
+  if (!account) {
+    return (
+      <div className="max-w-6xl mx-auto p-6 lg:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+          <p className="text-gray-500 text-lg">Không tìm thấy thông tin hồ sơ.</p>
+          <button
+            onClick={() => refetch()}
+            className="mt-4 px-4 py-2.5 bg-gradient-to-r from-[#23AEB1] to-[#1B8E90] text-white rounded-xl hover:shadow-lg transition-all duration-200"
+          >
+            Thử Lại
+          </button>
         </div>
       </div>
     );
@@ -162,7 +211,6 @@ const Profile: React.FC = () => {
         <div className="px-6 lg:px-8 pb-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-12">
             <div className="relative shrink-0">
-              {/* avatar giả lập từ tên */}
               <img
                 src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
                   form.fullName || "User"
@@ -181,14 +229,14 @@ const Profile: React.FC = () => {
               <h1 className="text-2xl font-bold text-gray-900 mb-1">
                 {form.fullName || "—"}
               </h1>
-              <p className="text-gray-500 text-sm mb-3">{account?.email}</p>
+              <p className="text-gray-500 text-sm mb-3">{account?.email || "—"}</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-2">
                 <div className="text-center sm:text-left">
                   <div className="text-2xl font-bold text-[#23AEB1]">
-                    {fmtMoney(account?.walletBalance)}
+                    {fmtMoney(account?.walletBalance)} ₫
                   </div>
-                  <div className="text-xs text-gray-500">Số dư ví (₫)</div>
+                  <div className="text-xs text-gray-500">Số dư ví</div>
                 </div>
                 <div className="text-center sm:text-left">
                   <div className="text-2xl font-bold text-[#23AEB1]">
@@ -198,13 +246,13 @@ const Profile: React.FC = () => {
                 </div>
                 <div className="text-center sm:text-left">
                   <div className="text-2xl font-bold text-[#23AEB1]">
-                    {account?.role ?? "-"}
+                    {account?.role ?? "—"}
                   </div>
                   <div className="text-xs text-gray-500">Vai trò</div>
                 </div>
                 <div className="text-center sm:text-left">
                   <div className="text-2xl font-bold text-[#23AEB1]">
-                    {account?.status ?? "-"}
+                    {account?.status ?? "—"}
                   </div>
                   <div className="text-xs text-gray-500">Trạng thái</div>
                 </div>
@@ -250,7 +298,15 @@ const Profile: React.FC = () => {
                     disabled={saving}
                     onClick={() => {
                       setEditMode(false);
-                      refetch();
+                      setForm({
+                        fullName: account.fullName ?? "Tan Kim",
+                        email: account.email ?? "kimltce170469@fpt.edu.vn",
+                        phoneNumber: account.phoneNumber ?? "",
+                        dateOfBirth: account.dateOfBirth ? new Date(account.dateOfBirth).toISOString().split("T")[0] : "",
+                        gender: account.gender ?? "",
+                        skillLevel: account.skillLevel ?? "",
+                        membershipType: account.membershipType ?? "",
+                      });
                     }}
                     className="flex-1 sm:flex-none px-4 py-2.5 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-gray-300 transition-all duration-200"
                   >
@@ -303,7 +359,7 @@ const Profile: React.FC = () => {
                   <input
                     value={form.fullName}
                     onChange={onChange("fullName")}
-                    className="w-full border rounded-md px-3 py-2 text-sm"
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-[#23AEB1] focus:border-[#23AEB1]"
                     placeholder="Nhập họ tên"
                   />
                 )}
@@ -324,7 +380,7 @@ const Profile: React.FC = () => {
                     type="date"
                     value={form.dateOfBirth || ""}
                     onChange={onChange("dateOfBirth")}
-                    className="w-full border rounded-md px-3 py-2 text-sm"
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-[#23AEB1] focus:border-[#23AEB1]"
                   />
                 )}
               </div>
@@ -343,7 +399,7 @@ const Profile: React.FC = () => {
                   <select
                     value={form.gender}
                     onChange={onChange("gender")}
-                    className="w-full border rounded-md px-3 py-2 text-sm"
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-[#23AEB1] focus:border-[#23AEB1]"
                   >
                     <option value="">— Chọn —</option>
                     <option value="male">Nam</option>
@@ -362,9 +418,7 @@ const Profile: React.FC = () => {
                 📱
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs text-gray-500 mb-0.5">
-                  Số điện thoại
-                </div>
+                <div className="text-xs text-gray-500 mb-0.5">Số điện thoại</div>
                 {!editMode ? (
                   <div className="font-medium text-gray-900">
                     {form.phoneNumber || "—"}
@@ -373,7 +427,7 @@ const Profile: React.FC = () => {
                   <input
                     value={form.phoneNumber}
                     onChange={onChange("phoneNumber")}
-                    className="w-full border rounded-md px-3 py-2 text-sm"
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-[#23AEB1] focus:border-[#23AEB1]"
                     placeholder="Nhập số điện thoại"
                   />
                 )}
@@ -396,7 +450,7 @@ const Profile: React.FC = () => {
                     type="email"
                     value={form.email}
                     onChange={onChange("email")}
-                    className="w-full border rounded-md px-3 py-2 text-sm"
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-[#23AEB1] focus:border-[#23AEB1]"
                     placeholder="abc@email.com"
                   />
                 )}
@@ -425,7 +479,7 @@ const Profile: React.FC = () => {
                   <input
                     value={form.skillLevel}
                     onChange={onChange("skillLevel")}
-                    className="w-full border rounded-md px-3 py-2 text-sm"
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-[#23AEB1] focus:border-[#23AEB1]"
                     placeholder="Beginner / Intermediate / Advanced…"
                   />
                 )}
@@ -436,9 +490,7 @@ const Profile: React.FC = () => {
             <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
               <CreditCard className="w-5 h-5 text-gray-400" />
               <div className="flex-1 min-w-0">
-                <div className="text-xs text-gray-500 mb-0.5">
-                  Hạng thành viên
-                </div>
+                <div className="text-xs text-gray-500 mb-0.5">Hạng thành viên</div>
                 {!editMode ? (
                   <div className="font-medium text-gray-900">
                     {form.membershipType || "—"}
@@ -447,7 +499,7 @@ const Profile: React.FC = () => {
                   <input
                     value={form.membershipType}
                     onChange={onChange("membershipType")}
-                    className="w-full border rounded-md px-3 py-2 text-sm"
+                    className="w-full border rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-[#23AEB1] focus:border-[#23AEB1]"
                     placeholder="Silver / Gold / Platinum…"
                   />
                 )}
@@ -456,17 +508,13 @@ const Profile: React.FC = () => {
 
             <div className="h-px bg-gray-100" />
 
-            {/* Notification toggle (demo local) */}
+            {/* Notification toggle */}
             <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
               <div className="flex items-center gap-3">
                 <Bell className="w-5 h-5 text-gray-400" />
                 <div>
-                  <div className="text-xs text-gray-500 mb-0.5">
-                    Thông báo lịch chơi
-                  </div>
-                  <div className="font-medium text-gray-900">
-                    Nhắc nhở tự động
-                  </div>
+                  <div className="text-xs text-gray-500 mb-0.5">Thông báo lịch chơi</div>
+                  <div className="font-medium text-gray-900">Nhắc nhở tự động</div>
                 </div>
               </div>
               <button
@@ -488,7 +536,7 @@ const Profile: React.FC = () => {
         </div>
       </section>
 
-      {/* (Tùy chọn) Achievements – có thể giữ nguyên UI cũ hoặc ẩn nếu chưa có dữ liệu từ BE */}
+      {/* Achievements */}
       <section
         aria-labelledby="achievements"
         className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6"

@@ -1,11 +1,38 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Clock, Star } from "lucide-react";
-import { posts } from "@pages/HomePage/BlogPost/data";
-import type { Post } from "@pages/HomePage/BlogPost/data";
+import { useGetBlogsQuery } from "@redux/api/blog/blogApi";
+import { type Blog, type Paged } from "@redux/api/blog/type";
 import endPoint from "@routes/router";
 
-/* ---------- Post Card (đã hạ size) ---------- */
-const PostCard = ({ post }: { post: Post }) => {
+const initials = (name?: string) =>
+  (name || '')
+    .trim()
+    .split(/\s+/)
+    .map((p) => p[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+interface PostCardProps {
+  post: {
+    id: number;
+    title: string;
+    description: string;
+    image: string;
+    author: string;
+    initials: string;
+    avatarColor: string;
+    date: string;
+    time: string;
+    category: string;
+    likes: number;
+    comments: number;
+    featured: boolean;
+  };
+}
+
+/* ---------- Post Card ---------- */
+const PostCard = ({ post }: PostCardProps) => {
   return (
     <article className="group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2">
       {/* Featured Badge */}
@@ -79,11 +106,7 @@ const PostCard = ({ post }: { post: Post }) => {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
-                  d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 
-               0 01-4.083-.98L2 17l1.338-3.123C2.493 
-               12.767 2 11.434 2 10c0-3.866 3.582-7 
-               8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 
-               0h-2v2h2V9zM9 9h2v2H9V9z"
+                  d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
                   clipRule="evenodd"
                 />
               </svg>
@@ -93,9 +116,8 @@ const PostCard = ({ post }: { post: Post }) => {
 
           {/* Read More */}
           <a
-            href={endPoint.BLOGPOST}
-            className="group relative text-teal-600 font-medium text-sm flex items-center gap-1 
-                       transition-all duration-300 hover:brightness-75 hover:translate-x-1"
+            href={`${endPoint.BLOGPOST}/${post.id}`}
+            className="group relative text-teal-600 font-medium text-sm flex items-center gap-1 transition-all duration-300 hover:brightness-75 hover:translate-x-1"
           >
             Đọc Thêm »
           </a>
@@ -105,34 +127,53 @@ const PostCard = ({ post }: { post: Post }) => {
   );
 };
 
-/* ---------- Community Section (đã hạ size) ---------- */
-const CommunitySection = () => {
-  const featuredPosts = posts.filter((p) => p.featured);
+/* ---------- Community Section ---------- */
+const CommunitySection: React.FC = () => {
+  const listParams = useMemo(
+    () => ({
+      status: "Published",
+      sortBy: "createdAt",
+      sortOrder: "desc",
+      page: 1,
+      pageSize: 3,
+    }),
+    []
+  );
 
-  let displayPosts: typeof posts = [];
+  const { data: blogData, isLoading, isError } = useGetBlogsQuery(listParams);
+  const blogsFromApi: Blog[] = useMemo(() => {
+    console.log("Blog data:", blogData); // Debugging
+    return blogData?.data
+      ? Array.isArray(blogData.data)
+        ? blogData.data
+        : (blogData.data.items || [])
+      : [];
+  }, [blogData]);
 
-  if (featuredPosts.length > 0) {
-    displayPosts = featuredPosts.slice(0, 3);
-    if (displayPosts.length < 3) {
-      const remainingPosts = posts
-        .filter((p) => !p.featured)
-        .sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-      displayPosts = [
-        ...displayPosts,
-        ...remainingPosts.slice(0, 3 - displayPosts.length),
-      ];
-    }
-  } else {
-    displayPosts = [...posts]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 3);
-  }
+  const mapBlogToPostCard = (blog: Blog): PostCardProps["post"] => {
+    const createdAt = new Date(blog.createdAt);
+    return {
+      id: blog.id,
+      title: blog.title,
+      description: blog.shortdesc || "Không có mô tả",
+      image: blog.imageUrl || "https://via.placeholder.com/300x200",
+      author: blog.authorName || "Ẩn danh",
+      initials: initials(blog.authorName) || "AN",
+      avatarColor: "bg-teal-600", // Fallback color
+      date: createdAt.toLocaleDateString("vi-VN"),
+      time: createdAt.toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      category: "Cầu lông", // Fallback, as category is not in Blog type
+      likes: 0, // Fallback, as likes are not in Blog type
+      comments: 0, // Fallback, as comments are not in Blog type
+      featured: blog.status === "Published", // Map Published to featured
+    };
+  };
 
   return (
     <section className="py-8 sm:py-14 bg-gray-50">
-      {/* dùng px chuẩn thay lg:px-15 */}
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-20">
         {/* Header */}
         <div className="text-center mb-8">
@@ -145,19 +186,61 @@ const CommunitySection = () => {
           </p>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="text-center text-gray-600">
+            <svg
+              className="animate-spin h-8 w-8 mx-auto text-[#1e9ea1]"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"
+              ></path>
+            </svg>
+            <p className="mt-2">Đang tải bài viết...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {isError && (
+          <div className="text-center text-red-500">
+            Lỗi khi tải danh sách bài viết. Vui lòng thử lại.
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !isError && blogsFromApi.length === 0 && (
+          <div className="text-center text-gray-600">
+            Không tìm thấy bài viết nào.
+          </div>
+        )}
+
         {/* Posts */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {displayPosts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
-        </div>
+        {!isLoading && !isError && blogsFromApi.length > 0 && (
+          <div className="grid md:grid-cols-3 gap-6">
+            {blogsFromApi.slice(0, 3).map((blog) => (
+              <PostCard key={blog.id} post={mapBlogToPostCard(blog)} />
+            ))}
+          </div>
+        )}
 
         {/* Button */}
         <div className="text-center mt-10">
           <a
             href={endPoint.BLOGPOST}
-            className="group inline-flex items-center gap-1 px-3 py-1.5 border-2 border-teal-200 text-teal-600 rounded-xl font-medium
-                       hover:bg-teal-50 hover:border-teal-300 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+            className="group inline-flex items-center gap-1 px-3 py-1.5 border-2 border-teal-200 text-teal-600 rounded-xl font-medium hover:bg-teal-50 hover:border-teal-300 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
           >
             Xem Thêm Bài Viết
             <span className="transform transition-transform duration-300 group-hover:translate-x-1">
