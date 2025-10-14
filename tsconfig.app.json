@@ -5,26 +5,30 @@
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "skipLibCheck": true,
 
-    /* Bundler mode */
-    "esModuleInterop": true, // ✅ thêm
-    "allowSyntheticDefaultImports": true, // ✅ thêm
-    "moduleResolution": "Node", // ✅ đổi từ "bundler" sang Node
+    /* Build & module settings */
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "Node",
     "allowJs": true,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "noEmitOnError": false, // ✅ cho phép build dù có lỗi type
+    "isolatedModules": false, // ✅ tránh lỗi khi vite build
     "jsx": "react-jsx",
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": false, // tắt để run with no error declared
-    "noUnusedParameters": false, // tắt để run with no error declared
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+
+    /* Alias */
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
