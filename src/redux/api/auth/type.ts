@@ -7,6 +7,12 @@ export type ApiEnvelope<T> = {
   data: T;
 };
 
+
+export interface VerifyAccountRequest {
+  userId: number;
+  token: string;
+}
+
 export type LoginBody = { email: string; password: string };
 
 // RegisterBody chỉ còn 4 field, đều REQUIRED

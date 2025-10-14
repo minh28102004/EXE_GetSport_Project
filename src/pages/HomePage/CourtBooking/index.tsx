@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
-import { Search, Calendar, ChevronDown, List, Map } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { Search, Calendar, ChevronDown } from "lucide-react";
 import { useClickOutside } from "@hooks/useClickOutSide";
-import CalendarModal from "./calendarModal";
+import CalendarModal from "./CalendarModal";
 import { motion, LayoutGroup } from "framer-motion";
 import { formatDateShort } from "@utils/dateFormat";
 import dayjs from "dayjs";
@@ -9,10 +9,12 @@ import { courts, amenitiesList, areas } from "./data";
 import CourtCard from "./CourtCard";
 import Pagination from "@components/Pagination";
 import MapView from "./GoogleMap/modernMapInterFace";
+import { useGetCourtsQuery } from "@redux/api/court/courtApi";
+import type { ListParams, Court } from "@redux/api/court/type";
+import { useNavigate } from "react-router-dom";
 
-// ========================== Main Component ==========================
 const BadmintonBooking: React.FC = () => {
-  // Calendar
+  // Calendar State
   const [selectedDate, setSelectedDate] = useState<string>(
     dayjs().format("YYYY-MM-DD")
   );
@@ -28,14 +30,14 @@ const BadmintonBooking: React.FC = () => {
     };
   });
 
-  // Sidebar
+  // Sidebar Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [showAmenitiesAll, setShowAmenitiesAll] = useState(false);
   const [showAvailableOnly, setShowAvailableOnly] = useState(true);
-  const [showNewOnly, setShowNewOnly] = useState(true);
+  const [showNewOnly, setShowNewOnly] = useState(false);
   const [isList, setIsList] = useState(true);
   const [selectedArea, setSelectedArea] = useState(areas[0]);
   const [open, setOpen] = useState(false);
@@ -49,10 +51,88 @@ const BadmintonBooking: React.FC = () => {
   const step = 1000;
   const markers = [50000, 200000, 350000, 500000];
 
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+
+  // Sorting
+  const [sortBy, setSortBy] = useState<string>("pricePerHour");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  // API Integration
+    const navigate = useNavigate();
+
+  const listParams: ListParams = {
+    status: "Approved",
+    search: searchQuery || undefined,
+    sortBy,
+    sortOrder,
+    page: currentPage,
+    pageSize,
+    minPrice: min,
+    maxPrice: priceRange,
+    startDate: null, 
+  };
+
+  const { data: courtData, isLoading, isError } = useGetCourtsQuery(listParams, {
+    skip: !selectedDate,
+  });
+
+  const courtsFromApi = courtData?.data
+    ? Array.isArray(courtData.data)
+      ? courtData.data
+      : courtData.data.items
+    : [];
+  const totalItems = Array.isArray(courtData?.data)
+    ? courtData.data.length
+    : courtData?.data?.total || 0;
+  const totalPages = Array.isArray(courtData?.data)
+    ? Math.ceil(courtData.data.length / pageSize)
+    : courtData?.data?.totalPages || 1;
+
+  const filteredCourts = courtsFromApi.filter((court: Court) => {
+    if (rating > 0 && (court.rating === undefined || court.rating < rating)) {
+      return false;
+    }
+
+    if (
+      selectedAmenities.length > 0 &&
+      (!court.amenities ||
+        !selectedAmenities.every((amenity) => court.amenities?.includes(amenity)))
+    ) {
+      return false;
+    }
+
+    if (showAvailableOnly && !court.isActive) {
+      return false;
+    }
+
+    if (showNewOnly && court.isNewlyOpened !== true) {
+      return false;
+    }
+
+    if (selectedArea.value !== "all" && court.location !== selectedArea.value) {
+      return false;
+    }
+
+    return true;
+  });
+
+  const paginatedCourts = filteredCourts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, rating, selectedAmenities, showAvailableOnly, showNewOnly, selectedArea, priceRange, selectedDate]);
+
   useClickOutside(dropdownRef, () => setOpen(false));
 
   const handleBooking = (courtId: number) => {
-    alert(`Đặt sân ${courts.find((c) => c.id === courtId)?.name}`);
+    const court = courtsFromApi.find((c) => c.id === courtId);
+    if (court) {
+      navigate(`/Court/detail/${courtId}`);
+    }
   };
 
   const toggleAmenity = (amenity: string): void => {
@@ -63,15 +143,19 @@ const BadmintonBooking: React.FC = () => {
     );
   };
 
-  // ========================== Pagination ==========================
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6;
-
-  const totalPages = Math.ceil(courts.length / pageSize);
-  const paginatedCourts = courts.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const resetFilters = () => {
+    setSearchQuery("");
+    setRating(0);
+    setSelectedAmenities([]);
+    setShowAmenitiesAll(false);
+    setShowAvailableOnly(true);
+    setShowNewOnly(false);
+    setSelectedArea(areas[0]);
+    setPriceRange(max);
+    setSortBy("pricePerHour");
+    setSortOrder("asc");
+    setCurrentPage(1);
+  };
 
   return (
     <div className="min-h-screen bg-slate-100/60">
@@ -110,7 +194,6 @@ const BadmintonBooking: React.FC = () => {
                   }`}
                 />
               </button>
-
               <div
                 className={`absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden transform transition-all duration-200 origin-top ${
                   open
@@ -158,7 +241,6 @@ const BadmintonBooking: React.FC = () => {
                     />
                   ))}
                 </div>
-
                 <input
                   type="range"
                   min={min}
@@ -172,7 +254,6 @@ const BadmintonBooking: React.FC = () => {
                   onTouchEnd={() => setIsDragging(false)}
                   className="absolute top-1/2 left-0 w-full -translate-y-1/2 appearance-none bg-transparent pointer-events-auto custom-thumb"
                 />
-
                 {isDragging && (
                   <div
                     className="absolute -top-3.5 w-14 text-center text-xs font-semibold text-white bg-teal-500 rounded shadow-md pointer-events-none"
@@ -186,7 +267,6 @@ const BadmintonBooking: React.FC = () => {
                   </div>
                 )}
               </div>
-
               <div className="flex justify-between text-[11px] text-gray-500 mt-1">
                 {markers.map((val) => (
                   <span key={val}>{val.toLocaleString()}₫</span>
@@ -225,7 +305,6 @@ const BadmintonBooking: React.FC = () => {
                   </label>
                 ))}
               </div>
-
               {amenitiesList.length > 6 && (
                 <button
                   onClick={() => setShowAmenitiesAll(!showAmenitiesAll)}
@@ -298,7 +377,6 @@ const BadmintonBooking: React.FC = () => {
                     </div>
                   </div>
                 </label>
-
                 <label className="flex items-center justify-between cursor-pointer">
                   <span className="text-sm text-gray-700">
                     Có khung giờ trống
@@ -328,10 +406,16 @@ const BadmintonBooking: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3 pt-3">
-              <button className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm hover:border-[#1bb4b7] hover:text-[#1e9ea1] hover:shadow-md transition">
+              <button
+                onClick={resetFilters}
+                className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm hover:border-[#1bb4b7] hover:text-[#1e9ea1] hover:shadow-md transition"
+              >
                 Đặt Lại
               </button>
-              <button className="flex-1 bg-gradient-to-r from-[#2ebabc] to-[#21a5a9] hover:brightness-95 text-white py-2 rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition">
+              <button
+                onClick={() => setCurrentPage(1)}
+                className="flex-1 bg-gradient-to-r from-[#2ebabc] to-[#21a5a9] hover:brightness-95 text-white py-2 rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition"
+              >
                 Áp Dụng
               </button>
             </div>
@@ -359,8 +443,6 @@ const BadmintonBooking: React.FC = () => {
               <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
                 {isList ? "Danh Sách Sân Cầu Lông" : "Bản Đồ Sân Cầu Lông"}
               </h2>
-
-              {/* Toggle */}
               <LayoutGroup>
                 <div
                   role="tablist"
@@ -369,27 +451,18 @@ const BadmintonBooking: React.FC = () => {
                     if (e.key === "ArrowLeft") setIsList(true);
                     if (e.key === "ArrowRight") setIsList(false);
                   }}
-                  className="relative grid grid-cols-2 
-               w-40 sm:w-44  /* ⬅️ ngắn lại tổng thể */
-               rounded-full border border-slate-200
-               bg-white/80 backdrop-blur shadow-inner 
-               p-0.5 select-none" /* ⬅️ track mỏng hơn */
+                  className="relative grid grid-cols-2 w-40 sm:w-44 rounded-full border border-slate-200 bg-white/80 backdrop-blur shadow-inner p-0.5 select-none"
                 >
-                  {/* Danh sách */}
                   <button
                     role="tab"
                     aria-selected={isList}
                     onClick={() => setIsList(true)}
-                    className="relative rounded-full 
-                 px-2.5 py-2.5  /* ⬅️ padding nhỏ hơn */
-                 text-xs /* ⬅️ chữ nhỏ hơn chút */
-                 leading-none font-semibold whitespace-nowrap"
+                    className="relative rounded-full px-2.5 py-2.5 text-xs leading-none font-semibold whitespace-nowrap"
                   >
                     {isList && (
                       <motion.div
                         layoutId="toggle-pill"
-                        className="absolute inset-0 rounded-full shadow-md ring-1 ring-teal-300/40
-                     bg-[#21a5a9]"
+                        className="absolute inset-0 rounded-full shadow-md ring-1 ring-teal-300/40 bg-[#21a5a9]"
                         transition={{
                           type: "spring",
                           stiffness: 600,
@@ -399,32 +472,25 @@ const BadmintonBooking: React.FC = () => {
                       />
                     )}
                     <span
-                      className={`relative z-10 inline-flex items-center gap-1 /* ⬅️ gap nhỏ lại */
-                    ${
-                      isList
-                        ? "text-white"
-                        : "text-slate-600 hover:text-slate-800"
-                    }`}
+                      className={`relative z-10 inline-flex items-center gap-1 ${
+                        isList
+                          ? "text-white"
+                          : "text-slate-600 hover:text-slate-800"
+                      }`}
                     >
                       Danh sách
                     </span>
                   </button>
-
-                  {/* Bản đồ */}
                   <button
                     role="tab"
                     aria-selected={!isList}
                     onClick={() => setIsList(false)}
-                    className="relative rounded-full 
-                 px-2.5 py-1 sm:py-1.5
-                 text-[11px] sm:text-xs 
-                 leading-none font-semibold whitespace-nowrap"
+                    className="relative rounded-full px-2.5 py-1 sm:py-1.5 text-[11px] sm:text-xs leading-none font-semibold whitespace-nowrap"
                   >
                     {!isList && (
                       <motion.div
                         layoutId="toggle-pill"
-                        className="absolute inset-0 rounded-full shadow-md ring-1 ring-teal-300/40
-                     bg-[#21a5a9]"
+                        className="absolute inset-0 rounded-full shadow-md ring-1 ring-teal-300/40 bg-[#21a5a9]"
                         transition={{
                           type: "spring",
                           stiffness: 600,
@@ -434,12 +500,11 @@ const BadmintonBooking: React.FC = () => {
                       />
                     )}
                     <span
-                      className={`relative z-10 inline-flex items-center gap-1
-                    ${
-                      !isList
-                        ? "text-white"
-                        : "text-slate-600 hover:text-slate-800"
-                    }`}
+                      className={`relative z-10 inline-flex items-center gap-1 ${
+                        !isList
+                          ? "text-white"
+                          : "text-slate-600 hover:text-slate-800"
+                      }`}
                     >
                       Bản đồ
                     </span>
@@ -455,7 +520,6 @@ const BadmintonBooking: React.FC = () => {
                   <Calendar className="w-4 h-4 text-[#1e9ea1]" />
                   Chọn ngày
                 </p>
-
                 <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                   {dates.map((date) => (
                     <button
@@ -481,7 +545,6 @@ const BadmintonBooking: React.FC = () => {
                     <Calendar className="w-5 h-5 mb-0.5" />
                     <span className="text-xs font-medium">Khác</span>
                   </button>
-
                   <CalendarModal
                     open={openCalendarModal}
                     onClose={() => setOpenCalendarModal(false)}
@@ -491,7 +554,6 @@ const BadmintonBooking: React.FC = () => {
                     }}
                   />
                 </div>
-
                 {selectedDate && (
                   <p className="mt-3 text-sm text-gray-700">
                     <span className="font-medium text-[#1e9ea1]">
@@ -504,9 +566,20 @@ const BadmintonBooking: React.FC = () => {
             )}
           </div>
 
-          {/* List view court or Map */}
+          {/* List view or Map */}
           {isList ? (
             <>
+              {isLoading && <div className="text-center">Đang tải...</div>}
+              {isError && (
+                <div className="text-center text-red-500">
+                  Lỗi khi tải danh sách sân
+                </div>
+              )}
+              {!isLoading && !isError && filteredCourts.length === 0 && (
+                <div className="text-center text-gray-600">
+                  Không tìm thấy sân phù hợp
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {paginatedCourts.map((court) => (
                   <CourtCard
@@ -516,18 +589,17 @@ const BadmintonBooking: React.FC = () => {
                   />
                 ))}
               </div>
-
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 pageSize={pageSize}
-                totalItems={courts.length}
+                totalItems={totalItems}
                 onPageChange={setCurrentPage}
               />
             </>
           ) : (
             <div className="mt-2">
-              <MapView />
+              <MapView courts={filteredCourts} />
             </div>
           )}
         </div>
