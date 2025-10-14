@@ -125,6 +125,7 @@ const CourtManagement: React.FC = () => {
 
   const handleCourtSaved = async (courtData: Partial<Court> & { images?: File[] }) => {
     try {
+      console.log(courtData);
       if (courtData.id) {
         await updateCourt({
           id: courtData.id,
@@ -136,7 +137,6 @@ const CourtManagement: React.FC = () => {
         toast.success("Tạo sân mới thành công!");
       }
       closeModal();
-      // Refetch
       setPage(1);
     } catch (e) {
       console.error(e);
