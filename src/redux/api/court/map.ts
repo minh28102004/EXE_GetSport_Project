@@ -24,4 +24,5 @@ export const mapUiToDto = (c: Partial<Court> & { images?: File[] }): CreateCourt
   startDate: c.startDate ?? undefined,
   endDate: c.endDate ?? undefined,
   images: c.images,
+  status: c.status ?? undefined,
 });

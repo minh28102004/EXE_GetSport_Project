@@ -14,7 +14,7 @@ const PROD_BASE =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(
     /\/+$/,
     ""
-  ) || "https://api.getsport.3docorp.vn/api";
+  ) || "https://getsport.3docorp.vn/api";
 
 // Kết thúc bằng "/" để RTK join đúng
 const API_BASE =
