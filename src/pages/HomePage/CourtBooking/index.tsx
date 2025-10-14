@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Search, Calendar, ChevronDown } from "lucide-react";
 import { useClickOutside } from "@hooks/useClickOutSide";
-import CalendarModal from "./CalendarModal";
+import CalendarModal from "./calendarModal";
 import { motion, LayoutGroup } from "framer-motion";
 import { formatDateShort } from "@utils/dateFormat";
 import dayjs from "dayjs";
