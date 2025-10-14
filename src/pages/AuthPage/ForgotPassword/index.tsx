@@ -275,7 +275,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
     <div className="flex items-center justify-center p-2">
       <div className="relative w-full max-w-sm sm:max-w-md">
         {/* Card */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden transition-all duration-300 hover:scale-[1.01]">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg  overflow-hidden transition-all duration-300 hover:scale-[1.01]">
           {/* Header with branding */}
           <div className="relative bg-gradient-to-r from-teal-500 via-teal-600 to-cyan-600 px-7 py-4 text-center">
             <div

@@ -20,7 +20,7 @@ import {
   useUpdateAccountMutation,
 } from "@redux/api/account/accountApi";
 import { selectToken } from "@redux/features/auth/authSlice";
-import { getUserIdFromToken } from "@/utils/jwt";
+import { getUserIdFromToken } from "@utils/jwt";
 
 type FormState = {
   fullName: string;
