@@ -20,7 +20,7 @@ import {
   barClassFor,
   labelForScore,
 } from "@hooks/usePasswordStrength";
-import { useRegisterMutation } from "@/redux/api/auth/authApi";
+import { useRegisterMutation } from "@redux/api/auth/authApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 

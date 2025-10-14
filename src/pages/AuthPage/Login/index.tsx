@@ -10,7 +10,7 @@ import { CustomTextInput, CustomPasswordInput } from "@components/Form_Input";
 import LoadingSpinner from "@components/Loading_Spinner";
 import useCustomForm from "@hooks/useReactHookForm";
 import { GiShuttlecock } from "react-icons/gi";
-import { useLoginMutation } from "@/redux/api/auth/authApi";
+import { useLoginMutation } from "@redux/api/auth/authApi";
 import { setLoggedIn } from "@redux/features/auth/authSlice";
 import { routeForRole } from "@utils/routeForRole";
 
