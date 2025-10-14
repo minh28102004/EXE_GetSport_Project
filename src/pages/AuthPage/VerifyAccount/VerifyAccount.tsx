@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle, AlertCircle } from "lucide-react";
 import { useVerifyAccountMutation } from "@redux/api/auth/authApi";
 import LoadingSpinner from "@components/Loading_Spinner";
+import endPoint from "@routes/router";
 
 const VerifyAccount: React.FC = () => {
   const navigate = useNavigate();
@@ -17,13 +18,15 @@ const VerifyAccount: React.FC = () => {
 
     const verify = async () => {
       if (!userId || !token) {
-        setError("Missing User ID or verification token in the URL.");
+        setError(
+          "Thiếu thông tin người dùng hoặc mã xác minh trong đường dẫn."
+        );
         return;
       }
 
       const userIdNum = parseInt(userId);
       if (isNaN(userIdNum) || userIdNum <= 0) {
-        setError("User ID must be a valid number.");
+        setError("ID người dùng không hợp lệ.");
         return;
       }
 
@@ -32,14 +35,14 @@ const VerifyAccount: React.FC = () => {
           userId: userIdNum,
           token: token.trim(),
         }).unwrap();
-        setSuccess(response.message || "Account verified successfully.");
-        setTimeout(() => navigate("/login"), 2000); // Redirect to login after 2 seconds
+        setSuccess(response.message || "Xác minh tài khoản thành công!");
+        setTimeout(() => navigate(endPoint.LOGIN), 500); // Chuyển hướng sau 0.5 giây
       } catch (err: any) {
-        console.error("Verification Error:", err);
+        console.error("Lỗi xác minh:", err);
         setError(
           err.data?.message ||
             err.message ||
-            "An error occurred while verifying your account."
+            "Đã xảy ra lỗi trong quá trình xác minh tài khoản."
         );
       }
     };
@@ -52,13 +55,13 @@ const VerifyAccount: React.FC = () => {
       <div className="mx-auto max-w-md px-5">
         <div className="bg-white rounded-xl shadow-md p-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-            Verify Your Account
+            Xác minh tài khoản
           </h1>
 
           {isLoading && (
             <div className="text-center text-gray-600 text-lg">
               <LoadingSpinner inline size="6" />
-              <p className="mt-4">Verifying your account...</p>
+              <p className="mt-4">Đang xác minh tài khoản của bạn...</p>
             </div>
           )}
 
@@ -78,14 +81,14 @@ const VerifyAccount: React.FC = () => {
 
           {!isLoading && !success && !error && (
             <p className="text-gray-600 text-center">
-              Processing your verification request...
+              Đang xử lý yêu cầu xác minh của bạn...
             </p>
           )}
 
           <p className="mt-6 text-center text-sm text-gray-600">
-            Already verified?{" "}
-            <a href="/login" className="text-[#2ebabc] hover:underline">
-              Log in
+            Đã xác minh tài khoản?{" "}
+            <a href={endPoint.LOGIN} className="text-[#2ebabc] hover:underline">
+              Đăng nhập
             </a>
           </p>
         </div>

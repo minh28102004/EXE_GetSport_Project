@@ -9,6 +9,11 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Tooltip } from "@mui/material";
 import Avatar from "@components/Avatar_User_Image";
 
+// 🔹 lấy dispatch để logout
+import { useDispatch } from "react-redux";
+// Nếu bạn có hook typed: import { useAppDispatch } from "@/redux/hooks";
+import { logout } from "@/redux/features/auth/authSlice"; // <-- chỉnh path theo dự án của bạn
+
 interface MenuItem {
   name: string;
   icon: React.ReactNode;
@@ -41,10 +46,16 @@ const Sidebar: React.FC<SidebarProps> = ({
   toggleSidebar,
 }) => {
   const PRIMARY_COLOR = "#1e9ea1";
+  const dispatch = useDispatch(); // hoặc useAppDispatch()
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigateTo("/login");
+  };
 
   return (
     <>
-      {/* Sidebar chính */}
+      {/* Sidebar */}
       <aside
         ref={sidebarRef}
         className={`flex flex-col h-full bg-white p-2 shadow-xl overflow-hidden transition-all duration-500 ease-in-out
@@ -52,11 +63,11 @@ const Sidebar: React.FC<SidebarProps> = ({
           isMobile
             ? `fixed top-0 left-0 h-full z-50 transform ${
                 sidebarOpen ? "translate-x-0" : "-translate-x-full"
-              } w-68`
+              } w-[272px]`
             : `${sidebarOpen ? "min-w-60 max-w-60" : "min-w-16 max-w-16"}`
         }`}
       >
-        {/* Header: Logo + nút toggle khi đóng */}
+        {/* Header */}
         <div
           className={`flex items-center relative ${
             isMobile
@@ -66,9 +77,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               : "pb-1 mr-1"
           }`}
         >
-          {/* Logo */}
           <span
-            className={`font-bold transition-all duration-300 ${ 
+            className={`font-bold transition-all duration-300 ${
               sidebarOpen ? "text-4xl" : "text-3xl"
             }`}
             style={{ color: PRIMARY_COLOR }}
@@ -76,24 +86,21 @@ const Sidebar: React.FC<SidebarProps> = ({
             {sidebarOpen ? "Get Sport" : ""}
           </span>
 
-          {/* Khi sidebar đóng: chỉ hiện nút trong header */}
           {!isMobile && !sidebarOpen && (
             <button
               onClick={toggleSidebar}
-              className="ml-auto flex items-center justify-center
-                         w-10 h-10 rounded-xl 
-                         bg-white hover:brightness-90
-                         transition-all duration-300"
+              className="ml-auto flex items-center justify-center w-10 h-10 rounded-xl bg-white hover:brightness-90 transition-all duration-300"
+              aria-label="Open sidebar"
             >
               <FiChevronRight size={22} />
             </button>
           )}
 
-          {/* Close button mobile */}
           {isMobile && sidebarOpen && (
             <button
               onClick={onCloseMobile}
               className="absolute right-2 top-6 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 hover:shadow-md transition-all duration-200"
+              aria-label="Close sidebar"
             >
               <CloseOutlined className="text-lg text-gray-600" />
             </button>
@@ -102,8 +109,16 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         <hr className="border-gray-200 mb-2" />
 
-        {/* Menu */}
-        <nav className="flex-1 overflow-hidden">
+        {/* Menu – mở thì cuộn, thu thì ẩn thanh cuộn */}
+        <nav
+          className={`flex-1 ${
+            sidebarOpen ? "overflow-y-auto pr-1" : "overflow-hidden"
+          }`}
+          style={{
+            scrollbarGutter: sidebarOpen ? "stable both-edges" : undefined,
+          }}
+          aria-label="Sidebar navigation"
+        >
           {menuItems.map((item) => (
             <MenuItemButton
               key={item.name}
@@ -120,7 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           ))}
         </nav>
 
-        {/* Bottom Section */}
+        {/* Bottom */}
         <div
           className={`border-t border-gray-200 pt-2 ${
             sidebarOpen ? "space-y-1.5" : ""
@@ -172,7 +187,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* Logout */}
           <Tooltip
             title="Logout"
             placement="right"
@@ -180,9 +194,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             disableHoverListener={sidebarOpen}
           >
             <button
-              onClick={() => alert("Logging out...")}
+              onClick={handleLogout}
               className={`flex items-center w-full px-2 py-1.5 rounded-lg hover:bg-red-100 text-red-600 ${
-                sidebarOpen ? "justify-start " : "justify-center "
+                sidebarOpen ? "justify-start" : "justify-center"
               }`}
             >
               <LogoutOutlined
@@ -201,21 +215,19 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </aside>
 
-      {/* Khi sidebar mở: toggle button bám mép ngoài */}
+      {/* Toggle ngoài mép (desktop khi đang mở) */}
       {!isMobile && sidebarOpen && (
         <button
           onClick={toggleSidebar}
-          className="fixed z-50 flex items-center justify-center
-                   rounded-xl
-                   bg-white hover:brightness-90 
-                   transition-all duration-500"
+          className="fixed z-50 flex items-center justify-center rounded-xl bg-white hover:brightness-90 transition-all duration-500"
           style={{
-            top: "0.75rem", // top-3
-            left: "212px", // mép ngoài sidebar mở
+            top: "0.75rem",
+            left: "212px",
             width: "36px",
             height: "36px",
             transform: "translateX(-50%)",
           }}
+          aria-label="Collapse sidebar"
         >
           <FiChevronLeft size={22} />
         </button>
