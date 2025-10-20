@@ -20,7 +20,7 @@ import {
   barClassFor,
   labelForScore,
 } from "@hooks/usePasswordStrength";
-import { useRegisterMutation } from "@/redux/api/auth/authApi";
+import { useRegisterMutation } from "@redux/api/auth/authApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -113,7 +113,7 @@ const Register: React.FC<RegisterProps> = ({
   return (
     <div className="flex items-center justify-center p-2">
       <div className="relative w-full max-w-sm sm:max-w-[420px] overflow-visible">
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden transition-all duration-300 hover:scale-[1.01]">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-[1.01]">
           {/* Header */}
           <div className="bg-gradient-to-r from-teal-500 via-teal-600/70 to-teal-600/80 py-4">
             <div className="mx-auto flex items-center justify-center gap-2">

@@ -10,7 +10,7 @@ import { CustomTextInput, CustomPasswordInput } from "@components/Form_Input";
 import LoadingSpinner from "@components/Loading_Spinner";
 import useCustomForm from "@hooks/useReactHookForm";
 import { GiShuttlecock } from "react-icons/gi";
-import { useLoginMutation } from "@/redux/api/auth/authApi";
+import { useLoginMutation } from "@redux/api/auth/authApi";
 import { setLoggedIn } from "@redux/features/auth/authSlice";
 import { routeForRole } from "@utils/routeForRole";
 
@@ -93,8 +93,6 @@ const Login: React.FC<LoginProps> = ({
     return () => window.removeEventListener("resize", calc);
   }, [showCoach]);
 
-  const rememberChecked = watch("remember");
-
   // Nút "Điền vào form" trên coachmark
   const fillFromHint = () => {
     const cur = watch();
@@ -102,16 +100,6 @@ const Login: React.FC<LoginProps> = ({
       email: hintCreds?.email ?? cur.email ?? "",
       password: hintCreds?.password ?? cur.password ?? "",
       remember: cur.remember ?? false,
-    });
-  };
-
-  // Nút "Bật ngay" cho 'Ghi nhớ đăng nhập'
-  const turnOnRemember = () => {
-    const cur = watch();
-    reset({
-      email: cur.email ?? "",
-      password: cur.password ?? "",
-      remember: true,
     });
   };
 
@@ -220,7 +208,7 @@ const Login: React.FC<LoginProps> = ({
         )}
 
         {/* Card */}
-        <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl  overflow-hidden">
           <div className="bg-gradient-to-r from-teal-500 via-teal-600/70 to-teal-600/80 py-3 text-center">
             <div className="mx-auto w-14 h-14 bg-white/20 rounded-2xl transition-transform duration-300 hover:rotate-12 flex items-center justify-center mb-1.5">
               <GiShuttlecock className="w-7 h-7 text-white " />

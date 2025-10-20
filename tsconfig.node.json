@@ -4,26 +4,27 @@
     "target": "ES2023",
     "lib": ["ES2023"],
     "module": "ESNext",
-    "skipLibCheck": true,
 
-    /* Bundler mode */
-    "moduleResolution": "Node", // ✅ sửa từ "bundler" ➝ "Node"
+    /* Build & module settings */
+    "skipLibCheck": true,
+    "moduleResolution": "Node",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "noEmitOnError": false, // ✅ vẫn build dù lỗi
+    "isolatedModules": false,
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": false, // tắt để run with no error declared
-    "noUnusedParameters": false, // tắt để run with no error declared
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    /* Bổ sung thêm types cho Node */
+    /* Node types */
     "types": ["node"]
-    // "typeRoots": ["./node_modules/@types", "./@types"]
   },
   "include": ["vite.config.ts"]
 }

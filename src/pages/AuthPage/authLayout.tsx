@@ -9,6 +9,7 @@ import {
 import { FiArrowLeft } from "react-icons/fi";
 
 import AnimatedBackground from "@components/Animated_Background";
+import AuthBg from "@assets/bgImage.jpg";
 import Login from "./Login";
 import Register from "./Register";
 import ForgotPassword from "./ForgotPassword";
@@ -91,6 +92,7 @@ const AuthPage: React.FC = () => {
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
       <AnimatedBackground />
+
       <div className={`${view === "register" ? "pb-8" : "pb-0"} sm:pb-0`}>
         {/* Back to home */}
         <Link

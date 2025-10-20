@@ -20,19 +20,21 @@ const MenuItemButton: React.FC<MenuItemButtonProps> = ({
   const button = (
     <button
       onClick={onClick}
-      className={`flex items-center w-full p-3 mb-2 rounded-lg transition-all duration-300 justify-start
+      aria-current={isActive ? "page" : undefined}
+      className={`group flex w-full items-center justify-start p-3 mb-2 rounded-lg transition-all duration-300
         ${
           isActive
-            ? "bg-[#1e9ea1] text-[#1e9ea1]"
-            : "hover:bg-[#1e9ea1]/20 hover:text-[#1e9ea1]"
-        }`}
+            ? "bg-[#1e9ea1] text-white shadow-sm"
+            : "text-gray-700 hover:bg-[#1e9ea1]/15 hover:text-[#1e9ea1]"
+        }
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300`}
     >
-      <span className="text-2xl">{icon}</span>
+      {/* icon ăn theo currentColor */}
+      <span className="text-2xl leading-none text-current">{icon}</span>
+
       <span
         className={`ml-3 overflow-hidden transition-all duration-300 ease-in-out ${
-          sidebarOpen
-            ? "opacity-100 max-w-xs text-md font-medium"
-            : "opacity-0 max-w-0"
+          sidebarOpen ? "opacity-100 max-w-xs text-md font-medium" : "opacity-0 max-w-0"
         }`}
         style={{ whiteSpace: "nowrap" }}
       >
