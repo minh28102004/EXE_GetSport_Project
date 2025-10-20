@@ -96,6 +96,13 @@ export const packageApi = baseApi.injectEndpoints({
           : [{ type: "Package" as const, id: "LIST" }];
       },
     }),
+getOwnerPackagePaymentStatus: b.query<any, { id: number; status?: string }>({
+  query: ({ id, status = "check" }) => ({
+    url: `/OwnerPackage/${id}/payment-status`,
+    params: { status },
+  }),
+}),
+
 
     getPackage: b.query<PackageEnvelope, number>({
       query: (id) => ({ url: `${PACKAGE_PATH}/${id}` }),
@@ -168,4 +175,5 @@ export const {
   useCreatePackageMutation,
   useUpdatePackageMutation,
   useDeletePackageMutation,
+  useGetOwnerPackagePaymentStatusQuery
 } = packageApi;

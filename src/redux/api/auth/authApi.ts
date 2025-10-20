@@ -1,5 +1,5 @@
 import { baseApi } from "@redux/api/baseApi";
-import type { ApiEnvelope, AuthData, LoginBody, RegisterBody, VerifyAccountRequest } from "./type";
+import type { ApiEnvelope, AuthData, LoginBody, RegisterBody, VerifyAccountRequest, ForgotPasswordBody, ResetPasswordBody } from "./type";
 
 type AuthProfile = Omit<AuthData, "token">;
 
@@ -27,12 +27,34 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: (resp: ApiEnvelope<string>): ApiEnvelope<string> => {
-        console.log("verifyAccount Response:", resp); 
+        console.log("verifyAccount Response:", resp);
         return resp;
       },
+    }),
+
+    forgotPassword: b.mutation<ApiEnvelope<null>, ForgotPasswordBody>({
+      query: (body) => ({
+        url: "Auth/forgot-password-token",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    resetPassword: b.mutation<ApiEnvelope<null>, ResetPasswordBody>({
+      query: (body) => ({
+        url: "Auth/reset-password",
+        method: "POST",
+        body,
+      }),
     }),
   }),
   overrideExisting: false,
 });
 
-export const { useLoginMutation, useRegisterMutation, useVerifyAccountMutation } = authApi;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useVerifyAccountMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+} = authApi;

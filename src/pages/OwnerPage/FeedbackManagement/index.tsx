@@ -135,7 +135,6 @@ const FeedbackManagement: React.FC = () => {
       closeModal();
       setPage(1);
     } catch (e) {
-      console.error(e);
       toast.error("An error occurred. Please try again.");
     }
   };

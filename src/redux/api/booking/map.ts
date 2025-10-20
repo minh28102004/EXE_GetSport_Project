@@ -25,7 +25,7 @@ export const mapDtoToUi = (dto: CourtBookingDto & {
   slotId: dto.slotId,
   slotStartTime: dto.slotStartTime,
   slotEndTime: dto.slotEndTime,
-  bookingDate: dto.bookingDate,
+  bookingDate: dto.bookingdate,
   status: dto.status,
   amount: dto.amount,
   createAt: dto.createAt,

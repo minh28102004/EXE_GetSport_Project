@@ -89,12 +89,6 @@ const CourtBookingManagement: React.FC = () => {
         ? filteredData.data
         : (filteredData?.data as Paged<CourtBooking> | undefined)?.items ?? []);
 
-  console.log("CourtBookingManagement: API data:", data);
-  console.log("CourtBookingManagement: rows:", rows);
-  console.log("CourtBookingManagement: params:", params);
-  console.log("CourtBookingManagement: filteredData:", filteredData);
-  console.log("CourtBookingManagement: filteredRows:", filteredRows);
-
   const openModal = (booking: CourtBooking | null = null) => {
     setCurrentBooking(booking);
     setIsModalOpen(true);
@@ -297,7 +291,7 @@ const CourtBookingManagement: React.FC = () => {
                   {new Date(b.slotStartTime).toLocaleTimeString()} -{" "}
                   {new Date(b.slotEndTime).toLocaleTimeString()}
                 </td>
-                <td className="p-3">{new Date(b.bookingDate).toLocaleDateString()}</td>
+                <td className="p-3">{new Date(b.bookingdate).toLocaleDateString()}</td>
                 <td className="p-3">{b.amount.toLocaleString()} VND</td>
                 <td className="p-3">
                   <select

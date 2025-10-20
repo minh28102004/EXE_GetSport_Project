@@ -1,19 +1,20 @@
-// CourtForm.tsx
 import React, { useEffect, useState } from "react";
 import type { Court } from "@redux/api/court/type";
-import LoadingSpinner from "@components/Loading_Spinner"; // Giả sử có
-import { X, MapPin, DollarSign, Calendar, Image } from "lucide-react";
+import LoadingSpinner from "@components/Loading_Spinner";
+import { X, MapPin, DollarSign, Calendar, Image, List } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 type Props = {
-  court: Court | null; // null = create
+  court: Court | null;
   onSave: (court: Partial<Court> & { images?: File[] }) => void | Promise<void>;
   onClose: () => void;
   loading?: boolean;
 };
 
 const defaultNew: Partial<Court> = {
+  name: "",
   location: "",
+  utilities: [],
   pricePerHour: 0,
   priority: 0,
   isActive: true,
@@ -59,10 +60,16 @@ const CourtForm: React.FC<Props> = ({ court, onSave, onClose, loading }) => {
     court ? { ...court } : { ...defaultNew }
   );
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [utilitiesInput, setUtilitiesInput] = useState<string>(
+    court?.utilities?.join(", ") ?? ""
+  );
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     setForm(court ? { ...court } : { ...defaultNew });
+    setUtilitiesInput(court?.utilities?.join(", ") ?? "");
     setImagePreviews([]);
+    setErrors({});
   }, [court]);
 
   const setField = <K extends keyof (Court & { images?: File[] })>(
@@ -79,8 +86,39 @@ const CourtForm: React.FC<Props> = ({ court, onSave, onClose, loading }) => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!form.name?.trim()) {
+      newErrors.name = "Tên sân là bắt buộc.";
+    } else if (form.name.length < 3 || form.name.length > 100) {
+      newErrors.name = "Tên sân phải từ 3 đến 100 ký tự.";
+    }
+    if (!form.location?.trim()) {
+      newErrors.location = "Vị trí là bắt buộc.";
+    }
+    if (!form.pricePerHour || form.pricePerHour <= 0) {
+      newErrors.pricePerHour = "Giá mỗi giờ phải lớn hơn 0.";
+    }
+    if (!form.utilities || form.utilities.length === 0) {
+      newErrors.utilities = "Phải cung cấp ít nhất một tiện ích.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleUtilitiesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    setUtilitiesInput(input);
+    const utilities = input
+      .split(",")
+      .map((u) => u.trim())
+      .filter((u) => u);
+    setField("utilities", utilities);
+  };
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     onSave(form);
   };
 
@@ -107,48 +145,80 @@ const CourtForm: React.FC<Props> = ({ court, onSave, onClose, loading }) => {
       <Section icon={<MapPin className="w-4 h-4" />} title="Thông tin sân">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="md:col-span-2">
-            <Label htmlFor="location">Vị trí</Label>
+            <Label htmlFor="name">Tên sân</Label>
             <input
-              id="location"
-              className={baseField}
-              value={form.location ?? ""}
-              onChange={(e) => setField("location", e.target.value)}
-              placeholder="VD: Sân bóng ABC, Quận 1"
+              id="name"
+              className={`${baseField} ${errors.name ? "border-red-500" : ""}`}
+              value={form.name ?? ""}
+              onChange={(e) => setField("name", e.target.value)}
+              placeholder="VD: Sân bóng ABC"
               required
               disabled={loading}
               autoFocus
             />
+            {errors.name && (
+              <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+            )}
           </div>
-
+          <div className="md:col-span-2">
+            <Label htmlFor="location">Vị trí</Label>
+            <input
+              id="location"
+              className={`${baseField} ${errors.location ? "border-red-500" : ""}`}
+              value={form.location ?? ""}
+              onChange={(e) => setField("location", e.target.value)}
+              placeholder="VD: Quận 1, TP.HCM"
+              required
+              disabled={loading}
+            />
+            {errors.location && (
+              <p className="text-xs text-red-500 mt-1">{errors.location}</p>
+            )}
+          </div>
+          <div className="md:col-span-2">
+            <Label htmlFor="utilities">Tiện ích (phân cách bằng dấu phẩy)</Label>
+            <input
+              id="utilities"
+              className={`${baseField} ${errors.utilities ? "border-red-500" : ""}`}
+              value={utilitiesInput}
+              onChange={handleUtilitiesChange}
+              placeholder="VD: Đậu xe, Nhà vệ sinh, Quán nước"
+              required
+              disabled={loading}
+            />
+            {errors.utilities && (
+              <p className="text-xs text-red-500 mt-1">{errors.utilities}</p>
+            )}
+          </div>
           <div>
             <Label htmlFor="pricePerHour">Giá/giờ (VND)</Label>
             <input
               id="pricePerHour"
               type="number"
               min={0}
-              className={baseField}
+              className={`${baseField} ${errors.pricePerHour ? "border-red-500" : ""}`}
               value={form.pricePerHour ?? ""}
               onChange={(e) => setField("pricePerHour", Number(e.target.value))}
               placeholder="0"
               required
               disabled={loading}
             />
+            {errors.pricePerHour && (
+              <p className="text-xs text-red-500 mt-1">{errors.pricePerHour}</p>
+            )}
           </div>
-
           <div>
             <Label htmlFor="priority">Ưu tiên</Label>
             <input
               id="priority"
               type="number"
-              min={0}
+              min={1}
               className={baseField}
-              value={form.priority ?? ""}
-              onChange={(e) => setField("priority", Number(e.target.value))}
-              placeholder="0"
-              disabled={loading}
+              value={1}
+              placeholder="1"
+              disabled={true}
             />
           </div>
-
           <div>
             <Label htmlFor="status">Trạng thái</Label>
             <select
@@ -156,14 +226,13 @@ const CourtForm: React.FC<Props> = ({ court, onSave, onClose, loading }) => {
               className={baseField}
               value={form.status ?? "Pending"}
               onChange={(e) => setField("status", e.target.value)}
-              disabled={loading || !isEdit}
+              disabled={true}
             >
               <option value="Pending">Pending</option>
               <option value="Approved">Approved</option>
               <option value="Rejected">Rejected</option>
             </select>
           </div>
-
           <div className="md:col-span-2">
             <Label htmlFor="images">Hình ảnh (tùy chọn)</Label>
             <input
@@ -203,7 +272,6 @@ const CourtForm: React.FC<Props> = ({ court, onSave, onClose, loading }) => {
               disabled={loading}
             />
           </div>
-
           <div>
             <Label htmlFor="endDate">Ngày kết thúc</Label>
             <input
@@ -281,7 +349,7 @@ export const CourtFormModal: React.FC<ModalProps> = ({
             animate={{ y: 0, scale: 1, opacity: 1 }}
             exit={{ y: -8, scale: 0.98, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 26 }}
-            className="relative z-[101] w-[92vw] max-w-2xl rounded-2xl bg-white p-4 shadow-xl"
+            className="relative z-[101] w-[92vw] max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"

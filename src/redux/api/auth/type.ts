@@ -1,4 +1,3 @@
-// src/redux/features/auth/type.ts
 export type ApiEnvelope<T> = {
   statusCode: number;
   status: string;
@@ -7,7 +6,6 @@ export type ApiEnvelope<T> = {
   data: T;
 };
 
-
 export interface VerifyAccountRequest {
   userId: number;
   token: string;
@@ -15,12 +13,21 @@ export interface VerifyAccountRequest {
 
 export type LoginBody = { email: string; password: string };
 
-// RegisterBody chỉ còn 4 field, đều REQUIRED
 export type RegisterBody = {
   fullname: string;
   email: string;
   password: string;
-  role: string; // hoặc: "Staff" | "Admin" | "Customer" 
+  role: string; // hoặc: "Staff" | "Admin" | "Customer"
+};
+
+export type ForgotPasswordBody = {
+  email: string;
+};
+
+export type ResetPasswordBody = {
+  email: string;
+  token: string;
+  newPassword: string;
 };
 
 export type AuthData = {
@@ -29,4 +36,3 @@ export type AuthData = {
   email: string;
   role: string;
 };
-

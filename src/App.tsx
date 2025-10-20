@@ -57,6 +57,17 @@ import BookingCallback from "./pages/HomePage/CourtBooking/BookingCallback";
 import BookingHistory from "@pages/CustomerPage/BookingHistory";
 import BookingDetail from "./pages/CustomerPage/BookingHistory/BookingDetail";
 import VerifyAccount from "./pages/AuthPage/VerifyAccount/VerifyAccount";
+import BlogDetail from "./pages/HomePage/BlogPost/BlogDetail";
+import PlaymatePostList from "./pages/HomePage/PlaymatePost/PlaymatePost";
+import PlaymatePostDetail from "./pages/HomePage/PlaymatePost/PlaymatePostDetail";
+import CreateBlog from "./pages/CustomerPage/Post/CreateBlog";
+import EditBlog from "./pages/CustomerPage/Post/EditBlog";
+import PaymentPage from "./pages/OwnerPage/OwnerPackages/PaymentPage";
+import SuccessPage from "./pages/OwnerPage/OwnerPackages/SuccessPage";
+import CancelPage from "./pages/OwnerPage/OwnerPackages/CancelPage";
+import OwnerPackagesList from "./pages/OwnerPage/OwnerPackages/OwnerPackagesList";
+import MySubscriptions from "./pages/OwnerPage/OwnerPackages/MySubscriptions";
+import ResetPassword from "./pages/AuthPage/ForgotPassword/ResetPassword";
 
 function AppRoutes() {
   return (
@@ -71,7 +82,23 @@ function AppRoutes() {
           <Route path={endPoint.FAQS} element={<FAQsPage />} />
           <Route path={endPoint.CONTACT} element={<ContactPage />} />
           <Route path={endPoint.COURTBOOKING} element={<CourtBooking />} />
+          <Route
+          path="/create-blog"
+          element={
+              <CreateBlog />
+          }
+        />
+        <Route
+          path="/edit-blog/:id"
+          element={
+              <EditBlog />
+          }
+        />
           <Route path="Auth/verify" element={<VerifyAccount />} />
+          <Route path="Auth/reset-password" element={<ResetPassword />} />
+          <Route path="/blogPost/:id" element={<BlogDetail />} />
+          <Route path="/playPost" element={<PlaymatePostList />} />
+          <Route path="/playPost/:id" element={<PlaymatePostDetail />} />
           <Route path="Court/detail/:courtId" element={<CourtDetail />} />
           <Route path="Court/booking/:courtId" element={<CourtBookingPay />} />
           <Route path="/booking/callback/success" element={<BookingCallback />} />
@@ -137,6 +164,18 @@ function AppRoutes() {
           <Route path="CourtManagement" element={<CourtManagement />} />
           <Route path="Feedback" element={<FeedbackManagement />} />
           <Route path="BookingManagement" element={<BookingManagement />} />
+          <Route path="ownerpackage/payment/:id"  element={ <PaymentPage /> } />
+          <Route path="ownerpackages"  element={<OwnerPackagesList /> } />
+          <Route path="ownerpackage/success" element={<SuccessPage />} />
+          <Route path="ownerpackage/cancel" element={<CancelPage />} />
+        <Route
+          path="my-subscriptions"
+          element={
+
+              <MySubscriptions />
+
+          }
+        />
           <Route path="Settings" element={<StaffProfile />} />
         </Route>
 

@@ -15,6 +15,7 @@ import {
   MessageCircleQuestion,
   ShieldCheck,
   FileText,
+  PlayCircle,
 } from "lucide-react";
 import React, {
   memo,
@@ -68,7 +69,7 @@ const navItems: NavItem[] = [
   { label: "Trang chủ", to: endPoint.HOMEPAGE, icon: Home },
   { label: "Giới thiệu", to: endPoint.ABOUT, icon: HelpCircle },
   { label: "Bài viết", to: endPoint.BLOGPOST, icon: Newspaper },
-  { label: "FAQs", to: endPoint.FAQS, icon: MessageCircleQuestion },
+  { label: "Tìm người chơi", to: endPoint.PLAYPOST, icon: PlayCircle },
   { label: "Đặt sân", to: endPoint.COURTBOOKING, icon: Calendar },
   { label: "Liên hệ", to: endPoint.CONTACT, icon: Phone },
 ];

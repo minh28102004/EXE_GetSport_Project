@@ -138,6 +138,11 @@ const ManagementLayout: React.FC<{ user?: any; role?: "admin" | "owner" }> = ({
             path: "/layoutOwner/Feedback",
             icon: <Star size={24} />,
           },
+           {
+            name: "Gói dịch vụ",
+            path: "/layoutOwner/ownerpackages",
+            icon: <Star size={24} />,
+          },
           {
             name: "Tin nhắn",
             path: "/layoutOwner/Messages",

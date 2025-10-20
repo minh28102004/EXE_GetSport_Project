@@ -144,12 +144,12 @@ const CourtManagement: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number, location?: string) => {
-    const ok = window.confirm(`Bạn có chắc muốn xoá sân${location ? ` "${location}"` : ""}?`);
+  const handleDelete = async (id: number, name?: string) => {
+    const ok = window.confirm(`Bạn có chắc muốn xoá sân${name ? ` "${name}"` : ""}?`);
     if (!ok) return;
     try {
       await deleteCourt(id).unwrap();
-      toast.success(`Đã xoá${location ? ` "${location}"` : ""}!`);
+      toast.success(`Đã xoá${name ? ` "${name}"` : ""}!`);
     } catch (e) {
       console.error(e);
       toast.error("Xoá thất bại, vui lòng thử lại!");
@@ -162,7 +162,7 @@ const CourtManagement: React.FC = () => {
         id: c.id,
         body: { isActive: !c.isActive },
       }).unwrap();
-      toast.info(`Sân "${c.location}" đã được ${c.isActive ? "khóa" : "mở khóa"}.`);
+      toast.info(`Sân "${c.name}" đã được ${c.isActive ? "khóa" : "mở khóa"}.`);
     } catch (e) {
       console.error(e);
       toast.error("Không thể đổi trạng thái sân.");
@@ -204,14 +204,14 @@ const CourtManagement: React.FC = () => {
           {/* Search */}
           <div className="lg:col-span-4">
             <label className="text-xs font-semibold text-gray-500 mb-1 block">
-              Tìm kiếm vị trí
+              Tìm kiếm tên hoặc tiện ích
             </label>
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Vị trí..."
+                placeholder="Tên sân hoặc tiện ích..."
                 className={`${filterInputCls} pl-9 pr-9`}
               />
               {search && (
@@ -254,6 +254,7 @@ const CourtManagement: React.FC = () => {
               className={filterInputCls}
             >
               <option value="priority">Ưu tiên</option>
+              <option value="name">Tên</option>
               <option value="priceperhour">Giá</option>
               <option value="location">Vị trí</option>
               <option value="startdate">Ngày bắt đầu</option>
@@ -349,7 +350,7 @@ const CourtManagement: React.FC = () => {
         <table className="w-full text-left border-collapse">
           <thead className="bg-gradient-to-r from-teal-50 to-sky-50 border-b border-teal-100 text-gray-700">
             <tr>
-              <th className="p-3">Chủ sân</th>
+              <th className="p-3">Tên sân</th>
               <th className="p-3">Vị trí</th>
               <th className="p-3">Giá/giờ</th>
               <th className="p-3">Trạng thái</th>
@@ -366,14 +367,7 @@ const CourtManagement: React.FC = () => {
                 key={c.id}
                 className={`${i % 2 === 0 ? "bg-white" : "bg-slate-50"} hover:bg-slate-100 transition`}
               >
-                <td className="p-3 font-medium text-gray-800">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-teal-100 text-teal-700 grid place-items-center text-sm font-semibold">
-                      {initials(c.ownerName)}
-                    </div>
-                    <span>{c.ownerName}</span>
-                  </div>
-                </td>
+                <td className="p-3">{c.name ?? "--"}</td>
                 <td className="p-3">{c.location}</td>
                 <td className="p-3">{c.pricePerHour.toLocaleString()} VND</td>
                 <td className="p-3">
@@ -440,7 +434,7 @@ const CourtManagement: React.FC = () => {
                   <Tooltip title="Xoá" arrow>
                     <button
                       className="p-2 rounded-md hover:bg-gray-100 transition"
-                      onClick={() => handleDelete(c.id, c.location)}
+                      onClick={() => handleDelete(c.id, c.name)}
                       disabled={busy}
                     >
                       <FaTrash className="text-red-500 hover:text-red-700" />
@@ -451,7 +445,7 @@ const CourtManagement: React.FC = () => {
             ))}
             {filteredRows.length === 0 && (
               <tr>
-                <td className="p-6 text-center text-gray-500" colSpan={9}>
+                <td className="p-6 text-center text-gray-500" colSpan={10}>
                   Không tìm thấy sân phù hợp.
                 </td>
               </tr>

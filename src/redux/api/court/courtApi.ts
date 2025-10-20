@@ -1,4 +1,3 @@
-// @redux/api/court/courtApi.ts
 import { baseApi } from "@redux/api/baseApi";
 import type {
   Court,
@@ -122,7 +121,6 @@ export const courtApi = baseApi.injectEndpoints({
     getMyCourts: b.query<CourtListEnvelope, ListParams | undefined>({
       query: (params) => ({ url: `${COURT_PATH}/my${toQuery(params)}` }),
       transformResponse: (resp: CourtListRaw): CourtListEnvelope => {
-        // Tương tự getCourts
         const payload = takeData<CourtDto[] | Paged<CourtDto>>(resp);
         if (Array.isArray(payload)) {
           const mapped = payload.map(mapDtoToUi);
@@ -148,7 +146,11 @@ export const courtApi = baseApi.injectEndpoints({
     createCourt: b.mutation<CourtEnvelope, CreateCourtDto>({
       query: (body) => {
         const formData = new FormData();
+        if (body.name) formData.append("Name", body.name);
         if (body.location) formData.append("Location", body.location);
+        if (body.utilities && body.utilities.length > 0) {
+          body.utilities.forEach((util, index) => formData.append(`Utilities[${index}]`, util));
+        }
         if (body.pricePerHour !== undefined) formData.append("Priceperhour", body.pricePerHour.toString());
         if (body.priority !== undefined) formData.append("Priority", body.priority.toString());
         if (body.startDate) formData.append("Startdate", body.startDate.toString());
@@ -175,7 +177,11 @@ export const courtApi = baseApi.injectEndpoints({
     >({
       query: ({ id, body }) => {
         const formData = new FormData();
+        if (body.name !== undefined) formData.append("Name", body.name || "");
         if (body.location !== undefined) formData.append("Location", body.location || "");
+        if (body.utilities !== undefined && body.utilities.length > 0) {
+          body.utilities.forEach((util, index) => formData.append(`Utilities[${index}]`, util));
+        }
         if (body.pricePerHour !== undefined) formData.append("Priceperhour", body.pricePerHour.toString());
         if (body.priority !== undefined) formData.append("Priority", body.priority.toString());
         if (body.startDate !== undefined) formData.append("Startdate", body.startDate || "");

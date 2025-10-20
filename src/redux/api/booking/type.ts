@@ -5,7 +5,7 @@ export type CourtBookingDto = {
   userId: number;
   courtId: number;
   slotId: number;
-  bookingDate: Date;
+  bookingdate: Date;
   status: string;
   amount: number;
   createAt: Date;

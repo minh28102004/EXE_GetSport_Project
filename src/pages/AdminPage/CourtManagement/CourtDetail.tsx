@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { X, MapPin,  Image, Star } from "lucide-react";
+import { X, MapPin, Image, Star, List } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGetCourtQuery, useGetCourtFeedbacksQuery } from "@redux/api/court/courtApi";
 import type { Court } from "@redux/api/court/type";
@@ -49,7 +49,7 @@ const CourtDetail: React.FC<Props> = ({ courtId, onClose }) => {
     <div className="relative w-full p-4">
       {/* Header + Close */}
       <div className="sticky top-0 z-10 -mt-2 -mx-2 flex items-center justify-between rounded-t-xl bg-white/90 px-2 py-2 backdrop-blur border-b">
-        <h2 className="text-2xl font-semibold text-slate-900">Chi tiết sân: {court.location}</h2>
+        <h2 className="text-2xl font-semibold text-slate-900">Chi tiết sân: {court.name ?? court.location}</h2>
         <button
           type="button"
           onClick={onClose}
@@ -65,12 +65,33 @@ const CourtDetail: React.FC<Props> = ({ courtId, onClose }) => {
         <Section icon={<MapPin className="w-4 h-4" />} title="Thông tin cơ bản">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
+              <label className={labelCls}>Tên sân</label>
+              <p className={baseField}>{court.name ?? "--"}</p>
+            </div>
+            <div>
               <label className={labelCls}>Chủ sân</label>
               <p className={baseField}>{court.ownerName}</p>
             </div>
             <div>
               <label className={labelCls}>Vị trí</label>
               <p className={baseField}>{court.location ?? "--"}</p>
+            </div>
+            <div>
+              <label className={labelCls}>Tiện ích</label>
+              <div className="flex flex-wrap gap-2">
+                {court.utilities && court.utilities.length > 0 ? (
+                  court.utilities.map((util, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700"
+                    >
+                      {util}
+                    </span>
+                  ))
+                ) : (
+                  <p className={baseField}>--</p>
+                )}
+              </div>
             </div>
             <div>
               <label className={labelCls}>Giá/giờ (VND)</label>
@@ -188,7 +209,7 @@ export const CourtDetailModal: React.FC<Props & { open: boolean }> = ({ open, co
             animate={{ y: 0, scale: 1, opacity: 1 }}
             exit={{ y: -8, scale: 0.98, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 26 }}
-            className="relative z-[101] w-[92vw] max-w-4xl rounded-2xl bg-white p-4 shadow-xl"
+            className="relative z-[101] w-[92vw] max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"

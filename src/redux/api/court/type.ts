@@ -1,4 +1,3 @@
-// @redux/api/court/type.ts
 import type { ApiEnvelope } from "@redux/api/auth/type";
 
 /** BE DTO */
@@ -6,14 +5,18 @@ export type CourtDto = {
   courtId: number;
   ownerId: number;
   ownerName: string;
+  name?: string | null;
   location: string;
-  imageurls: string[]; // Array of URLs
+  utilities?: string[] | null;
+  imageurls: string[];
   priceperhour: number;
   status?: string | null;
   isactive: boolean;
   priority: number;
-  startdate?: string | null; // ISO date
+  startdate?: string | null;
   enddate?: string | null;
+  totalFeedbacks?: number;
+  averageRating?: number;
 };
 
 /** UI type (camelCase, id) */
@@ -21,7 +24,9 @@ export type Court = {
   id: number;
   ownerId: number;
   ownerName: string;
+  name?: string | null;
   location: string;
+  utilities: string[];
   imageUrls: string[];
   pricePerHour: number;
   status?: string | null;
@@ -29,11 +34,15 @@ export type Court = {
   priority: number;
   startDate?: string | null;
   endDate?: string | null;
+  totalFeedbacks: number;
+  averageRating: number;
 };
 
 /** Create DTO (từ BE, với files) */
 export type CreateCourtDto = {
+  name: string;
   location: string;
+  utilities: string[];
   pricePerHour: number;
   priority?: number;
   startDate?: string;
@@ -47,7 +56,6 @@ export type UpdateCourtDto = Partial<CreateCourtDto> & {
   isActive?: boolean;
 };
 
-
 /** List params (từ BE params) */
 export type ListParams = {
   status?: string | null;
@@ -58,7 +66,7 @@ export type ListParams = {
   pageSize?: number;
   minPrice?: number;
   maxPrice?: number;
-  startDate?: string; // YYYY-MM-DD
+  startDate?: string;
   endDate?: string;
 };
 
@@ -75,7 +83,7 @@ export type Paged<T> = {
   total: number;
   page: number;
   pageSize: number;
-  totalPages?: number; // Thêm cho UI
+  totalPages?: number;
 };
 
 /** Envelopes */

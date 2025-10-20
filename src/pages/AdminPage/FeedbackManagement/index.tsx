@@ -19,6 +19,8 @@ import type { Feedback, Paged } from "@redux/api/feedback/type";
 import { mapUiToCreateDto, mapUiToUpdateDto } from "@redux/api/feedback/map";
 import { FeedbackFormModal } from "./FeedbackForm";
 import { FeedbackDetailModal } from "./FeedbackDetail";
+import { useSelector } from "react-redux";
+import { selectAuth } from "@/redux/features/auth/authSlice";
 
 const initials = (name?: string) =>
   (name || "")
@@ -41,7 +43,7 @@ const FeedbackManagement: React.FC = () => {
   const rows: Feedback[] = Array.isArray(data?.data)
     ? (data?.data as Feedback[])
     : (data?.data as Paged<Feedback> | undefined)?.items ?? [];
-
+const {  userLogin } = useSelector(selectAuth);
   const totalPages = (data?.data as Paged<Feedback>)?.totalPages ?? 1;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -384,7 +386,7 @@ const FeedbackManagement: React.FC = () => {
                 <td className="p-3">{f.courtLocation}</td>
                 <td className="p-3">{f.rating}</td>
                 <td className="p-3 truncate max-w-xs">{f.comment}</td>
-                <td className="p-3">{new Date(f.createdAt).toLocaleString()}</td>
+                <td className="p-3">{new Date(f.createat).toLocaleString()}</td>
                 <td className="p-3 flex gap-2 items-center">
                   <Tooltip title="View Details" arrow>
                     <button
@@ -395,6 +397,7 @@ const FeedbackManagement: React.FC = () => {
                       <FaEye className="text-teal-500 hover:text-teal-700" />
                     </button>
                   </Tooltip>
+                  {userLogin && userLogin.role.toLower() === "admin" &&
                   <Tooltip title="Edit" arrow>
                     <button
                       onClick={() => openModal(f)}
@@ -404,6 +407,8 @@ const FeedbackManagement: React.FC = () => {
                       <FaEdit className="text-blue-500 hover:text-blue-700" />
                     </button>
                   </Tooltip>
+                  } 
+                  
                   <Tooltip title="Delete" arrow>
                     <button
                       className="p-2 rounded-md hover:bg-gray-100 transition"
@@ -453,6 +458,7 @@ const FeedbackManagement: React.FC = () => {
       {/* Form Modal */}
       <FeedbackFormModal
         open={isModalOpen}
+        feedback={currentFeedback}
         onSave={handleFeedbackSaved}
         onClose={busy ? () => {} : closeModal}
         loading={busy}

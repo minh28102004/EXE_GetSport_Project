@@ -7,6 +7,7 @@ const endPoint = {
   BLOGPOST: "/blogPost",
   ABOUT: "/about",
   FAQS: "/faqs",
+   PLAYPOST: "/playPost",
   COURTBOOKING: "/booking",
   LOCATIONS: "/locations",
   CONTACT: "/contact",

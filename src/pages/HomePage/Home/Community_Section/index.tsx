@@ -159,16 +159,16 @@ const CommunitySection: React.FC = () => {
       image: blog.imageUrl || "https://via.placeholder.com/300x200",
       author: blog.authorName || "Ẩn danh",
       initials: initials(blog.authorName) || "AN",
-      avatarColor: "bg-teal-600", // Fallback color
+      avatarColor: "bg-teal-600", 
       date: createdAt.toLocaleDateString("vi-VN"),
       time: createdAt.toLocaleTimeString("vi-VN", {
         hour: "2-digit",
         minute: "2-digit",
       }),
-      category: "Cầu lông", // Fallback, as category is not in Blog type
-      likes: 0, // Fallback, as likes are not in Blog type
-      comments: 0, // Fallback, as comments are not in Blog type
-      featured: blog.status === "Published", // Map Published to featured
+      category: "Cầu lông", 
+      likes: 0,
+      comments: 0, 
+      featured: blog.status === "Published", 
     };
   };
 

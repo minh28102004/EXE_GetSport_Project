@@ -14,9 +14,8 @@ const PROD_BASE =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(
     /\/+$/,
     ""
-  ) || "https://getsport.3docorp.vn/api";
+  ) || "https://api.getsport.3docorp.vn/api";
 
-// Kết thúc bằng "/" để RTK join đúng
 const API_BASE =
   (import.meta.env.DEV ? "/api" : PROD_BASE).replace(/\/+$/, "") + "/";
 
@@ -39,7 +38,6 @@ const rawBase = fetchBaseQuery({
   },
 });
 
-// Lấy đúng kiểu extra từ rawBase để tránh lệch generic
 type RawExtra = Parameters<typeof rawBase>[2];
 
 const baseQueryWithAuth: BaseQueryFn<
@@ -55,15 +53,44 @@ const baseQueryWithAuth: BaseQueryFn<
     const err = res.error;
     if (err?.status === 401) api.dispatch(logout());
 
-    // Nếu server trả HTML (IIS 404/405/OPTIONS), gợi ý dễ hiểu hơn
     const data = (err as FetchBaseQueryError).data as unknown;
     if (typeof data === "string" && /^\s*<!doctype html/i.test(data)) {
-      (err as FetchBaseQueryError).data = {
-        message:
-          "Server trả về HTML (sai route/method hoặc IIS/WebDAV chặn PUT/DELETE/OPTIONS).",
-        htmlSnippet: data.slice(0, 200),
-      };
-    }
+  (err as FetchBaseQueryError).data = {
+    message:
+      "Server trả về HTML (có thể sai route/method hoặc IIS/WebDAV chặn PUT/DELETE/OPTIONS).",
+    htmlSnippet: data.slice(0, 200),
+  };
+} else {
+
+  if (data && typeof data === "object") {
+    const d = data as {
+      message?: string;
+      Message?: string;
+      statusCode?: number;
+      status?: string;
+      errors?: Record<string, string[]>;
+    };
+
+    const message =
+      d.message ||
+      d.Message ||
+      (d.statusCode && d.status
+        ? `${d.statusCode} ${d.status}`
+        : "Đã xảy ra lỗi không xác định");
+
+    (err as FetchBaseQueryError).data = {
+      message,
+      details: d.errors || undefined,
+      statusCode: d.statusCode || undefined,
+      status: d.status || undefined,
+    };
+  } else {
+    (err as FetchBaseQueryError).data = {
+      message: "Phản hồi từ server không hợp lệ.",
+      raw: data,
+    };
+  }
+}
   }
   return res;
 };
@@ -71,6 +98,6 @@ const baseQueryWithAuth: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithAuth,
-  tagTypes, // dùng mảng chung tagTypes: ["Account"] => thêm thì vào tagTypes.ts mà add
+  tagTypes,
   endpoints: () => ({}),
 });

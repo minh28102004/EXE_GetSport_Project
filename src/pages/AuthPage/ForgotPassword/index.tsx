@@ -8,6 +8,7 @@ import {
   FiRefreshCw,
 } from "react-icons/fi";
 import LoadingSpinner from "@components/Loading_Spinner";
+import { useForgotPasswordMutation } from "@redux/api/auth/authApi";
 
 interface ForgotPasswordProps {
   toggleView?: () => void;
@@ -18,6 +19,7 @@ interface ForgotPasswordProps {
 interface FormData {
   email: string;
 }
+
 interface ValidationErrors {
   email?: string;
 }
@@ -46,7 +48,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const [apiError, setApiError] = useState<string | null>(null);
 
+  const [forgotPassword] = useForgotPasswordMutation();
   const { validateEmail } = useEmailValidation();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +59,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
     if (errors[name as keyof ValidationErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
+    setApiError(null);
   };
 
   const handleSubmit = async () => {
@@ -64,13 +69,18 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
       return;
     }
     setIsLoading(true);
+    setApiError(null);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      onEmailSent?.(formData.email);
-      setCurrentStep("sent");
-      startCountdown();
-    } catch (error) {
-      console.error("Failed to send reset email:", error);
+      const response = await forgotPassword({ email: formData.email }).unwrap();
+      if (response.statusCode === 200) {
+        onEmailSent?.(formData.email);
+        setCurrentStep("sent");
+        startCountdown();
+      } else {
+        setApiError(response.message || "Không thể gửi email khôi phục");
+      }
+    } catch (error: any) {
+      setApiError(error?.data?.message || "Không thể gửi email khôi phục");
     } finally {
       setIsLoading(false);
     }
@@ -79,12 +89,17 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
   const handleResend = async () => {
     if (!canResend) return;
     setIsLoading(true);
+    setApiError(null);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      onResendEmail?.(formData.email);
-      startCountdown();
-    } catch (error) {
-      console.error("Failed to resend email:", error);
+      const response = await forgotPassword({ email: formData.email }).unwrap();
+      if (response.statusCode === 200) {
+        onResendEmail?.(formData.email);
+        startCountdown();
+      } else {
+        setApiError(response.message || "Không thể gửi lại email");
+      }
+    } catch (error: any) {
+      setApiError(error?.data?.message || "Không thể gửi lại email");
     } finally {
       setIsLoading(false);
     }
@@ -129,7 +144,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             <FiMail
               className={`h-5 w-5 transition-colors duration-200 ${
-                errors.email ? "text-red-400" : "text-gray-400"
+                errors.email || apiError ? "text-red-400" : "text-gray-400"
               }`}
             />
           </div>
@@ -141,19 +156,19 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
             onChange={handleInputChange}
             className={`w-full pl-11 pr-4 py-2.5 border-2 rounded-xl outline-none bg-gray-50 text-gray-900 placeholder-gray-500 transition-all duration-200
             ${
-              errors.email
+              errors.email || apiError
                 ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500/20"
                 : "border-gray-200 hover:border-teal-400/30 focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20"
             }`}
             placeholder="your@email.com"
-            aria-describedby={errors.email ? "email-error" : undefined}
+            aria-describedby={errors.email || apiError ? "email-error" : undefined}
           />
         </div>
 
-        {errors.email && (
+        {(errors.email || apiError) && (
           <div className="flex items-center gap-1 text-red-600 animate-shake">
             <FiAlertCircle className="w-4 h-4" />
-            <p className="text-sm">{errors.email}</p>
+            <p className="text-sm">{errors.email || apiError}</p>
           </div>
         )}
       </div>
@@ -235,7 +250,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
               Thời gian hiệu lực
             </p>
             <p className="text-sm text-gray-600">
-              Link sẽ hết hạn sau 24 giờ vì lý do bảo mật
+              Link sẽ hết hạn sau 1 giờ vì lý do bảo mật
             </p>
           </div>
         </div>
@@ -299,7 +314,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({
             <div className="transition-all duration-300 ease-in-out">
               {currentStep === "input" && renderInputStep()}
               {currentStep === "sent" && renderSentStep()}
-              {/* currentStep === "success" có thể bổ sung sau nếu cần */}
             </div>
           </div>
         </div>

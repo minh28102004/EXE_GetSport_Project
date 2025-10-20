@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Calendar, MapPin, User, Clock, DollarSign, Image as ImageIcon, Star } from "lucide-react";
+import { Calendar, MapPin, User, Clock, DollarSign, Image as ImageIcon, Star, List } from "lucide-react";
 import { useGetCourtQuery } from "@redux/api/court/courtApi";
 import { useGetAverageRatingByCourtQuery, useGetFeedbacksByCourtQuery } from "@redux/api/feedback/feedbackApi";
 import { formatDateShort } from "@utils/dateFormat";
@@ -102,14 +102,14 @@ const CourtDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-100/60 py-10">
-      <div className="mx-auto max-w-5xl px-5">
+      <div className="mx-auto max-w-5xl px-5 max-h-[90vh] overflow-y-auto">
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           {/* Header with Images */}
           <div className="relative h-64 md:h-96">
             {court.imageUrls && court.imageUrls.length > 0 ? (
               <img
                 src={court.imageUrls[0]}
-                alt={court.location}
+                alt={court.name ?? court.location}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.currentTarget.src = "https://via.placeholder.com/300x150";
@@ -123,7 +123,7 @@ const CourtDetail: React.FC = () => {
             )}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
               <h1 className="text-3xl md:text-4xl font-bold text-white">
-                {court.location}
+                {court.name ?? court.location}
               </h1>
               <p className="text-lg text-gray-200 flex items-center gap-2 mt-2">
                 <MapPin className="w-5 h-5" />
@@ -142,10 +142,44 @@ const CourtDetail: React.FC = () => {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3">
+                    <List className="w-5 h-5 text-[#1e9ea1]" />
+                    <div>
+                      <p className="text-sm text-gray-600">Tên sân</p>
+                      <p className="font-medium">{court.name || "N/A"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
                     <User className="w-5 h-5 text-[#1e9ea1]" />
                     <div>
                       <p className="text-sm text-gray-600">Chủ sở hữu</p>
                       <p className="font-medium">{court.ownerName || "N/A"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MapPin className="w-5 h-5 text-[#1e9ea1]" />
+                    <div>
+                      <p className="text-sm text-gray-600">Vị trí</p>
+                      <p className="font-medium">{court.location || "N/A"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <List className="w-5 h-5 text-[#1e9ea1]" />
+                    <div>
+                      <p className="text-sm text-gray-600">Tiện ích</p>
+                      <div className="flex flex-wrap gap-2">
+                        {court.utilities && court.utilities.length > 0 ? (
+                          court.utilities.map((util, idx) => (
+                            <span
+                              key={idx}
+                              className="px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700"
+                            >
+                              {util}
+                            </span>
+                          ))
+                        ) : (
+                          <p className="font-medium text-gray-600">N/A</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

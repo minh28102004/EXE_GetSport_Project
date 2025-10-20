@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { X, Star, MessageSquare, User, Calendar } from "lucide-react";
+import { X, Star, User, Calendar } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGetFeedbackQuery } from "@redux/api/feedback/feedbackApi";
 import type { Feedback } from "@redux/api/feedback/type";
@@ -89,7 +89,20 @@ const FeedbackDetail: React.FC<Props> = ({ feedbackId, onClose }) => {
             </div>
             <div className="md:col-span-2">
               <label className={labelCls}>Court Images</label>
-              <p className={baseField}>{feedback.courtImageUrls.join(", ")}</p>
+              {feedback.courtImageUrls.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                  {feedback.courtImageUrls.map((url, index) => (
+                    <img
+                      key={index}
+                      src={url}
+                      alt={`Court image ${index + 1}`}
+                      className="w-full h-40 object-cover rounded-lg shadow-sm"
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className={baseField}>No images available.</p>
+              )}
             </div>
           </div>
         </Section>

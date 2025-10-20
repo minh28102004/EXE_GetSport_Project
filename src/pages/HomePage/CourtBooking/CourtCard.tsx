@@ -34,7 +34,7 @@ const CourtCard: React.FC<CourtCardProps> = ({ court, onBooking }) => {
       {/* Court Info */}
       <div className="p-5">
         <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1.5 group-hover:text-teal-700 transition-colors">
-          {court.location}
+          {court.name}
         </h3>
         <div className="flex items-center gap-2 text-gray-600 mb-2.5">
           <MapPin className="w-4 h-4" />

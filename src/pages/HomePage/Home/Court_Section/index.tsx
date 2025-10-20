@@ -104,7 +104,7 @@ const CourtSection: React.FC = () => {
                 <div className="relative overflow-hidden">
                   <img
                     src={court.imageUrls[0] || "https://via.placeholder.com/300x200"}
-                    alt={court.ownerName || `Sân cầu lông ${court.id}`}
+                    alt={court.name || `Sân cầu lông ${court.id}`}
                     className="w-full h-48 object-cover transition-all duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -120,24 +120,19 @@ const CourtSection: React.FC = () => {
                   {/* Rating */}
                   <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-md">
                     <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                    <span className="font-medium text-sm">0</span>
-                    <span className="text-gray-500 text-xs">(0)</span>
+                    <span className="font-medium text-sm">{court.averageRating}</span>
+                    <span className="text-gray-500 text-xs">({court.totalFeedbacks})</span>
                   </div>
                 </div>
 
                 {/* Court Info */}
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-teal-700 transition-colors duration-300">
-                    {court.ownerName || `Sân cầu lông ${court.id}`}
+                    {court.name || `Sân cầu lông ${court.id}`}
                   </h3>
                   <div className="flex items-center gap-2 text-gray-600 mb-3">
                     <MapPin className="w-4 h-4" />
                     <span className="text-sm line-clamp-1">{court.location || "Không xác định"}</span>
-                  </div>
-
-                  {/* Amenities */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <span className="text-xs text-gray-500">Không có tiện ích</span>
                   </div>
 
                   {/* Price + Button */}
@@ -152,11 +147,6 @@ const CourtSection: React.FC = () => {
                     >
                       Đặt Ngay
                     </button>
-                  </div>
-
-                  {/* Slots */}
-                  <div className="flex gap-2 mt-3 overflow-hidden whitespace-nowrap justify-center">
-                    <span className="text-xs text-gray-500">Không có khung giờ</span>
                   </div>
                 </div>
               </div>

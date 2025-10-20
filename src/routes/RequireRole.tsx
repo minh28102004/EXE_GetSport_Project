@@ -8,7 +8,6 @@ import endPoint from "@routes/router";
 type Role = "admin" | "owner" | "customer" | string;
 const norm = (v?: string) => (v ?? "").trim().toLowerCase();
 
-// mở rộng: chấp nhận vài biến thể role phổ biến
 const normalizeRole = (r?: string) => {
   const s = norm(r);
   if (s.startsWith("role_")) return s.slice(5);

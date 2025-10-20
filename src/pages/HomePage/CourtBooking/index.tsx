@@ -34,8 +34,8 @@ const BadmintonBooking: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [showAmenitiesAll, setShowAmenitiesAll] = useState(false);
+  const [selectedUtilities, setSelectedUtilities] = useState<string[]>([]);
+  const [showUtilitiesAll, setShowUtilitiesAll] = useState(false);
   const [showAvailableOnly, setShowAvailableOnly] = useState(true);
   const [showNewOnly, setShowNewOnly] = useState(false);
   const [isList, setIsList] = useState(true);
@@ -58,8 +58,9 @@ const BadmintonBooking: React.FC = () => {
   // Sorting
   const [sortBy, setSortBy] = useState<string>("pricePerHour");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
   // API Integration
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const listParams: ListParams = {
     status: "Approved",
@@ -69,9 +70,8 @@ const BadmintonBooking: React.FC = () => {
     page: currentPage,
     pageSize,
     minPrice: min,
-    maxPrice: priceRange,
-    startDate: null, 
-  };
+    maxPrice: priceRange
+    };
 
   const { data: courtData, isLoading, isError } = useGetCourtsQuery(listParams, {
     skip: !selectedDate,
@@ -90,26 +90,26 @@ const BadmintonBooking: React.FC = () => {
     : courtData?.data?.totalPages || 1;
 
   const filteredCourts = courtsFromApi.filter((court: Court) => {
-    if (rating > 0 && (court.rating === undefined || court.rating < rating)) {
+    // Filter by rating
+    if (rating > 0 && (court.averageRating === undefined || court.averageRating < rating)) {
       return false;
     }
 
+    // Filter by utilities
     if (
-      selectedAmenities.length > 0 &&
-      (!court.amenities ||
-        !selectedAmenities.every((amenity) => court.amenities?.includes(amenity)))
+      selectedUtilities.length > 0 &&
+      (!court.utilities ||
+        !selectedUtilities.every((utility) => court.utilities?.includes(utility)))
     ) {
       return false;
     }
 
+    // Filter by availability
     if (showAvailableOnly && !court.isActive) {
       return false;
     }
 
-    if (showNewOnly && court.isNewlyOpened !== true) {
-      return false;
-    }
-
+    // Filter by area
     if (selectedArea.value !== "all" && court.location !== selectedArea.value) {
       return false;
     }
@@ -124,7 +124,7 @@ const BadmintonBooking: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, rating, selectedAmenities, showAvailableOnly, showNewOnly, selectedArea, priceRange, selectedDate]);
+  }, [searchQuery, rating, selectedUtilities, showAvailableOnly, selectedArea, priceRange, selectedDate]);
 
   useClickOutside(dropdownRef, () => setOpen(false));
 
@@ -135,19 +135,19 @@ const BadmintonBooking: React.FC = () => {
     }
   };
 
-  const toggleAmenity = (amenity: string): void => {
-    setSelectedAmenities((prev) =>
-      prev.includes(amenity)
-        ? prev.filter((a) => a !== amenity)
-        : [...prev, amenity]
+  const toggleUtility = (utility: string): void => {
+    setSelectedUtilities((prev) =>
+      prev.includes(utility)
+        ? prev.filter((a) => a !== utility)
+        : [...prev, utility]
     );
   };
 
   const resetFilters = () => {
     setSearchQuery("");
     setRating(0);
-    setSelectedAmenities([]);
-    setShowAmenitiesAll(false);
+    setSelectedUtilities([]);
+    setShowUtilitiesAll(false);
     setShowAvailableOnly(true);
     setShowNewOnly(false);
     setSelectedArea(areas[0]);
@@ -172,7 +172,7 @@ const BadmintonBooking: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Tên sân hoặc địa chỉ"
+                  placeholder="Tên sân, địa chỉ hoặc tiện ích"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm hover:border-teal-500/80 focus:ring-1 focus:outline-none focus:border-teal-500/60 focus:ring-[#1e9ea1] transition-all duration-200"
@@ -274,43 +274,43 @@ const BadmintonBooking: React.FC = () => {
               </div>
             </div>
 
-            {/* Amenities */}
+            {/* Utilities */}
             <div>
               <h3 className="font-semibold text-gray-800/90 mb-2.5">
                 Tiện Ích
-                {selectedAmenities.length > 0 && (
+                {selectedUtilities.length > 0 && (
                   <>
                     {" "}
-                    ({selectedAmenities.length}/{amenitiesList.length})
+                    ({selectedUtilities.length}/{amenitiesList.length})
                   </>
                 )}
               </h3>
               <div className="grid grid-cols-1 gap-x-5 gap-y-2.5">
-                {(showAmenitiesAll
+                {(showUtilitiesAll
                   ? amenitiesList
                   : amenitiesList.slice(0, 6)
-                ).map((amenity) => (
+                ).map((utility) => (
                   <label
-                    key={amenity.key}
+                    key={utility.key}
                     className="flex items-center space-x-2 cursor-pointer text-[13px]"
                   >
                     <input
                       type="checkbox"
-                      checked={selectedAmenities.includes(amenity.key)}
-                      onChange={() => toggleAmenity(amenity.key)}
+                      checked={selectedUtilities.includes(utility.key)}
+                      onChange={() => toggleUtility(utility.key)}
                       className="w-4 h-4 text-[#1e9ea1] border-gray-300 rounded focus:ring-[#1e9ea1]"
                     />
-                    {amenity.icon}
-                    <span className="text-gray-700">{amenity.label}</span>
+                    {utility.icon}
+                    <span className="text-gray-700">{utility.label}</span>
                   </label>
                 ))}
               </div>
               {amenitiesList.length > 6 && (
                 <button
-                  onClick={() => setShowAmenitiesAll(!showAmenitiesAll)}
+                  onClick={() => setShowUtilitiesAll(!showUtilitiesAll)}
                   className="mt-2 text-[#1e9ea1] text-sm font-medium hover:underline hover:brightness-75"
                 >
-                  {showAmenitiesAll ? "Thu gọn" : "Xem thêm"}
+                  {showUtilitiesAll ? "Thu gọn" : "Xem thêm"}
                 </button>
               )}
             </div>
@@ -428,7 +428,7 @@ const BadmintonBooking: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 max-h-[90vh] overflow-y-auto">
           {/* Date Selector / Header */}
           <div
             className={`bg-white rounded-lg shadow-sm p-5 ${
@@ -514,7 +514,7 @@ const BadmintonBooking: React.FC = () => {
             </div>
 
             {/* Calendar Buttons */}
-            {isList && (
+            {/* {isList && (
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-2.5 flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-[#1e9ea1]" />
@@ -563,7 +563,7 @@ const BadmintonBooking: React.FC = () => {
                   </p>
                 )}
               </div>
-            )}
+            )} */}
           </div>
 
           {/* List view or Map */}

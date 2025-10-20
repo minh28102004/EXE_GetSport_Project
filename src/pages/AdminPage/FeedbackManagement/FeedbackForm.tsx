@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import type { Feedback } from "@redux/api/feedback/type";
 import LoadingSpinner from "@components/Loading_Spinner";
-import { X, Star, MessageSquare } from "lucide-react";
+import { X, Star } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 type Props = {
+  feedback?: Partial<Feedback>;
   onSave: (data: Partial<Feedback>) => void | Promise<void>;
   onClose: () => void;
   loading?: boolean;
@@ -44,13 +45,23 @@ const Section: React.FC<{
   </div>
 );
 
-const FeedbackForm: React.FC<Props> = ({ onSave, onClose, loading }) => {
+const FeedbackForm: React.FC<Props> = ({ feedback, onSave, onClose, loading }) => {
   const [form, setForm] = useState<Partial<Feedback>>({
-    bookingId: 0,
-    rating: 5,
-    comment: "",
+    bookingId: feedback?.bookingId ?? 0,
+    rating: feedback?.rating ?? 5,
+    comment: feedback?.comment ?? "",
   });
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (feedback) {
+      setForm({
+        bookingId: feedback.bookingId ?? 0,
+        rating: feedback.rating ?? 5,
+        comment: feedback.comment ?? "",
+      });
+    }
+  }, [feedback]);
 
   const setField = <K extends keyof Feedback>(key: K, value: any) =>
     setForm((s) => ({ ...s, [key]: value }));
@@ -69,10 +80,14 @@ const FeedbackForm: React.FC<Props> = ({ onSave, onClose, loading }) => {
     onSave(form);
   };
 
+  const isEditMode = !!feedback;
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="sticky top-0 z-10 -mt-2 -mx-2 flex items-center justify-between rounded-t-xl bg-white/90 px-2 py-2 backdrop-blur border-b">
-        <h2 className="text-2xl font-semibold text-slate-900">Create Feedback</h2>
+        <h2 className="text-2xl font-semibold text-slate-900">
+          {isEditMode ? "Edit Feedback" : "Create Feedback"}
+        </h2>
         <button
           type="button"
           onClick={onClose}
@@ -103,7 +118,7 @@ const FeedbackForm: React.FC<Props> = ({ onSave, onClose, loading }) => {
               onChange={(e) => setField("bookingId", e.target.value ? Number(e.target.value) : 0)}
               placeholder="Enter booking ID"
               required
-              disabled={loading}
+              disabled={loading || isEditMode} // Disable bookingId in edit mode
               autoFocus
             />
           </div>
@@ -147,11 +162,11 @@ const FeedbackForm: React.FC<Props> = ({ onSave, onClose, loading }) => {
         </button>
         <button
           type="submit"
-          className="inline-flex items-center gap-2 rounded-lg bg-[#23AEB1] px-4 py-2 text-sm text-white shadow-sm transition hover:brightness-95 focus:outline-none focus:ring-1 focus:ring-teal-300 disabled:opacity-70"
+          className="inline-flex items-center gap-2 rounded-lg bg-[#23AEB1] px-4 py-2 text-sm shadow-sm transition hover:brightness-95 focus:outline-none focus:ring-1 focus:ring-teal-300 disabled:opacity-70"
           disabled={loading}
         >
           {loading && <LoadingSpinner inline color="white" size="4" />}
-          Submit Feedback
+          {isEditMode ? "Update Feedback" : "Submit Feedback"}
         </button>
       </div>
     </form>
@@ -165,7 +180,9 @@ type ModalProps = Props & { open: boolean };
 export const FeedbackFormModal: React.FC<ModalProps> = ({
   open,
   onClose,
-  ...formProps
+  feedback,
+  onSave,
+  loading,
 }) => {
   useEffect(() => {
     if (!open) return;
@@ -200,7 +217,7 @@ export const FeedbackFormModal: React.FC<ModalProps> = ({
             aria-modal="true"
           >
             <div className="flex-1 min-h-0 max-h-[80vh] overflow-y-auto p-4">
-              <FeedbackForm {...formProps} onClose={onClose} />
+              <FeedbackForm feedback={feedback} onSave={onSave} onClose={onClose} loading={loading} />
             </div>
           </motion.div>
         </motion.div>

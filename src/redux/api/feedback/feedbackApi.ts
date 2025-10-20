@@ -260,7 +260,6 @@ export const feedbackApi = baseApi.injectEndpoints({
         body,
       }),
       transformResponse: (resp: FeedbackRaw): FeedbackEnvelope => {
-        console.log("updateFeedback Response:", resp); // Log response for debugging
         const dto = takeData<FeedbackDto>(resp);
         const mapped = mapDtoToUi(dto);
         return isEnvelope(resp)

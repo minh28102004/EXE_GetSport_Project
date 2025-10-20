@@ -19,7 +19,7 @@ const BookingCallback: React.FC = () => {
   useEffect(() => {
     if (!accessToken) {
       const redirectUrl = encodeURIComponent(location.pathname + location.search);
-      navigate(`/login?redirect=${redirectUrl}`);
+      navigate(`/auth?view=login&redirect=${redirectUrl}`);
     }
   }, [accessToken, navigate, location]);
 
