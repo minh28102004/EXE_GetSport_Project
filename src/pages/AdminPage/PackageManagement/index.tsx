@@ -43,8 +43,7 @@ const PackageManagement: React.FC = () => {
     ? (data?.data as Package[])
     : (data?.data as Paged<Package> | undefined)?.items ?? [];
 
-  const totalPages = (data?.data as Paged<Package>)?.totalPages ?? 1;
-
+const totalPages = data?.pagination?.totalPages;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [currentPackage, setCurrentPackage] = useState<Package | null>(null);

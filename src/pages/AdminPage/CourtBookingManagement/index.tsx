@@ -31,7 +31,7 @@ const CourtBookingManagement: React.FC = () => {
     ? data.data
     : (data?.data as Paged<CourtBooking> | undefined)?.items ?? [];
 
-  const totalPages = (data?.data as Paged<CourtBooking>)?.totalPages ?? 1;
+  const totalPages = data?.pagination?.totalPages;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);

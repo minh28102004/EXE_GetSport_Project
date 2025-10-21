@@ -40,8 +40,7 @@ const PlaymateJoinManagement: React.FC = () => {
     ? (data?.data as PlaymateJoin[])
     : (data?.data as Paged<PlaymateJoin> | undefined)?.items ?? [];
 
-  const totalPages = (data?.data as Paged<PlaymateJoin>)?.totalPages ?? 1;
-
+const totalPages = data?.pagination?.totalPages;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [currentJoin, setCurrentJoin] = useState<PlaymateJoin | null>(null);

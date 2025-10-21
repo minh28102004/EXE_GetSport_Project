@@ -47,8 +47,7 @@ const CourtSlotManagement: React.FC = () => {
     ? (data?.data as CourtSlot[])
     : (data?.data as Paged<CourtSlot> | undefined)?.items ?? [];
 
-  const totalPages = (data?.data as Paged<CourtSlot>)?.totalPages ?? 1;
-
+const totalPages = data?.pagination?.totalPages;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);

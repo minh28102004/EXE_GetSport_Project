@@ -64,8 +64,7 @@ const BlogManagement: React.FC = () => {
   const rows: Blog[] = Array.isArray(data?.data)
     ? (data?.data as Blog[])
     : (data?.data as Paged<Blog> | undefined)?.items ?? [];
-  const totalPages = (data?.data as Paged<Blog>)?.totalPages ?? 1;
-
+const totalPages = data?.pagination?.totalPages;
   const resetFilters = () => {
     setSearch('');
     setStatusFilter('all');

@@ -44,8 +44,7 @@ const CourtManagement: React.FC = () => {
     ? (data?.data as Court[])
     : (data?.data as Paged<Court> | undefined)?.items ?? [];
 
-  const totalPages = (data?.data as Paged<Court>)?.totalPages ?? 1;
-
+const totalPages = data?.pagination?.totalPages;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [currentCourt, setCurrentCourt] = useState<Court | null>(null);

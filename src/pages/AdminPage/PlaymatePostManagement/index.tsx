@@ -42,8 +42,7 @@ const PlaymatePostManagement: React.FC = () => {
     ? (data?.data as PlaymatePost[])
     : (data?.data as Paged<PlaymatePost> | undefined)?.items ?? [];
 
-  const totalPages = (data?.data as Paged<PlaymatePost>)?.totalPages ?? 1;
-
+const totalPages = data?.pagination?.totalPages;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [currentPost, setCurrentPost] = useState<PlaymatePost | null>(null);

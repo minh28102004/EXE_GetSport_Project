@@ -42,8 +42,7 @@ const FeedbackManagement: React.FC = () => {
     ? (data?.data as Feedback[])
     : (data?.data as Paged<Feedback> | undefined)?.items ?? [];
 
-  const totalPages = (data?.data as Paged<Feedback>)?.totalPages ?? 1;
-
+const totalPages = data?.pagination?.totalPages;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [currentFeedback, setCurrentFeedback] = useState<Feedback | null>(null);
