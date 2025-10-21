@@ -82,20 +82,13 @@ const BadmintonBooking: React.FC = () => {
       ? courtData.data
       : courtData.data.items
     : [];
-  const totalItems = Array.isArray(courtData?.data)
-    ? courtData.data.length
-    : courtData?.data?.total || 0;
-  const totalPages = Array.isArray(courtData?.data)
-    ? Math.ceil(courtData.data.length / pageSize)
-    : courtData?.data?.totalPages || 1;
-
+  const totalItems = courtData?.pagination?.totalCount || 0;
+const totalPages = courtData?.pagination?.totalPages || 1;
   const filteredCourts = courtsFromApi.filter((court: Court) => {
-    // Filter by rating
     if (rating > 0 && (court.averageRating === undefined || court.averageRating < rating)) {
       return false;
     }
 
-    // Filter by utilities
     if (
       selectedUtilities.length > 0 &&
       (!court.utilities ||
@@ -104,12 +97,10 @@ const BadmintonBooking: React.FC = () => {
       return false;
     }
 
-    // Filter by availability
     if (showAvailableOnly && !court.isActive) {
       return false;
     }
 
-    // Filter by area
     if (selectedArea.value !== "all" && court.location !== selectedArea.value) {
       return false;
     }
@@ -117,10 +108,7 @@ const BadmintonBooking: React.FC = () => {
     return true;
   });
 
-  const paginatedCourts = filteredCourts.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const paginatedCourts = filteredCourts;
 
   useEffect(() => {
     setCurrentPage(1);

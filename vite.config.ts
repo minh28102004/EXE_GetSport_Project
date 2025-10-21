@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  const target = env.VITE_API_TARGET ?? "https://api.getsport.3docorp.vn";
+  const target = env.VITE_API_TARGET ?? "https://getsport.3docorp.vn";
 
   return {
     plugins: [react(), tailwindcss()],
