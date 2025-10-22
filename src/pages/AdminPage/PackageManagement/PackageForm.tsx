@@ -121,10 +121,9 @@ const PackageForm: React.FC<Props> = ({ package: pkg, onSave, onClose, loading }
               id="name"
               className={baseField}
               value={form.name ?? ""}
-              onChange={(e) => setField("name", e.target.value)}
               placeholder="VD: Gói Premium 30 ngày"
               required
-              disabled={loading}
+              disabled={true}
               autoFocus
             />
           </div>

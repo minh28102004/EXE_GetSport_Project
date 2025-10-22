@@ -8,6 +8,7 @@ import {
   FaLock,
   FaUnlock,
   FaEye,
+  FaClock,
 } from "react-icons/fa";
 import Tooltip from "@mui/material/Tooltip";
 import { toast } from "react-toastify";
@@ -21,6 +22,9 @@ import type { Court, Paged } from "@redux/api/court/type";
 import { mapUiToDto } from "@redux/api/court/map";
 import { CourtFormModal } from "./CourtForm";
 import { CourtDetailModal } from "./CourtDetail";
+import {
+  useCheckActivePackageQuery,
+} from "@redux/api/ownerPackage/ownerPackageApi";
 
 const initials = (name?: string) =>
   (name || "")
@@ -40,11 +44,20 @@ const CourtManagement: React.FC = () => {
   const pageSize = 10;
   const { data, isLoading, isError } = useGetCourtsQuery({ page, pageSize });
 
+  const { 
+    data: packageData, 
+    isLoading: checkingPackage 
+  } = useCheckActivePackageQuery();
+
+  const hasActivePackage = packageData?.data?.hasActivePackage ?? false;
+  const daysRemaining = packageData?.data?.daysRemaining ?? 0;
+  const packageName = packageData?.data?.packageName ?? "";
+
   const rows: Court[] = Array.isArray(data?.data)
     ? (data?.data as Court[])
     : (data?.data as Paged<Court> | undefined)?.items ?? [];
 
-const totalPages = data?.pagination?.totalPages;
+  const totalPages = data?.pagination?.totalPages;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [currentCourt, setCurrentCourt] = useState<Court | null>(null);
@@ -168,7 +181,8 @@ const totalPages = data?.pagination?.totalPages;
     }
   };
 
-  if (isLoading)
+  // ✅ LOADING KHI CHECK PACKAGE
+  if (isLoading || checkingPackage)
     return <div className="text-center p-10">Đang tải dữ liệu...</div>;
   if (isError)
     return <div className="text-center p-10 text-red-500">Lỗi khi tải dữ liệu</div>;
@@ -186,15 +200,58 @@ const totalPages = data?.pagination?.totalPages;
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => openModal(null)}
-          className="inline-flex items-center gap-2 rounded-lg bg-[#23AEB1] px-4 py-2 text-sm text-white shadow-sm transition hover:brightness-95 focus:outline-none focus:ring-1 focus:ring-teal-300 disabled:opacity-70"
-          disabled={busy}
-        >
-          <FaPlus />
-          Tạo sân mới
-        </button>
+        {/* ✅ PACKAGE STATUS + BUTTON */}
+        <div className="flex items-center gap-3">
+          {/* Package Status */}
+          <Tooltip 
+            title={hasActivePackage ? `Còn ${daysRemaining} ngày` : "Gói đã hết hạn"}
+            arrow
+          >
+            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
+              hasActivePackage 
+                ? "bg-green-100 text-green-700" 
+                : "bg-red-100 text-red-700"
+            }`}>
+              {hasActivePackage ? (
+                <>
+                  <FaClock className="text-xs" />
+                  {daysRemaining} ngày
+                </>
+              ) : (
+                <>
+                  <FaClock className="text-xs" />
+                  Hết hạn
+                </>
+              )}
+            </div>
+          </Tooltip>
+
+          {/* ✅ NÚT ADD - CHỈ HIỆN KHI CÒN GÓI */}
+          {hasActivePackage && (
+            <button
+              type="button"
+              onClick={() => openModal(null)}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#23AEB1] px-4 py-2 text-sm text-white shadow-sm transition hover:brightness-95 focus:outline-none focus:ring-1 focus:ring-teal-300 disabled:opacity-70"
+              disabled={busy}
+            >
+              <FaPlus />
+              Tạo sân mới
+            </button>
+          )}
+
+          {/* ✅ THÔNG BÁO KHI KHÔNG CÒN GÓI */}
+          {!hasActivePackage && (
+            <Tooltip 
+              title={`Mua gói "${packageName}" để tạo sân mới`}
+              arrow
+            >
+              <div className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-600 cursor-not-allowed">
+                <FaPlus />
+                Không thể tạo sân
+              </div>
+            </Tooltip>
+          )}
+        </div>
       </div>
 
       {/* Filter bar */}
@@ -454,7 +511,7 @@ const totalPages = data?.pagination?.totalPages;
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {totalPages && totalPages > 1 && (
         <div className="mt-4 flex justify-center gap-2">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -476,9 +533,9 @@ const totalPages = data?.pagination?.totalPages;
         </div>
       )}
 
-      {/* Form Modal */}
+      {/* Form Modal - CHỈ HIỂN KHI CÒN GÓI */}
       <CourtFormModal
-        open={isModalOpen}
+        open={isModalOpen && hasActivePackage}
         court={currentCourt}
         onSave={handleCourtSaved}
         onClose={busy ? () => {} : closeModal}

@@ -55,10 +55,15 @@ const PaymentPage: React.FC = () => {
         startdate: today.toISOString().split('T')[0],
         enddate: endDate.toISOString().split('T')[0],
         price: pkg.price,
-        priority: 1, // Default priority, adjust as needed
+        priority: 1,
       };
 
       const response = await createOwnerPackageBooking(ownerPackageData).unwrap();
+      if(response?.data?.isFreeTrial == tru) {
+            toast.info("Gói FREE_TRIAL đã được kích hoạt thành công! Bạn có thể tạo sân ngay.");
+            navigate("/layoutOwner/my-subscriptions");
+      }
+      else
       if (response.data && response.paymentLink) {
         toast.info("Chuyển đến cổng thanh toán...");
         window.location.href = response.paymentLink; 
@@ -66,8 +71,7 @@ const PaymentPage: React.FC = () => {
         toast.error("Không thể tạo link thanh toán. Vui lòng thử lại.");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Có lỗi xảy ra khi khởi tạo thanh toán. Vui lòng thử lại.");
+      toast.error(error?.data?.message || "Có lỗi xảy ra khi khởi tạo thanh toán. Vui lòng thử lại.");
     }
   };
 

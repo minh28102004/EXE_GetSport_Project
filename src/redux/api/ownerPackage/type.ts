@@ -73,6 +73,24 @@ export type OwnerPackagePaymentStatus = {
   amountRemaining?: number;
 };
 
+// ✅ THÊM MỚI
+export type OwnerPackageActiveCheckDto = {
+  hasActivePackage: boolean;
+  ownerId: number;
+  packageId: number;
+  packageName: string;
+  duration: number;
+  startDate: string;
+  endDate: string;
+  daysRemaining: number;
+  price: number;
+  priority: number;
+  isExpired: boolean;
+  ownerName: string;
+};
+
+export type OwnerPackageActiveCheckEnvelope = ApiEnvelope<OwnerPackageActiveCheckDto>;
+
 export type Paged<T> = {
   items: T[];
   total: number;

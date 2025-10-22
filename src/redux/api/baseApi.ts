@@ -14,7 +14,7 @@ const PROD_BASE =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(
     /\/+$/,
     ""
-  ) || "https://getsport.3docorp.vn/api";
+  ) || "https://localhost:7260/api";
 
 const API_BASE =
   (import.meta.env.DEV ? "/api" : PROD_BASE).replace(/\/+$/, "") + "/";

@@ -10,6 +10,8 @@ import type {
   OwnerPackageFilterParams,
   OwnerPackagePaymentStatus,
   Paged,
+  OwnerPackageActiveCheckDto, // ✅ THÊM
+  OwnerPackageActiveCheckEnvelope, // ✅ THÊM
 } from "./type";
 import { mapDtoToUi } from "./map";
 import type { ApiEnvelope } from "@redux/api/auth/type";
@@ -142,6 +144,18 @@ export const ownerPackageApi = baseApi.injectEndpoints({
       providesTags: [{ type: "OwnerPackage", id: "MY_LIST" }],
     }),
 
+    // ✅ CHECK ACTIVE PACKAGE - MỚI
+    checkActivePackage: b.query<OwnerPackageActiveCheckEnvelope>({
+      query: () => ({ url: `${OWNER_PACKAGE_PATH}/check-active` }),
+      transformResponse: (resp: any): OwnerPackageActiveCheckEnvelope => {
+        const dto = takeData<OwnerPackageActiveCheckDto>(resp);
+        return isEnvelope(resp)
+          ? { ...resp, data: dto }
+          : okEnvelope(dto);
+      },
+      providesTags: [{ type: "OwnerPackage", id: "ACTIVE_CHECK" }],
+    }),
+
     // Create owner package (Admin/Staff only or booking)
     createOwnerPackage: b.mutation<OwnerPackageEnvelope, OwnerPackageCreateDto>({
       query: (body) => ({
@@ -213,25 +227,22 @@ export const ownerPackageApi = baseApi.injectEndpoints({
       ],
     }),
 
-  getOwnerPackagePaymentStatus: b.query<
-  OwnerPackagePaymentStatus,
-  { id: number; status?: string }
->({
-  query: ({ id, status = "check" }) => ({
-    url: `${OWNER_PACKAGE_PATH}/${id}/payment-status11111?status=${status}`,
-    params: { status },
-  }),
-  transformResponse: (resp: any, _meta, { id }) => ({
-    ownerPackageId: resp.data?.ownerpackageId || id,
-    status: resp.data?.status || "Pending",
-    paymentStatus: resp.data?.paymentStatus || "PENDING",
-    amountPaid: resp.data?.amountPaid,
-    amountRemaining: resp.data?.amountRemaining,
-  }),
-}),
-
-
-
+    getOwnerPackagePaymentStatus: b.query<
+      OwnerPackagePaymentStatus,
+      { id: number; status?: string }
+    >({
+      query: ({ id, status = "check" }) => ({
+        url: `${OWNER_PACKAGE_PATH}/${id}/payment-status?status=${status}`,
+        params: { status },
+      }),
+      transformResponse: (resp: any, _meta, { id }) => ({
+        ownerPackageId: resp.data?.ownerpackageId || id,
+        status: resp.data?.status || "Pending",
+        paymentStatus: resp.data?.paymentStatus || "PENDING",
+        amountPaid: resp.data?.amountPaid,
+        amountRemaining: resp.data?.amountRemaining,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -240,6 +251,7 @@ export const {
   useGetOwnerPackagesQuery,
   useGetOwnerPackageQuery,
   useGetMyOwnerPackagesQuery,
+  useCheckActivePackageQuery,
   useCreateOwnerPackageMutation,
   useCreateOwnerPackageBookingMutation,
   useUpdateOwnerPackageMutation,

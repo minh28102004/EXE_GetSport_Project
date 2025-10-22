@@ -144,8 +144,8 @@ const ManagementLayout: React.FC<{ user?: any; role?: "admin" | "owner" }> = ({
             icon: <Star size={24} />,
           },
           {
-            name: "Tin nhắn",
-            path: "/layoutOwner/Messages",
+            name: "Gói của tôi",
+            path: "/layoutOwner/my-subscriptions",
             icon: <MessageSquare size={24} />,
           },
           {

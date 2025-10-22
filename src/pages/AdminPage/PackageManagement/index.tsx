@@ -196,15 +196,6 @@ const totalPages = data?.pagination?.totalPages;
             Quản lý các gói dịch vụ trong hệ thống
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => openModal(null)}
-          className="inline-flex items-center gap-2 rounded-lg bg-[#23AEB1] px-4 py-2 text-sm text-white shadow-sm transition hover:brightness-95 focus:outline-none focus:ring-1 focus:ring-teal-300 disabled:opacity-70"
-          disabled={busy}
-        >
-          <FaPlus />
-          Tạo gói mới
-        </button>
       </div>
 
       <div className="bg-white/70 backdrop-blur rounded-xl border border-gray-200 p-3 md:p-4 mb-4">
@@ -442,7 +433,7 @@ const totalPages = data?.pagination?.totalPages;
                       )}
                     </button>
                   </Tooltip>
-                  <Tooltip title="Xóa" arrow>
+                  {/* <Tooltip title="Xóa" arrow>
                     <button
                       className="p-2 rounded-md hover:bg-gray-100 transition"
                       onClick={() => handleDelete(p.id, p.name)}
@@ -450,7 +441,7 @@ const totalPages = data?.pagination?.totalPages;
                     >
                       <FaTrash className="text-red-500 hover:text-red-700" />
                     </button>
-                  </Tooltip>
+                  </Tooltip> */}
                 </td>
               </tr>
             ))}

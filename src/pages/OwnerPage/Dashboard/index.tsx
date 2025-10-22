@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { FiGrid, FiCalendar, FiDollarSign, FiStar, FiPackage, FiUsers } from "react-icons/fi";
+import {
+  FiGrid,
+  FiDollarSign,
+  FiCalendar,
+  FiStar,
+  FiUsers,
+  FiPackage,
+  FiChevronLeft,
+  FiChevronRight,
+} from "react-icons/fi";
 import {
   BarChart,
   Bar,
@@ -12,6 +21,8 @@ import {
   PieChart,
   Pie,
   Cell,
+  LineChart,
+  Line,
 } from "recharts";
 import {
   useGetOwnerDashboardQuery,
@@ -19,23 +30,27 @@ import {
   useGetOwnerRecentBookingsQuery,
   useGetOwnerRecentFeedbacksQuery,
 } from "@redux/api/dashboard/dashboardApi";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import vi from "date-fns/locale/vi";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 const OwnerDashboard: React.FC = () => {
   const [dateRange, setDateRange] = useState({
-    startDate: "2025-01-01",
-    endDate: "2025-10-16",
+    startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1), // Đầu tháng
+    endDate: new Date(), // Hôm nay
+    customRange: false,
   });
 
   const { data: dashboardData, error: dashboardError, isLoading: isDashboardLoading } = useGetOwnerDashboardQuery({
-    startDate: dateRange.startDate,
-    endDate: dateRange.endDate,
+    startDate: dateRange.startDate.toISOString().split("T")[0],
+    endDate: dateRange.endDate.toISOString().split("T")[0],
   });
 
   const { data: topCourtsData, error: topCourtsError, isLoading: isTopCourtsLoading } = useGetOwnerTopCourtsQuery({
-    startDate: dateRange.startDate,
-    endDate: dateRange.endDate,
+    startDate: dateRange.startDate.toISOString().split("T")[0],
+    endDate: dateRange.endDate.toISOString().split("T")[0],
     topN: 5,
   });
 
@@ -45,20 +60,71 @@ const OwnerDashboard: React.FC = () => {
   const { data: recentFeedbacksData, error: recentFeedbacksError, isLoading: isRecentFeedbacksLoading } =
     useGetOwnerRecentFeedbacksQuery({ limit: 5 });
 
-  const handleFilterChange = (range: string) => {
-    const today = new Date().toISOString().split("T")[0];
-    if (range === "today") {
-      setDateRange({ startDate: today, endDate: today });
-    } else if (range === "7days") {
-      const start = new Date();
-      start.setDate(start.getDate() - 7);
-      setDateRange({ startDate: start.toISOString().split("T")[0], endDate: today });
-    } else if (range === "30days") {
-      const start = new Date();
-      start.setDate(start.getDate() - 30);
-      setDateRange({ startDate: start.toISOString().split("T")[0], endDate: today });
+  // Preset Filters
+  const handlePresetFilter = (type: string) => {
+    const today = new Date();
+    let start = new Date();
+    let end = new Date();
+
+    switch (type) {
+      case "today":
+        start = end = today;
+        break;
+      case "yesterday":
+        start = end = new Date(today.getTime() - 86400000);
+        break;
+      case "week":
+        const day = today.getDay();
+        start = new Date(today.getTime() - (day === 0 ? 6 : day - 1) * 86400000);
+        end = today;
+        break;
+      case "month":
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = today;
+        break;
+      case "lastMonth":
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        end = new Date(today.getFullYear(), today.getMonth(), 0);
+        break;
+      case "year":
+        start = new Date(today.getFullYear(), 0, 1);
+        end = today;
+        break;
+      case "lastYear":
+        start = new Date(today.getFullYear() - 1, 0, 1);
+        end = new Date(today.getFullYear() - 1, 11, 31);
+        break;
+      default:
+        return;
+    }
+
+    setDateRange({ startDate: start, endDate: end, customRange: false });
+  };
+
+  // Custom Date Range
+  const handleDateChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    setDateRange({
+      startDate: start || new Date(),
+      endDate: end || new Date(),
+      customRange: true,
+    });
+  };
+
+  // Format display
+  const getPeriodDisplay = () => {
+    const start = dateRange.startDate;
+    const end = dateRange.endDate;
+    
+    if (start.toDateString() === end.toDateString()) {
+      return `${end.toLocaleDateString('vi-VN')}`;
+    } else {
+      return `${start.toLocaleDateString('vi-VN')} - ${end.toLocaleDateString('vi-VN')}`;
     }
   };
+
+  // Days difference for chart type
+  const daysDiff = Math.ceil((dateRange.endDate.getTime() - dateRange.startDate.getTime()) / (1000 * 3600 * 24));
 
   if (isDashboardLoading || isTopCourtsLoading || isRecentBookingsLoading || isRecentFeedbacksLoading) {
     return <div className="flex justify-center items-center h-screen">Đang tải dữ liệu...</div>;
@@ -73,130 +139,168 @@ const OwnerDashboard: React.FC = () => {
   const recentBookings = recentBookingsData?.data ?? [];
   const recentFeedbacks = recentFeedbacksData?.data ?? [];
 
+  // Prepare chart data based on range
+  let revenueChartData = [];
+  let chartType = "line";
+  let xAxisKey = "date";
+  let chartTitle = "Doanh thu";
+
+  if (daysDiff <= 1) {
+    // 1 ngày: theo giờ
+    revenueChartData = Object.entries(dashboard?.hourlyRevenue || {}).map(([hour, amount]) => ({
+      hour: `${hour}:00`,
+      revenue: amount,
+    }));
+    chartType = "bar";
+    xAxisKey = "hour";
+    chartTitle = "Doanh thu theo giờ";
+  } else if (daysDiff <= 31) {
+    // <= 1 tháng: theo ngày
+    revenueChartData = Object.entries(dashboard?.dailyRevenue || {}).map(([date, amount]) => ({
+      date: new Date(date).toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' }),
+      revenue: amount,
+    }));
+    chartType = "line";
+    xAxisKey = "date";
+    chartTitle = "Doanh thu theo ngày";
+  } else {
+    // > 1 tháng: theo tháng
+    revenueChartData = Object.entries(dashboard?.monthlyRevenue || {}).map(([month, amount]) => {
+      const [year, mon] = month.split('-');
+      const monthNames = ['Th1', 'Th2', 'Th3', 'Th4', 'Th5', 'Th6', 'Th7', 'Th8', 'Th9', 'Th10', 'Th11', 'Th12'];
+      return {
+        month: monthNames[parseInt(mon) - 1],
+        revenue: amount,
+      };
+    });
+    chartType = "bar";
+    xAxisKey = "month";
+    chartTitle = "Doanh thu theo tháng";
+  }
+
   const courtsByStatusData = Object.entries(dashboard?.courtsByStatus || {}).map(([status, count]) => ({
     name: status,
     value: count,
   }));
+
   const bookingsByStatusData = Object.entries(dashboard?.bookingsByStatus || {}).map(([status, count]) => ({
     name: status,
     value: count,
   }));
-  const dailyRevenueData = Object.entries(dashboard?.dailyRevenue || {}).map(([date, amount]) => ({
-    date,
-    amount,
-  }));
-  const monthlyRevenueData = Object.entries(dashboard?.monthlyRevenue || {}).map(([month, amount]) => ({
-    month,
-    amount,
-  }));
 
   return (
     <div className="flex-1 p-6">
-      {/* Page Header */}
+      {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Tổng quan cho chủ sân</h2>
         <p className="text-gray-600">Xem tổng quan hoạt động kinh doanh của bạn</p>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Tổng số sân</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboard?.totalCourts ?? 0}</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
-              <FiGrid className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Tổng đặt sân</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboard?.totalBookings ?? 0}</p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
-              <FiCalendar className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Tổng doanh thu</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboard?.totalRevenue.toLocaleString() ?? 0} VND</p>
-            </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-2xl flex items-center justify-center">
-              <FiDollarSign className="w-6 h-6 text-yellow-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Đánh giá trung bình</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboard?.averageRating.toFixed(1) ?? 0}</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
-              <FiStar className="w-6 h-6 text-purple-600" />
+      {/* Date Range Filter */}
+      <div className="mb-6 bg-white rounded-2xl p-6 shadow-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Preset Buttons */}
+          <div className="lg:col-span-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-4">
+              {[
+                { key: "today", label: "Hôm nay" },
+                { key: "yesterday", label: "Hôm qua" },
+                { key: "week", label: "Tuần" },
+                { key: "month", label: "Tháng" },
+                { key: "lastMonth", label: "Th. trước" },
+                { key: "year", label: "Năm" },
+              ].map((item) => {
+                const isActive = !dateRange.customRange && (
+                  (item.key === "today" && dateRange.startDate.toDateString() === dateRange.endDate.toDateString()) ||
+                  (item.key === "yesterday" && 
+                   new Date(dateRange.startDate.getTime() - 86400000).toDateString() === new Date().toDateString()) ||
+                  (item.key === "month" && dateRange.startDate.getDate() === 1 && 
+                   dateRange.startDate.getMonth() === dateRange.endDate.getMonth() && 
+                   dateRange.startDate.getFullYear() === dateRange.endDate.getFullYear()) ||
+                  (item.key === "year" && dateRange.startDate.getMonth() === 0 && 
+                   dateRange.startDate.getDate() === 1 && 
+                   dateRange.startDate.getFullYear() === dateRange.endDate.getFullYear())
+                );
+                
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => handlePresetFilter(item.key)}
+                    className={`px-3 py-2 text-xs rounded-lg font-medium transition-all ${
+                      isActive
+                        ? "bg-[#23AEB1] text-white shadow-md"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Tổng phản hồi</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboard?.totalFeedbacks ?? 0}</p>
-            </div>
-            <div className="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center">
-              <FiStar className="w-6 h-6 text-indigo-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Tổng gói chủ sân</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboard?.totalOwnerPackages ?? 0}</p>
-            </div>
-            <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center">
-              <FiPackage className="w-6 h-6 text-orange-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Gói chủ sân hoạt động</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboard?.activeOwnerPackages ?? 0}</p>
-            </div>
-            <div className="w-12 h-12 bg-teal-100 rounded-2xl flex items-center justify-center">
-              <FiPackage className="w-6 h-6 text-teal-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Tổng bài đăng tìm bạn chơi</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboard?.totalPlaymatePosts ?? 0}</p>
-            </div>
-            <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center">
-              <FiUsers className="w-6 h-6 text-pink-600" />
+
+          {/* Date Picker */}
+          <div className="flex flex-col sm:flex-row gap-3 items-center">
+            <DatePicker
+              selectsRange
+              startDate={dateRange.startDate}
+              endDate={dateRange.endDate}
+              onChange={handleDateChange}
+              locale={vi}
+              dateFormat="dd/MM/yyyy"
+              className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23AEB1] focus:border-transparent"
+              placeholderText="Chọn khoảng thời gian"
+              endDatePlaceholder="Đến ngày"
+              wrapperClassName="w-full"
+            />
+            <span className="text-sm text-gray-500 hidden sm:block">|</span>
+            <div className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-2 rounded-lg">
+              {getPeriodDisplay()}
             </div>
           </div>
         </div>
       </div>
 
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {[
+          { icon: FiGrid, label: "Tổng số sân", value: dashboard?.totalCourts ?? 0, color: "blue" },
+          { icon: FiCalendar, label: "Tổng đặt sân", value: dashboard?.totalBookings ?? 0, color: "green" },
+          { icon: FiDollarSign, label: "Doanh thu", value: dashboard?.totalRevenue?.toLocaleString() ?? 0, color: "yellow", suffix: "VND" },
+          { icon: FiStar, label: "Đánh giá TB", value: dashboard?.averageRating?.toFixed(1) ?? 0, color: "purple" },
+        ].map((stat, index) => (
+          <div key={index} className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stat.value} {stat.suffix || ""}
+                </p>
+              </div>
+              <div className={`w-12 h-12 bg-${stat.color}-100 rounded-2xl flex items-center justify-center`}>
+                <stat.icon className={`w-6 h-6 text-${stat.color}-600`} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Courts By Status */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Sân theo trạng thái</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={courtsByStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label>
+              <Pie 
+                data={courtsByStatusData} 
+                dataKey="value" 
+                nameKey="name" 
+                cx="50%" 
+                cy="50%" 
+                outerRadius={80} 
+                label
+              >
                 {courtsByStatusData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -206,11 +310,21 @@ const OwnerDashboard: React.FC = () => {
             </PieChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Bookings By Status */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Đặt sân theo trạng thái</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={bookingsByStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label>
+              <Pie 
+                data={bookingsByStatusData} 
+                dataKey="value" 
+                nameKey="name" 
+                cx="50%" 
+                cy="50%" 
+                outerRadius={80} 
+                label
+              >
                 {bookingsByStatusData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -220,120 +334,130 @@ const OwnerDashboard: React.FC = () => {
             </PieChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Revenue Chart - Dynamic */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Doanh thu hàng ngày</h3>
-            <div className="flex gap-2">
-              <button
-                className="px-3 py-1 text-sm bg-[#23AEB1] rounded-lg"
-                onClick={() => handleFilterChange("30days")}
-              >
-                30 ngày
-              </button>
-              <button
-                className="px-3 py-1 text-sm bg-gray-100 rounded-lg"
-                onClick={() => handleFilterChange("7days")}
-              >
-                7 ngày
-              </button>
-              <button
-                className="px-3 py-1 text-sm bg-gray-100 rounded-lg"
-                onClick={() => handleFilterChange("today")}
-              >
-                Hôm nay
-              </button>
-            </div>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{chartTitle}</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dailyRevenueData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="amount" fill="#8884d8" />
-            </BarChart>
+            {chartType === "line" ? (
+              <LineChart data={revenueChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey={xAxisKey} />
+                <YAxis />
+                <Tooltip formatter={(value) => [`${value?.toLocaleString()} VND`, "Doanh thu"]} />
+                <Legend />
+                <Line type="monotone" dataKey="revenue" stroke="#23AEB1" strokeWidth={2} />
+              </LineChart>
+            ) : (
+              <BarChart data={revenueChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey={xAxisKey} />
+                <YAxis />
+                <Tooltip formatter={(value) => [`${value?.toLocaleString()} VND`, "Doanh thu"]} />
+                <Legend />
+                <Bar dataKey="revenue" fill="#23AEB1" />
+              </BarChart>
+            )}
           </ResponsiveContainer>
         </div>
+
+        {/* Monthly Revenue Bar */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Doanh thu hàng tháng</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyRevenueData}>
+            <BarChart data={Object.entries(dashboard?.monthlyRevenue || {}).map(([month, amount]) => ({
+              month,
+              revenue: amount,
+            }))}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
-              <Tooltip />
+              <Tooltip formatter={(value) => [`${value?.toLocaleString()} VND`, "Doanh thu"]} />
               <Legend />
-              <Bar dataKey="amount" fill="#82ca9d" />
+              <Bar dataKey="revenue" fill="#82ca9d" />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Top Courts + Recent Bookings + Recent Feedbacks */}
+      {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top Courts */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top sân có lượt đặt cao nhất</h3>
-          <div className="space-y-4">
-            {topCourts.map((court) => (
-              <div key={court.courtId} className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold">{court.name}</p>
-                  <p className="text-gray-500 text-sm">ID: {court.courtId}</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top sân phổ biến</h3>
+          <div className="space-y-3">
+            {topCourts.map((court, index) => (
+              <div key={court.courtId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 bg-[#23AEB1] text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <p className="font-semibold text-sm">{court.name}</p>
+                    <p className="text-gray-500 text-xs">ID: {court.courtId}</p>
+                  </div>
                 </div>
-                <p className="text-gray-900 font-semibold">{court.bookingCount} lượt</p>
+                <p className="text-[#23AEB1] font-semibold">{court.bookingCount} lượt</p>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Recent Bookings */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Đặt sân gần đây</h3>
-            <button className="text-[#23AEB1] text-sm">Xem tất cả</button>
+            <h3 className="text-lg font-semibold text-gray-900">Đặt sân mới</h3>
+            <button className="text-[#23AEB1] text-sm hover:underline">Xem tất cả →</button>
           </div>
-          <div className="space-y-4">
-            {recentBookings.map((booking) => (
-              <div key={booking.bookingId} className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold">{booking.userName}</p>
-                  <p className="text-gray-500 text-sm">
-                    {booking.courtName} - {new Date(booking.bookingDate).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    booking.status === "Paid"
-                      ? "bg-green-100 text-green-700"
+          <div className="space-y-3">
+            {recentBookings.slice(0, 5).map((booking) => (
+              <div key={booking.bookingId} className="p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate">{booking.userName}</p>
+                    <p className="text-gray-500 text-xs truncate">
+                      {booking.courtName} - {new Date(booking.bookingDate).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
+                    booking.status === "Paid" 
+                      ? "bg-green-100 text-green-700" 
                       : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {booking.status === "Paid" ? "Đã thanh toán" : "Chờ thanh toán"}
-                </span>
+                  }`}>
+                    {booking.status === "Paid" ? "Đã TT" : "Chờ"}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Recent Feedbacks */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Phản hồi gần đây</h3>
-            <button className="text-[#23AEB1] text-sm">Xem tất cả</button>
+            <h3 className="text-lg font-semibold text-gray-900">Phản hồi mới</h3>
+            <button className="text-[#23AEB1] text-sm hover:underline">Xem tất cả →</button>
           </div>
-          <div className="space-y-4">
-            {recentFeedbacks.map((feedback) => (
-              <div key={feedback.feedbackId} className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold">{feedback.userName}</p>
-                  <p className="text-gray-500 text-sm">
-                    {feedback.courtName} - {feedback.rating} sao
+          <div className="space-y-3">
+            {recentFeedbacks.slice(0, 5).map((feedback) => (
+              <div key={feedback.feedbackId} className="p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate">{feedback.userName}</p>
+                    <div className="flex items-center gap-1 text-xs text-yellow-500 mb-1">
+                      {[...Array(5)].map((_, i) => (
+                        <FiStar key={i} className={i < feedback.rating ? "fill-current" : ""} />
+                      ))}
+                    </div>
+                    <p className="text-gray-500 text-xs line-clamp-2">{feedback.comment}</p>
+                  </div>
+                  <p className="text-gray-400 text-xs ml-2 whitespace-nowrap">
+                    {new Date(feedback.createAt).toLocaleDateString()}
                   </p>
-                  <p className="text-gray-500 text-sm">{feedback.comment}</p>
                 </div>
-                <p className="text-gray-500 text-sm">
-                  {new Date(feedback.createAt).toLocaleDateString()}
-                </p>
               </div>
             ))}
           </div>

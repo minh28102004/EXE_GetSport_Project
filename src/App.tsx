@@ -68,6 +68,7 @@ import CancelPage from "./pages/OwnerPage/OwnerPackages/CancelPage";
 import OwnerPackagesList from "./pages/OwnerPage/OwnerPackages/OwnerPackagesList";
 import MySubscriptions from "./pages/OwnerPage/OwnerPackages/MySubscriptions";
 import ResetPassword from "./pages/AuthPage/ForgotPassword/ResetPassword";
+import MyPlaymateJoins from "./pages/CustomerPage/PlaymateJoins/MyPlaymateJoins";
 
 function AppRoutes() {
   return (
@@ -105,6 +106,7 @@ function AppRoutes() {
           <Route path="/booking-history" element={<BookingHistory />} />
           <Route path="/booking-detail/:bookingId" element={<BookingDetail/>} />
           <Route path="/booking/callback/cancel" element={<BookingCallback />} />
+           <Route path="/playjoin/my" element={<MyPlaymateJoins />} />
           <Route
             path={endPoint.TERMSOFSERVICE}
             element={<TermsOfServicePage />}

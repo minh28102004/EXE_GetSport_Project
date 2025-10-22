@@ -13,7 +13,7 @@ import { logout } from "@redux/features/auth/authSlice";
 import LoadingSpinner from "@components/Loading_Spinner"; // ⬅️ dùng spinner bạn đưa
 
 /* ================= Types ================= */
-export type TabId = "profile" | "history" | "posts" | "reviews";
+export type TabId = "profile" | "history" | "posts" | "reviews" | "playjoin";
 export type NavItem = {
   id: TabId;
   label: string;
