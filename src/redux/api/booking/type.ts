@@ -9,6 +9,7 @@ export type CourtBookingDto = {
   status: string;
   amount: number;
   createAt: Date;
+  paymentMethod: 'PayOS' | 'Wallet';
 };
 
 export type CourtBooking = {
