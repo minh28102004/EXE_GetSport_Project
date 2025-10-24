@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Calendar, Clock, DollarSign, MapPin } from "lucide-react";
+import { Calendar, Clock, DollarSign, MapPin, CreditCard, Wallet } from "lucide-react";
 import { useGetCourtQuery } from "@redux/api/court/courtApi";
 import { useGetSlotsByCourtAndDateQuery } from "@redux/api/courtSlot/courtSlotApi";
 import { useCreateCourtBookingMutation } from "@redux/api/booking/courtBookingApi";
@@ -10,6 +10,7 @@ import LoadingSpinner from "@components/Loading_Spinner";
 import dayjs from "dayjs";
 import { useSelector } from "react-redux";
 import { selectAuth } from "@/redux/features/auth/authSlice";
+import { toast } from "react-toastify";
 
 const CourtBookingPay: React.FC = () => {
   const { courtId } = useParams<{ courtId: string }>();
@@ -18,6 +19,7 @@ const CourtBookingPay: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
   const [voucherCode, setVoucherCode] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<'PayOS' | 'Wallet'>('PayOS'); 
 
   useEffect(() => {
     if (!accessToken) {
@@ -49,7 +51,10 @@ const CourtBookingPay: React.FC = () => {
   if (courtLoading) {
     return (
       <div className="min-h-screen bg-slate-100/60 flex items-center justify-center">
-        <div className="text-center text-gray-600 text-lg"><LoadingSpinner inline /> Đang tải thông tin sân...</div>
+        <div className="text-center text-gray-600 text-lg">
+          <LoadingSpinner inline />
+          Đang tải thông tin sân...
+        </div>
       </div>
     );
   }
@@ -72,13 +77,13 @@ const CourtBookingPay: React.FC = () => {
     }
 
     if (!selectedSlotId) {
-      alert("Vui lòng chọn khung giờ.");
+      toast.error("Vui lòng chọn khung giờ.");
       return;
     }
 
     const selectedSlot = slots.find((slot) => slot.id === selectedSlotId);
     if (!selectedSlot) {
-      alert("Khung giờ không hợp lệ.");
+      toast.error("Khung giờ không hợp lệ.");
       return;
     }
 
@@ -89,23 +94,33 @@ const CourtBookingPay: React.FC = () => {
       const bookingData = {
         courtId: Number(courtId),
         slotId: selectedSlotId,
-        bookingDate: new Date(selectedDate),
+        bookingdate: selectedDate, // ✅ Gửi string YYYY-MM-DD
         amount,
         voucherCode: voucherCode || undefined,
+        paymentMethod, // ✅ GỬI PHƯƠNG THỨC THANH TOÁN
       };
 
       const response = await createCourtBooking(bookingData).unwrap();
-      if (response.paymentLink) {
+
+      if (paymentMethod === 'PayOS' && response.paymentLink) {
+        // ✅ PAYOS: Chuyển hướng
+        toast.success("Chuyển đến PayOS để thanh toán!");
         window.location.href = response.paymentLink;
       } else {
-        alert("Đặt sân thành công!");
-        navigate("/");
+        // ✅ WALLET: Thành công ngay
+        toast.success("Đặt sân thành công bằng ví!");
+        setTimeout(() => navigate('/'), 2000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Booking error:", error);
-      alert("Lỗi khi đặt sân: " + (bookingError as any)?.data?.Message || "Vui lòng thử lại.");
+      toast.error(error?.data?.message || "Lỗi khi đặt sân. Vui lòng thử lại.");
     }
   };
+
+  const selectedSlot = selectedSlotId ? slots.find((slot) => slot.id === selectedSlotId) : null;
+  const totalAmount = selectedSlot 
+    ? ((new Date(selectedSlot.endTime).getTime() - new Date(selectedSlot.startTime).getTime()) / 3600000) * court.pricePerHour 
+    : 0;
 
   return (
     <div className="min-h-screen bg-slate-100/60 py-10">
@@ -216,32 +231,64 @@ const CourtBookingPay: React.FC = () => {
                         : "Chưa chọn"}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Tổng giá</span>
-                    <span className="font-medium">
-                      {selectedSlotId && slots.find((s) => s.id === selectedSlotId)
-                        ? formatPrice(
-                            ((new Date(slots.find((s) => s.id === selectedSlotId)!.endTime).getTime() -
-                              new Date(slots.find((s) => s.id === selectedSlotId)!.startTime).getTime()) /
-                              3600000) * court.pricePerHour
-                          ) + " ₫"
-                        : "Chưa chọn"}
+                  <div className="flex justify-between text-sm font-semibold text-lg">
+                    <span>Tổng tiền</span>
+                    <span className="text-[#1e9ea1]">
+                      {totalAmount ? formatPrice(totalAmount) + " ₫" : "Chưa chọn"}
                     </span>
                   </div>
+
+                  {/* ✅ PHƯƠNG THỨC THANH TOÁN */}
+                  <div className="border-t pt-4">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Phương thức thanh toán</h4>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => setPaymentMethod('PayOS')}
+                        className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                          paymentMethod === 'PayOS'
+                            ? 'bg-gradient-to-r from-[#2ebabc] to-[#21a5a9] text-white border-[#1e9ea1]'
+                            : 'border-gray-300 hover:border-[#1e9ea1]'
+                        }`}
+                      >
+                        <CreditCard className="w-4 h-4" />
+                        <span>PayOS (Thẻ, ví điện tử)</span>
+                      </button>
+                      <button
+                        onClick={() => setPaymentMethod('Wallet')}
+                        className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                          paymentMethod === 'Wallet'
+                            ? 'bg-gradient-to-r from-[#2ebabc] to-[#21a5a9] text-white border-[#1e9ea1]'
+                            : 'border-gray-300 hover:border-[#1e9ea1]'
+                        }`}
+                      >
+                        <Wallet className="w-4 h-4" />
+                        <span>Ví của tôi (Nhanh chóng)</span>
+                      </button>
+                    </div>
+                  </div>
+
                   <button
                     onClick={handleBooking}
                     disabled={bookingLoading || !selectedSlotId}
-                    className={`w-full py-3 rounded-lg font-medium text-white transition ${
+                    className={`w-full py-3 rounded-lg font-medium text-white transition-all ${
                       bookingLoading || !selectedSlotId
                         ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-gradient-to-r from-[#2ebabc] to-[#21a5a9] hover:brightness-95"
+                        : "bg-gradient-to-r from-[#2ebabc] to-[#21a5a9] hover:brightness-95 hover:shadow-lg"
                     }`}
                   >
-                    {bookingLoading ? <LoadingSpinner inline /> : "Đặt Sân"}
+                    {bookingLoading ? (
+                      <LoadingSpinner inline />
+                    ) : (
+                      <>
+                        {paymentMethod === 'PayOS' ? 'Thanh Toán Qua PayOS' : 'Đặt Sân Bằng Ví'}
+                        <span className="ml-2 text-sm">({formatPrice(totalAmount)} ₫)</span>
+                      </>
+                    )}
                   </button>
+
                   {bookingError && (
-                    <p className="text-red-500 text-sm text-center">
-                      {(bookingError as any)?.data?.Message || "Lỗi khi đặt sân. Vui lòng thử lại."}
+                    <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg">
+                      {(bookingError as any)?.data?.message || "Lỗi khi đặt sân. Vui lòng thử lại."}
                     </p>
                   )}
                 </div>

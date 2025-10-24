@@ -69,6 +69,7 @@ import OwnerPackagesList from "./pages/OwnerPage/OwnerPackages/OwnerPackagesList
 import MySubscriptions from "./pages/OwnerPage/OwnerPackages/MySubscriptions";
 import ResetPassword from "./pages/AuthPage/ForgotPassword/ResetPassword";
 import MyPlaymateJoins from "./pages/CustomerPage/PlaymateJoins/MyPlaymateJoins";
+import DepositSuccess from "./pages/CustomerPage/Profile/DepositSuccess";
 
 function AppRoutes() {
   return (
@@ -107,6 +108,7 @@ function AppRoutes() {
           <Route path="/booking-detail/:bookingId" element={<BookingDetail/>} />
           <Route path="/booking/callback/cancel" element={<BookingCallback />} />
            <Route path="/playjoin/my" element={<MyPlaymateJoins />} />
+           <Route path="/wallet/deposit-success/:orderCode" element={<DepositSuccess />} />
           <Route
             path={endPoint.TERMSOFSERVICE}
             element={<TermsOfServicePage />}

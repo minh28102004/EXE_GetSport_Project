@@ -174,7 +174,7 @@ const MyPlaymateJoins: React.FC = () => {
 
   // Handle view post
   const handleViewPost = (postId: number) => {
-    navigate(`/playmate-post/${postId}`);
+    navigate(`/playPost/${postId}`);
   };
 
   return (
@@ -455,43 +455,6 @@ const MyPlaymateJoins: React.FC = () => {
           </div>
         )}
       </section>
-
-      {/* Quick Stats */}
-      {joins.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="opacity-90">Tổng tham gia</p>
-                <p className="text-2xl font-bold">{totalCount}</p>
-              </div>
-              <Users className="w-12 h-12 opacity-75" />
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="opacity-90">Đã xác nhận</p>
-                <p className="text-2xl font-bold">
-                  {joins.filter(j => j.postStatus === "Confirmed").length}
-                </p>
-              </div>
-              <CheckCircle className="w-12 h-12 opacity-75" />
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl p-6 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="opacity-90">Chờ xác nhận</p>
-                <p className="text-2xl font-bold">
-                  {joins.filter(j => j.postStatus === "Pending").length}
-                </p>
-              </div>
-              <Clock className="w-12 h-12 opacity-75" />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -59,7 +59,7 @@ const PaymentPage: React.FC = () => {
       };
 
       const response = await createOwnerPackageBooking(ownerPackageData).unwrap();
-      if(response?.data?.isFreeTrial == tru) {
+      if(response?.data?.isFreeTrial == true) {
             toast.info("Gói FREE_TRIAL đã được kích hoạt thành công! Bạn có thể tạo sân ngay.");
             navigate("/layoutOwner/my-subscriptions");
       }

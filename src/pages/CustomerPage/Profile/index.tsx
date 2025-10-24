@@ -8,6 +8,7 @@ import {
   Edit3,
   Trophy,
   Bell,
+  ArrowRight,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -16,6 +17,10 @@ import {
   useGetUserQuery,
   useUpdateAccountMutation,
 } from "@redux/api/account/accountApi";
+import {
+  useGetCurrentWalletQuery,
+  useDepositToWalletMutation,
+} from "@redux/api/wallet/walletApi";
 import { selectToken } from "@redux/features/auth/authSlice";
 import { getUserIdFromToken } from "@utils/jwt";
 
@@ -31,7 +36,7 @@ type FormState = {
 
 function fmtMoney(v?: number) {
   try {
-    return (v ?? 0).toLocaleString("vi-VN");
+    return (v ?? 0).toLocaleString("vi-VN") + " ₫";
   } catch {
     return String(v ?? 0);
   }
@@ -40,20 +45,38 @@ function fmtMoney(v?: number) {
 const Profile: React.FC = () => {
   const token = useSelector(selectToken);
   const userId = useMemo(() => getUserIdFromToken(token), [token]);
-  console.log("Extracted userId from token:", userId);  
-  const { data, isLoading, isFetching, error, refetch } = useGetUserQuery(userId!, {
+  
+  // Account API
+  const { 
+    data: accountData, 
+    isLoading: accountLoading, 
+    isFetching: accountFetching, 
+    error: accountError, 
+    refetch: refetchAccount 
+  } = useGetUserQuery(userId!, {
     skip: !userId || !token,
     refetchOnMountOrArgChange: true,
-    refetchOnFocus: true,
-    refetchOnReconnect: true,
   });
 
+  // WALLET API - ✅ MỚI
+  const { 
+    data: walletData, 
+    isLoading: walletLoading, 
+    refetch: refetchWallet 
+  } = useGetCurrentWalletQuery(undefined, { skip: !userId || !token });
+
   const [updateAccount, { isLoading: saving }] = useUpdateAccountMutation();
+  const [depositToWallet, { isLoading: depositing }] = useDepositToWalletMutation(); 
 
-  const account = data?.data;
+  const account = accountData?.data;
+  const wallet = walletData?.data;
 
+  // States
   const [editMode, setEditMode] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(true);
+  const [showDepositModal, setShowDepositModal] = useState(false); 
+  const [depositAmount, setDepositAmount] = useState(100000); 
+
   const [form, setForm] = useState<FormState>({
     fullName: "",
     email: "",
@@ -64,17 +87,11 @@ const Profile: React.FC = () => {
     membershipType: "",
   });
 
-  // Debugging logs
-  useEffect(() => {
-    console.log("Profile Debug:", { token, userId, data, error, account });
-  }, [token, userId, data, error, account]);
-
-  // Initialize form with account data
   useEffect(() => {
     if (!account) return;
     setForm({
-      fullName: account.fullName ?? "Tan Kim",
-      email: account.email ?? "kimltce170469@fpt.edu.vn",
+      fullName: account.fullName ?? "",
+      email: account.email ?? "",
       phoneNumber: account.phoneNumber ?? "",
       dateOfBirth: account.dateOfBirth ? new Date(account.dateOfBirth).toISOString().split("T")[0] : "",
       gender: account.gender ?? "",
@@ -83,6 +100,28 @@ const Profile: React.FC = () => {
     });
   }, [account]);
 
+  const handleDeposit = async () => {
+    if (!userId || depositAmount < 10000) {
+      toast.error("Số tiền tối thiểu 10,000 ₫");
+      return;
+    }
+
+    try {
+      const orderCode = Date.now();
+      const result = await depositToWallet({ 
+        amount: depositAmount, 
+        orderCode 
+      }).unwrap();
+
+      toast.success("Chuyển đến PayOS thanh toán!");
+      
+      // ✅ AUTO REDIRECT TO PAYOS
+      window.location.href = result.data.paymentLink;
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Tạo thanh toán thất bại");
+    }
+  };
+
   const onChange =
     (k: keyof FormState) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -90,11 +129,7 @@ const Profile: React.FC = () => {
 
   const completionRate = useMemo(() => {
     const keys: (keyof FormState)[] = [
-      "fullName",
-      "email",
-      "phoneNumber",
-      "dateOfBirth",
-      "gender",
+      "fullName", "email", "phoneNumber", "dateOfBirth", "gender",
     ];
     const filled = keys.filter((k) => (form[k] ?? "").toString().trim()).length;
     return Math.round((filled / keys.length) * 100);
@@ -119,7 +154,7 @@ const Profile: React.FC = () => {
       await updateAccount({ id: userId, body }).unwrap();
       toast.success("Cập nhật hồ sơ thành công!");
       setEditMode(false);
-      refetch();
+      refetchAccount();
     } catch (e: any) {
       console.error("Update error:", e);
       toast.error(e?.data?.message || "Cập nhật thất bại. Vui lòng thử lại.");
@@ -144,15 +179,15 @@ const Profile: React.FC = () => {
   }
 
   // Handle API error
-  if (error) {
+  if (accountError) {
     return (
       <div className="max-w-6xl mx-auto p-6 lg:p-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
           <p className="text-red-500 text-lg">
-            {(error as any)?.data?.message || "Lỗi khi tải hồ sơ. Vui lòng thử lại."}
+            {(accountError as any)?.data?.message || "Lỗi khi tải hồ sơ. Vui lòng thử lại."}
           </p>
           <button
-            onClick={() => refetch()}
+            onClick={() => refetchAccount()}
             className="mt-4 px-4 py-2.5 bg-gradient-to-r from-[#23AEB1] to-[#1B8E90] text-white rounded-xl hover:shadow-lg transition-all duration-200"
           >
             Thử Lại
@@ -163,28 +198,28 @@ const Profile: React.FC = () => {
   }
 
   // Handle loading state
-  if (isLoading) {
+  if (accountLoading || walletLoading) {
     return (
       <div className="max-w-6xl mx-auto p-10">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10">
           <LoadingSpinner size="12" />
-          <p className="text-center mt-2 text-gray-500">Đang tải hồ sơ…</p>
+          <p className="text-center mt-2 text-gray-500">Đang tải hồ sơ & ví…</p>
         </div>
       </div>
     );
   }
 
   // Handle no account data
-  if (!account) {
+  if (!account || !wallet) {
     return (
       <div className="max-w-6xl mx-auto p-6 lg:p-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
           <p className="text-gray-500 text-lg">Không tìm thấy thông tin hồ sơ.</p>
           <button
-            onClick={() => refetch()}
+            onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2.5 bg-gradient-to-r from-[#23AEB1] to-[#1B8E90] text-white rounded-xl hover:shadow-lg transition-all duration-200"
           >
-            Thử Lại
+            Tải Lại
           </button>
         </div>
       </div>
@@ -232,9 +267,10 @@ const Profile: React.FC = () => {
               <p className="text-gray-500 text-sm mb-3">{account?.email || "—"}</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-2">
+                {/* ✅ WALLET BALANCE TỪ API WALLET */}
                 <div className="text-center sm:text-left">
                   <div className="text-2xl font-bold text-[#23AEB1]">
-                    {fmtMoney(account?.walletBalance)} ₫
+                    {fmtMoney(account.walletBalance)}
                   </div>
                   <div className="text-xs text-gray-500">Số dư ví</div>
                 </div>
@@ -270,9 +306,11 @@ const Profile: React.FC = () => {
                     <Edit3 className="w-4 h-4" />
                     Chỉnh sửa
                   </button>
+                  {/* ✅ NẠP VÍ BUTTON - FUNCTIONAL */}
                   <button
                     type="button"
-                    className="flex-1 sm:flex-none px-4 py-2.5 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-[#23AEB1] hover:text-[#23AEB1] transition-all duration-200 flex items-center justify-center gap-2 font-medium"
+                    onClick={() => setShowDepositModal(true)}
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-white border-2 border-[#23AEB1] text-[#23AEB1] rounded-xl hover:bg-[#23AEB1] hover:text-white transition-all duration-200 flex items-center justify-center gap-2 font-medium"
                   >
                     <CreditCard className="w-4 h-4" />
                     Nạp ví
@@ -299,8 +337,8 @@ const Profile: React.FC = () => {
                     onClick={() => {
                       setEditMode(false);
                       setForm({
-                        fullName: account.fullName ?? "Tan Kim",
-                        email: account.email ?? "kimltce170469@fpt.edu.vn",
+                        fullName: account.fullName ?? "",
+                        email: account.email ?? "",
                         phoneNumber: account.phoneNumber ?? "",
                         dateOfBirth: account.dateOfBirth ? new Date(account.dateOfBirth).toISOString().split("T")[0] : "",
                         gender: account.gender ?? "",
@@ -320,12 +358,8 @@ const Profile: React.FC = () => {
           {/* Completion progress */}
           <div className="mt-6 p-4 bg-gradient-to-r from-[#E6F7F8] to-[#F7FAFC] rounded-xl border border-[#23AEB1]/20">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">
-                Hoàn thiện hồ sơ
-              </span>
-              <span className="text-sm font-bold text-[#23AEB1]">
-                {completionRate}%
-              </span>
+              <span className="text-sm font-medium text-gray-700">Hoàn thiện hồ sơ</span>
+              <span className="text-sm font-bold text-[#23AEB1]">{completionRate}%</span>
             </div>
             <div className="h-2 bg-white rounded-full overflow-hidden">
               <div
@@ -337,7 +371,76 @@ const Profile: React.FC = () => {
         </div>
       </section>
 
-      {/* Info grid */}
+      {/* ✅ DEPOSIT MODAL - MỚI */}
+      {showDepositModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Nạp Tiền Vào Ví</h3>
+            
+            {/* Current Balance */}
+            <div className="text-center py-4 bg-gradient-to-r from-[#E6F7F8] to-[#F7FAFC] rounded-xl mb-6">
+              <p className="text-3xl font-bold text-[#23AEB1] mb-1">
+                {fmtMoney(wallet.balance)}
+              </p>
+              <p className="text-sm text-gray-500">Số dư hiện tại</p>
+            </div>
+
+            {/* Amount Input */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Số tiền nạp (VND)
+              </label>
+              <input
+                type="number"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(Number(e.target.value))}
+                min="10000"
+                max="50000000"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#23AEB1] focus:border-[#23AEB1]"
+                placeholder="Nhập số tiền (tối thiểu 10,000 ₫)"
+              />
+            </div>
+
+            {/* Payment Info */}
+            <div className="p-3 bg-gray-50 rounded-lg mb-6">
+              <div className="flex items-center gap-2 mb-1">
+                <CreditCard className="w-4 h-4 text-[#23AEB1]" />
+                <span className="font-medium text-[#23AEB1]">PayOS</span>
+              </div>
+              <p className="text-xs text-gray-500">Thẻ ATM, chuyển khoản, ví điện tử</p>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowDepositModal(false)}
+                className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+                disabled={depositing}
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={handleDeposit}
+                disabled={depositing || depositAmount < 10000}
+                className="flex-1 py-3 px-4 bg-gradient-to-r from-[#23AEB1] to-[#1B8E90] text-white rounded-xl flex items-center justify-center gap-2 font-medium hover:shadow-lg transition-all disabled:opacity-70"
+              >
+                {depositing ? (
+                  <LoadingSpinner inline color="white" size="4" />
+                ) : (
+                  <>
+                    Nạp {fmtMoney(depositAmount)}
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Info grid - GIỮ NGUYÊN */}
       <section className="grid lg:grid-cols-2 gap-6">
         {/* Personal info */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -352,9 +455,7 @@ const Profile: React.FC = () => {
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-gray-500 mb-0.5">Họ tên</div>
                 {!editMode ? (
-                  <div className="font-medium text-gray-900">
-                    {form.fullName || "—"}
-                  </div>
+                  <div className="font-medium text-gray-900">{form.fullName || "—"}</div>
                 ) : (
                   <input
                     value={form.fullName}
@@ -372,9 +473,7 @@ const Profile: React.FC = () => {
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-gray-500 mb-0.5">Ngày sinh</div>
                 {!editMode ? (
-                  <div className="font-medium text-gray-900">
-                    {form.dateOfBirth || "—"}
-                  </div>
+                  <div className="font-medium text-gray-900">{form.dateOfBirth || "—"}</div>
                 ) : (
                   <input
                     type="date"
@@ -392,9 +491,7 @@ const Profile: React.FC = () => {
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-gray-500 mb-0.5">Giới tính</div>
                 {!editMode ? (
-                  <div className="font-medium text-gray-900">
-                    {form.gender || "—"}
-                  </div>
+                  <div className="font-medium text-gray-900">{form.gender || "—"}</div>
                 ) : (
                   <select
                     value={form.gender}
@@ -414,15 +511,11 @@ const Profile: React.FC = () => {
 
             {/* Phone */}
             <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-              <div className="w-5 h-5 text-gray-400 flex items-center justify-center text-lg">
-                📱
-              </div>
+              <div className="w-5 h-5 text-gray-400 flex items-center justify-center text-lg">📱</div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-gray-500 mb-0.5">Số điện thoại</div>
                 {!editMode ? (
-                  <div className="font-medium text-gray-900">
-                    {form.phoneNumber || "—"}
-                  </div>
+                  <div className="font-medium text-gray-900">{form.phoneNumber || "—"}</div>
                 ) : (
                   <input
                     value={form.phoneNumber}
@@ -436,15 +529,11 @@ const Profile: React.FC = () => {
 
             {/* Email */}
             <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-              <div className="w-5 h-5 text-gray-400 flex items-center justify-center text-lg">
-                ✉️
-              </div>
+              <div className="w-5 h-5 text-gray-400 flex items-center justify-center text-lg">✉️</div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-gray-500 mb-0.5">Email</div>
                 {!editMode ? (
-                  <div className="font-medium text-gray-900 truncate">
-                    {form.email || "—"}
-                  </div>
+                  <div className="font-medium text-gray-900 truncate">{form.email || "—"}</div>
                 ) : (
                   <input
                     type="email"
@@ -472,9 +561,7 @@ const Profile: React.FC = () => {
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-gray-500 mb-0.5">Trình độ</div>
                 {!editMode ? (
-                  <div className="font-medium text-gray-900">
-                    {form.skillLevel || "—"}
-                  </div>
+                  <div className="font-medium text-gray-900">{form.skillLevel || "—"}</div>
                 ) : (
                   <input
                     value={form.skillLevel}
@@ -492,9 +579,7 @@ const Profile: React.FC = () => {
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-gray-500 mb-0.5">Hạng thành viên</div>
                 {!editMode ? (
-                  <div className="font-medium text-gray-900">
-                    {form.membershipType || "—"}
-                  </div>
+                  <div className="font-medium text-gray-900">{form.membershipType || "—"}</div>
                 ) : (
                   <input
                     value={form.membershipType}
@@ -537,25 +622,19 @@ const Profile: React.FC = () => {
       </section>
 
       {/* Achievements */}
-      <section
-        aria-labelledby="achievements"
-        className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6"
-      >
-        <h2
-          id="achievements"
-          className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"
-        >
+      <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-6">
+        <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
           <Trophy className="w-5 h-5 text-[#23AEB1]" />
           Thành tích & Huy hiệu
         </h2>
         <div className="text-gray-500 text-sm">Tính năng đang phát triển.</div>
       </section>
 
-      {(isFetching || saving) && (
+      {(accountFetching || saving || depositing) && (
         <div className="fixed bottom-4 right-4 bg-white shadow-lg rounded-xl px-3 py-2 border border-gray-100 flex items-center gap-2">
           <LoadingSpinner inline size="4" />
           <span className="text-sm text-gray-600">
-            {saving ? "Đang lưu thay đổi…" : "Đang đồng bộ dữ liệu…"}
+            {depositing ? "Đang tạo thanh toán…" : saving ? "Đang lưu thay đổi…" : "Đang đồng bộ…"}
           </span>
         </div>
       )}
