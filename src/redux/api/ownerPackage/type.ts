@@ -37,6 +37,7 @@ export type OwnerPackageCreateDto = {
   enddate: string;
   price: number;
   priority: number;
+  paymentMethod?: "PayOS" | "Wallet"; 
 };
 
 export type OwnerPackageUpdateDto = {
