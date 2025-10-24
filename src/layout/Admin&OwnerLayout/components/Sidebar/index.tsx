@@ -78,10 +78,13 @@ const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <span
-            className={`font-bold transition-all duration-300 ${
+            className={`font-bold leading-[1.15] overflow-visible transition-all duration-300 ${
               sidebarOpen ? "text-4xl" : "text-3xl"
             }`}
-            style={{ color: PRIMARY_COLOR }}
+            style={{
+              color: PRIMARY_COLOR,
+              fontFamily: '"Fredoka One", sans-serif',
+            }}
           >
             {sidebarOpen ? "Get Sport" : ""}
           </span>

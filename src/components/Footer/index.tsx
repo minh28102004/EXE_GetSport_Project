@@ -15,9 +15,13 @@ const Footer: React.FC = () => {
       <div className="w-full px-4 sm:px-10 py-6 sm:py-8 grid grid-cols-1 md:grid-cols-4 gap-8 sm:gap-10">
         {/* Cột 1 */}
         <div>
-          <h3 className="text-xl sm:text-2xl font-extrabold text-white leading-none">
+          <h2
+            className="text-2xl sm:text-3xl font-bold text-white leading-[1.15]  overflow-visible"
+            style={{ fontFamily: '"Fredoka One", sans-serif' }}
+          >
             Get <span className="text-[#23AEB1]">Sport!</span>
-          </h3>
+          </h2>
+
           <p className="mt-3 text-sm sm:text-base text-gray-400 leading-relaxed">
             Hệ thống đặt sân cầu lông hiện đại, tiện lợi và dễ sử dụng nhất Việt
             Nam.
