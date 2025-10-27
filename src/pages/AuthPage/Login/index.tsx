@@ -214,9 +214,13 @@ const Login: React.FC<LoginProps> = ({
               <GiShuttlecock className="w-7 h-7 text-white " />
             </div>
 
-            <h1 className="text-lg md:text-xl font-bold text-white mb-1">
+            <h1
+              className="text-lg md:text-xl font-bold text-white mb-1 leading-[1.15] overflow-visible"
+              style={{ fontFamily: '"Fredoka One", sans-serif' }}
+            >
               Get Sport
             </h1>
+
             <p className="text-teal-100 text-xs md:text-sm">
               Nền tảng đặt sân cầu lông hàng đầu
             </p>

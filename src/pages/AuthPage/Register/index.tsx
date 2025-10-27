@@ -120,7 +120,10 @@ const Register: React.FC<RegisterProps> = ({
               <div className="w-14 h-14 bg-white/20 rounded-2xl transition-transform duration-300 hover:rotate-12 flex items-center justify-center mb-1.5 backdrop-blur-sm">
                 <GiShuttlecock className="w-7 h-7 text-white" />
               </div>
-              <h1 className="ml-1 text-base md:text-lg font-bold text-white">
+              <h1
+                className="ml-1 text-base md:text-lg font-bold text-white leading-[1.15] overflow-visible"
+                style={{ fontFamily: '"Fredoka One", sans-serif' }}
+              >
                 Get Sport
               </h1>
             </div>
