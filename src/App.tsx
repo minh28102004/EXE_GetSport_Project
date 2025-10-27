@@ -70,6 +70,11 @@ import MySubscriptions from "./pages/OwnerPage/OwnerPackages/MySubscriptions";
 import ResetPassword from "./pages/AuthPage/ForgotPassword/ResetPassword";
 import MyPlaymateJoins from "./pages/CustomerPage/PlaymateJoins/MyPlaymateJoins";
 import DepositSuccess from "./pages/CustomerPage/Profile/DepositSuccess";
+import WalletTransactions from "./pages/OwnerPage/WalletTransactions/WalletTransactions";
+import WalletWithdraw from "./pages/OwnerPage/WalletTransactions/WalletWithdraw";
+import WalletWithdrawalRequests from "./pages/OwnerPage/WalletTransactions/WalletWithdrawalRequests";
+import Notifications from "./pages/CommonPage/Notifications";
+import MyPlaymatePosts from "./pages/CustomerPage/MyPlaymatePosts/MyPlaymatePosts";
 
 function AppRoutes() {
   return (
@@ -90,6 +95,12 @@ function AppRoutes() {
               <CreateBlog />
           }
         />
+         <Route
+          path="/notifications"
+          element={
+              <Notifications />
+          }
+        />
         <Route
           path="/edit-blog/:id"
           element={
@@ -108,7 +119,11 @@ function AppRoutes() {
           <Route path="/booking-detail/:bookingId" element={<BookingDetail/>} />
           <Route path="/booking/callback/cancel" element={<BookingCallback />} />
            <Route path="/playjoin/my" element={<MyPlaymateJoins />} />
+           <Route path="/playPost/my" element={<MyPlaymatePosts />} />
            <Route path="/wallet/deposit-success/:orderCode" element={<DepositSuccess />} />
+           <Route path="/wallet/transactions" element={<WalletTransactions />} />
+          <Route path="/wallet/withdraw" element={<WalletWithdraw />} />
+          <Route path="/wallet/withdrawal-requests" element={<WalletWithdrawalRequests />} />
           <Route
             path={endPoint.TERMSOFSERVICE}
             element={<TermsOfServicePage />}

@@ -10,6 +10,7 @@ import {
   User,
   Sparkles,
   ChevronRight,
+  Play,
 } from "lucide-react";
 import { selectAuth } from "@redux/features/auth/authSlice";
 import { clearToken, clearProfile } from "@utils/authStorage";
@@ -58,16 +59,16 @@ const UserMenu: React.FC<UserMenuProps> = ({
   const btnRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
 
-  // helper tránh lỗi // hoặc thiếu /
+  // Helper to safely join paths
   const join = (base: string, rel: string) =>
     `${base.replace(/\/$/, "")}/${rel.replace(/^\//, "")}`;
 
-  // dùng absolute path tới /userlayout/<child>
-  const menuItems = [
+  // Define all menu items
+  const allMenuItems = [
     {
       icon: User,
       label: "Hồ sơ cá nhân",
-      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_PROFILE), // => /userlayout/profile
+      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_PROFILE),
       color: "text-gray-700",
       hoverColor: "hover:bg-blue-50 hover:text-blue-700",
       iconBg: "group-hover:bg-blue-100",
@@ -75,7 +76,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
     {
       icon: Calendar,
       label: "Lịch sử đặt sân",
-      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_HISTORY), // => /userlayout/history
+      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_HISTORY),
       color: "text-gray-700",
       hoverColor: "hover:bg-blue-50 hover:text-blue-700",
       iconBg: "group-hover:bg-blue-100",
@@ -83,7 +84,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
     {
       icon: FileText,
       label: "Bài viết đã đăng",
-      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_POSTS), // => /userlayout/posts
+      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_POSTS),
       color: "text-gray-700",
       hoverColor: "hover:bg-blue-50 hover:text-blue-700",
       iconBg: "group-hover:bg-blue-100",
@@ -91,12 +92,41 @@ const UserMenu: React.FC<UserMenuProps> = ({
     {
       icon: MessageSquare,
       label: "Đánh giá của tôi",
-      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_REVIEWS), // => /userlayout/reviews
+      to: join(endPoint.CUSTOMER_BASE, endPoint.CUSTOMER_REVIEWS),
+      color: "text-gray-700",
+      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
+      iconBg: "group-hover:bg-blue-100",
+    },
+    {
+      icon: Play,
+      label: "Yêu cầu chơi",
+      to: join("", "/playjoin/my"),
+      color: "text-gray-700",
+      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
+      iconBg: "group-hover:bg-blue-100",
+    },
+      {
+      icon: Play,
+      label: "Tìm bạn chơi",
+      to: join("", "/playPost/my"),
+      color: "text-gray-700",
+      hoverColor: "hover:bg-blue-50 hover:text-blue-700",
+      iconBg: "group-hover:bg-blue-100",
+    },
+    {
+      icon: MessageSquare,
+      label: "Thông báo",
+      to: "/notifications",
       color: "text-gray-700",
       hoverColor: "hover:bg-blue-50 hover:text-blue-700",
       iconBg: "group-hover:bg-blue-100",
     },
   ];
+
+  // Filter menu items based on role
+  const menuItems = user?.role === "Customer"
+    ? allMenuItems
+    : allMenuItems.filter((item) => (item.label === "Hồ sơ cá nhân" || item.label === "Thông báo"));
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
@@ -122,7 +152,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
 
   if (!user) return null;
 
-  // Đăng xuất: đóng dropdown, show loading 1s, rồi clear storage + refresh
+  // Logout: close dropdown, show loading for 1s, clear storage, and redirect
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -133,6 +163,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
       clearToken();
       clearProfile();
       localStorage.removeItem("persist:root");
+      sessionStorage.removeItem("auth_profile"); // Clear auth_profile for consistency
     } finally {
       window.location.replace(endPoint.HOMEPAGE);
     }
@@ -206,8 +237,8 @@ const UserMenu: React.FC<UserMenuProps> = ({
             )}
           </div>
 
-          {/* Tên ngắn gọn + ellipsis giữa + title đầy đủ */}
-           <span
+          {/* Shortened name + ellipsis + full name tooltip */}
+          <span
             className={`${
               showNameOnMobile ? "" : "hidden md:block"
             } text-[15px] font-medium max-w-[180px] truncate ${

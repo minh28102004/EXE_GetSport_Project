@@ -24,7 +24,7 @@ const MenuItemButton: React.FC<MenuItemButtonProps> = ({
       className={`group flex w-full items-center justify-start p-3 mb-2 rounded-lg transition-all duration-300
         ${
           isActive
-            ? "bg-[#1e9ea1] text-white shadow-sm"
+            ? "bg-[#1e9ea1] shadow-sm"
             : "text-gray-700 hover:bg-[#1e9ea1]/15 hover:text-[#1e9ea1]"
         }
         focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300`}

@@ -231,7 +231,7 @@ const AdminDashboard: React.FC = () => {
                       (item.key === "year" && dateRange.startDate.getMonth() === 0 && 
                        dateRange.startDate.getDate() === 1 && 
                        dateRange.startDate.getFullYear() === dateRange.endDate.getFullYear())))
-                    ? "bg-[#23AEB1]shadow-md"
+                    ? "bg-[#23AEB1] text-[#23AEB1] shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >

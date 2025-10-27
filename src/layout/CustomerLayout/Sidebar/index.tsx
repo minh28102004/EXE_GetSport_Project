@@ -1,4 +1,3 @@
-// layout/CustomerLayout/Sidebar.tsx
 import React from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ChevronRight, ArrowLeft, LogOut } from "lucide-react";
@@ -10,10 +9,10 @@ import useIsLg from "@hooks/useIsLg";
 import endPoint from "@/routes/router";
 import { useDispatch } from "react-redux";
 import { logout } from "@redux/features/auth/authSlice";
-import LoadingSpinner from "@components/Loading_Spinner"; // ⬅️ dùng spinner bạn đưa
+import LoadingSpinner from "@components/Loading_Spinner"; 
 
 /* ================= Types ================= */
-export type TabId = "profile" | "history" | "posts" | "reviews" | "playjoin";
+export type TabId = "profile" | "history" | "posts" | "reviews" | "playjoin" | "notifications" | "playPost";
 export type NavItem = {
   id: TabId;
   label: string;
@@ -158,7 +157,6 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         }`}
       >
         {loading ? (
-          // dùng spinner của bạn — inline + chỉnh size & màu
           <LoadingSpinner
             inline
             size="5"
@@ -218,9 +216,26 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({
     !initialCollapsed
   );
   const [mobileOpen, setMobileOpen] = React.useState<boolean>(false);
-
-  // trạng thái logout loading
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
+
+  // Load user data from session storage
+  const [user, setUser] = React.useState<{ role: string } | null>(null);
+
+  React.useEffect(() => {
+    const storedAuth = sessionStorage.getItem("auth_profile");
+    if (storedAuth) {
+      try {
+        const parsedAuth = JSON.parse(storedAuth);
+        setUser({ role: parsedAuth.user?.role || "Customer" });
+      } catch (error) {
+        console.error("Failed to parse auth_profile from session storage:", error);
+        setUser({ role: "Customer" });
+      }
+    } else {
+      setUser({ role: "Customer" });
+    }
+  }, []);
+
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
   const handleLogout = async () => {
@@ -231,7 +246,7 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({
       dispatch(logout());
       navigate(endPoint.HOMEPAGE, { replace: true });
     } finally {
-      // điều hướng rồi nên không cần set lại state
+      // Navigation has occurred, no need to reset state
     }
   };
 
@@ -255,6 +270,33 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({
 
   const showLabel = (isLg && sidebarOpen) || !isLg;
   const collapsedDesktop = isLg && !sidebarOpen;
+
+  // Filter navigation items based on role
+  const filteredItems = user?.role === "Customer"
+    ? items
+    : items.filter((item) => item.id === "profile");
+
+  // Determine navigation path for the back button
+  const getBackPath = () => {
+    switch (user?.role) {
+      case "Owner":
+        return "/layoutOwner/Dashboard";
+      case "Admin":
+        return "/layoutAdmin/Dashboard";
+      default:
+        return endPoint.HOMEPAGE;
+    }
+  };
+
+  const getBackLabel = () => {
+    switch (user?.role) {
+      case "Owner":
+      case "Admin":
+        return "Quay lại quản trị";
+      default:
+        return "Quay lại trang chủ";
+    }
+  };
 
   const asideAnim: TargetAndTransition = isLg
     ? {
@@ -382,7 +424,7 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({
             animate="show"
             variants={containerVariants}
           >
-            {items.map((it) => (
+            {filteredItems.map((it) => (
               <motion.div key={it.id} variants={itemVariants}>
                 <MenuItemButton
                   item={it}
@@ -400,14 +442,14 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({
           <div className="px-3 pb-3 pt-2 mt-auto space-y-2 border-t border-gray-100">
             <ActionButton
               icon={ArrowLeft}
-              label="Quay lại trang chủ"
-              onClick={() => navigate(endPoint.HOMEPAGE)}
+              label={getBackLabel()}
+              onClick={() => navigate(getBackPath())}
               collapsedDesktop={collapsedDesktop}
             />
             <ActionButton
               icon={LogOut}
               label="Đăng xuất"
-              loading={isLoggingOut} // dùng spinner của bạn
+              loading={isLoggingOut}
               loadingLabel="Đang đăng xuất…"
               onClick={handleLogout}
               collapsedDesktop={collapsedDesktop}

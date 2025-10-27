@@ -127,7 +127,7 @@ const MySubscriptions: React.FC = () => {
       <section className="relative py-8 bg-white border-b border-gray-200">
         <div className="mx-auto w-full max-w-7xl px-6 md:px-8">
           <h2 className="font-bold text-3xl md:text-4xl text-gray-900 mb-3">Danh Sách Đăng Ký Của Bạn</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">Xem và quản lý các gói dịch vụ owner mà bạn đã đăng ký.</p>
+          <p className="text-lg text-gray-600 max-w-3xl">Xem và quản lý các gói dịch vụ owner mà bạn đã đăng ký.</p>
         </div>
       </section>
 

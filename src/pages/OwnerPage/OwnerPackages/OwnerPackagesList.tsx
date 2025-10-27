@@ -81,8 +81,8 @@ const OwnerPackagesList: React.FC = () => {
       {/* Title Section */}
       <section className="relative py-8 text-center">
         <div className="mx-auto w-full max-w-7xl px-5 md:px-8">
-          <h2 className="font-bold text-3xl md:text-4xl text-gray-900 mb-4">Gói Dịch Vụ Owner</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">Chọn gói phù hợp để nâng cấp tài khoản owner của bạn.</p>
+          <h2 className="font-bold text-3xl md:text-4xl text-gray-900 mb-4">Gói Dịch Vụ</h2>
+          <p className="text-lg text-gray-600 max-w-2xl">Chọn gói phù hợp để nâng cấp tài khoản owner của bạn.</p>
         </div>
       </section>
 

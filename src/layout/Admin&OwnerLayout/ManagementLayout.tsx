@@ -10,6 +10,9 @@ import {
   Star,
   MessageSquare,
   Settings,
+  User2Icon,
+  BellRing,
+  Wallet2,
 } from "lucide-react";
 
 const ManagementLayout: React.FC<{ user?: any; role?: "admin" | "owner" }> = ({
@@ -116,6 +119,21 @@ const ManagementLayout: React.FC<{ user?: any; role?: "admin" | "owner" }> = ({
             path: "/layoutAdmin/UserManagement",
             icon: <Users size={24} />,
           },
+           {
+            name: "Yêu cầu rút tiền",
+            path: "/wallet/withdrawal-requests",
+            icon: <Wallet2 size={24} />,
+          },
+          {
+            name: "Hồ sơ cá nhân",
+            path: "/customerlayout/profile",
+            icon: <User2Icon size={24} />,
+          },
+           {
+            name: "Thông báo",
+            path: "/notifications",
+            icon: <BellRing size={24} />,
+          },
         ]
       : [
           {
@@ -148,10 +166,20 @@ const ManagementLayout: React.FC<{ user?: any; role?: "admin" | "owner" }> = ({
             path: "/layoutOwner/my-subscriptions",
             icon: <MessageSquare size={24} />,
           },
+           {
+            name: "Yêu cầu rút tiền",
+            path: "/wallet/transactions",
+            icon: <Wallet2 size={24} />,
+          },
+           {
+            name: "Hồ sơ cá nhân",
+            path: "/customerlayout/profile",
+            icon: <User2Icon size={24} />,
+          },
           {
-            name: "Cài đặt",
-            path: "/layoutOwner/Settings",
-            icon: <Settings size={24} />,
+            name: "Thông báo",
+            path: "/notifications",
+            icon: <BellRing size={24} />,
           },
         ];
 

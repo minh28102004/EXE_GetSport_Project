@@ -228,7 +228,7 @@ const OwnerDashboard: React.FC = () => {
                     onClick={() => handlePresetFilter(item.key)}
                     className={`px-3 py-2 text-xs rounded-lg font-medium transition-all ${
                       isActive
-                        ? "bg-[#23AEB1] text-white shadow-md"
+                        ? "bg-[#23AEB1] text-[#23AEB1] shadow-md"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >

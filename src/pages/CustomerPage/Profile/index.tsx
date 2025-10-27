@@ -244,7 +244,7 @@ const Profile: React.FC = () => {
         </div>
 
         <div className="px-6 lg:px-8 pb-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-12">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 mt-6">
             <div className="relative shrink-0">
               <img
                 src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
@@ -267,7 +267,6 @@ const Profile: React.FC = () => {
               <p className="text-gray-500 text-sm mb-3">{account?.email || "—"}</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-2">
-                {/* ✅ WALLET BALANCE TỪ API WALLET */}
                 <div className="text-center sm:text-left">
                   <div className="text-2xl font-bold text-[#23AEB1]">
                     {fmtMoney(account.walletBalance)}
