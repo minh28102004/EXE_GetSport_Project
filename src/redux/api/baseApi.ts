@@ -14,10 +14,10 @@ const PROD_BASE =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(
     /\/+$/,
     ""
-  ) || "https://getsport.3docorp.vn/api";
+  ) || "https://getsport.3docorp.vn/api"; 
 
 const API_BASE =
-  (import.meta.env.DEV ? "/api" : PROD_BASE).replace(/\/+$/, "") + "/";
+  (PROD_BASE).replace(/\/+$/, "") + "/";
 
 // Bỏ dấu "/" đầu ở url tương đối (an toàn khi lỡ viết "/Auth/login")
 const normalizeArgs = (args: string | FetchArgs): string | FetchArgs => {
