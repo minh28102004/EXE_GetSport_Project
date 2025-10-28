@@ -107,13 +107,13 @@ function AppRoutes() {
               <EditBlog />
           }
         />
-          <Route path="Auth/verify" element={<VerifyAccount />} />
-          <Route path="Auth/reset-password" element={<ResetPassword />} />
+          <Route path="/Auth/verify" element={<VerifyAccount />} />
+          <Route path="/Auth/reset-password" element={<ResetPassword />} />
           <Route path="/blogPost/:id" element={<BlogDetail />} />
           <Route path="/playPost" element={<PlaymatePostList />} />
           <Route path="/playPost/:id" element={<PlaymatePostDetail />} />
-          <Route path="Court/detail/:courtId" element={<CourtDetail />} />
-          <Route path="Court/booking/:courtId" element={<CourtBookingPay />} />
+          <Route path="/Court/detail/:courtId" element={<CourtDetail />} />
+          <Route path="/Court/booking/:courtId" element={<CourtBookingPay />} />
           <Route path="/booking/callback/success" element={<BookingCallback />} />
           <Route path="/booking-history" element={<BookingHistory />} />
           <Route path="/booking-detail/:bookingId" element={<BookingDetail/>} />
